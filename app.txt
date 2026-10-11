@@ -1,0 +1,1015 @@
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"></head><body><title>슬기로운 라운드</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Sans+KR:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: one phone column with three tabs pinned on top — "다음 라운드" is the hub where the round is chosen once; "가는 길" and "스코어·정산" read from it */
+:root{
+  --bg:#EEF2EC;        /* fairway at dawn */
+  --surface:#FFFFFF;
+  --ink:#15302A;       /* deep pine */
+  --muted:#5C6F68;
+  --line:#D5DED7;
+  --fairway:#2E7A4E;
+  --flag:#F2C230;      /* pin flag */
+  --flag-ink:#2A2205;
+  --board:#15302A;
+  --board-ink:#F4F7F2;
+  --board-muted:#A8BDB3;
+  --chip:#E3EAE4;
+  --under:#2E7A4E;     /* circle: under par */
+  --over:#B4532A;      /* square: over par */
+  --font-display:"Barlow Condensed","Arial Narrow",system-ui,sans-serif;
+  --font-body:"IBM Plex Sans KR","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
+  --r:14px;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0D1614;--surface:#15211E;--ink:#E8EFEA;--muted:#93A79E;--line:#26352F;
+    --fairway:#5DBB84;--flag:#F2C230;--flag-ink:#2A2205;--board:#1C2D28;--board-ink:#F4F7F2;--board-muted:#93A79E;--chip:#1F2E29;
+    --under:#6CCB93;--over:#E9875C;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0D1614;--surface:#15211E;--ink:#E8EFEA;--muted:#93A79E;--line:#26352F;
+  --fairway:#5DBB84;--flag:#F2C230;--flag-ink:#2A2205;--board:#1C2D28;--board-ink:#F4F7F2;--board-muted:#93A79E;--chip:#1F2E29;
+  --under:#6CCB93;--over:#E9875C;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+.wrap>*{min-width:0;max-width:100%}
+section.wrap{width:100%}
+.row2>*,.names>*,.go>*,.move>*,.card>*{min-width:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--font-body);font-size:15px;line-height:1.5;padding:0 16px 40px}
+.wrap{max-width:520px;margin:0 auto;display:flex;flex-direction:column;gap:14px}
+.tabs{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);padding-block:12px 10px;display:flex;flex-direction:column;gap:8px}
+.brand{display:flex;justify-content:space-between;align-items:baseline;gap:8px;flex-wrap:wrap}
+.brand b{font-size:15px}
+.beta{display:inline-block;font-size:11.5px;font-weight:600;padding:2px 8px;border-radius:999px;background:var(--flag);color:var(--flag-ink);margin-left:6px;vertical-align:1px}
+.tag{font-size:12px;color:var(--muted)}
+.seg{display:grid;grid-template-columns:repeat(3,1fr);background:var(--chip);border-radius:999px;padding:4px;gap:4px}
+.seg button{appearance:none;border:0;background:transparent;color:var(--ink);font:600 14px var(--font-body);padding:9px 4px;border-radius:999px;cursor:pointer}
+.seg button[aria-selected="true"]{background:var(--surface);box-shadow:0 1px 2px rgba(0,0,0,.12)}
+.sample{font-size:13px;background:var(--chip);border-radius:12px;padding:10px 12px;display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+
+.btn{appearance:none;border:0;border-radius:999px;padding:10px 16px;font:600 14px var(--font-body);cursor:pointer;display:inline-flex;align-items:center;gap:6px;text-decoration:none}
+.btn-flag{background:var(--flag);color:var(--flag-ink)}
+.btn-plain{background:var(--chip);color:var(--ink)}
+.btn-ghost{background:transparent;color:var(--board-ink);box-shadow:inset 0 0 0 1.5px var(--board-muted)}
+button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--flag);outline-offset:2px}
+.share{display:flex;gap:8px;flex-wrap:wrap}
+
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px;display:flex;flex-direction:column;gap:12px}
+.card h2{font-size:13px;color:var(--muted);margin:0;font-weight:600;letter-spacing:.04em}
+.q{display:flex;flex-direction:column;gap:6px}
+.ql{font-size:13px;font-weight:600}
+.note{font-size:12.5px;color:var(--muted);margin:0}
+.quick{display:flex;gap:6px;flex-wrap:wrap}
+.chip{appearance:none;border:1.5px solid transparent;background:var(--chip);color:var(--ink);border-radius:999px;padding:7px 13px;font:500 14px var(--font-body);cursor:pointer;font-variant-numeric:tabular-nums}
+.chip[aria-pressed="true"]{background:var(--fairway);color:#fff;border-color:var(--fairway)}
+input[type=text],input[type=date],input[type=time],input[type=number],select{font:500 16px var(--font-body);color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px 12px;width:100%;min-width:0}
+input[type=time],input[type=number]{font-family:var(--font-display);font-size:22px;font-weight:600;padding:6px 12px;font-variant-numeric:tabular-nums}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.row2 input[type=time],.row2 input[type=date]{font:600 16px var(--font-body);padding:10px 8px}
+.names{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+
+/* hub */
+.ask{font-size:24px;font-weight:700;margin:4px 0 0;text-wrap:balance}
+.move{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.move button{appearance:none;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);border-radius:12px;padding:10px 6px;font:600 14px var(--font-body);cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px}
+.move button span{font:500 11.5px var(--font-body);color:var(--muted)}
+.move button[aria-pressed="true"]{border-color:var(--fairway);background:var(--chip)}
+.who{display:flex;flex-direction:column;gap:6px}
+.who label{display:flex;gap:10px;align-items:center;padding:8px 12px;border-radius:10px;background:var(--bg);font-weight:600;cursor:pointer}
+.who input{width:20px;height:20px;accent-color:var(--fairway)}
+.agree{display:grid;grid-template-columns:auto 1fr;gap:10px;align-items:start;font-size:13.5px;font-weight:600;padding:10px 12px;border-radius:12px;background:var(--bg);cursor:pointer}
+.agree input{width:20px;height:20px;margin-top:1px;accent-color:var(--fairway)}
+.go{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.go button{appearance:none;border:0;border-radius:var(--r);padding:14px;text-align:left;cursor:pointer;display:flex;flex-direction:column;gap:2px;font-family:var(--font-body)}
+.go .g1{background:var(--board);color:var(--board-ink)}
+.go .g2{background:var(--surface);color:var(--ink);box-shadow:inset 0 0 0 1px var(--line)}
+.go small{font-size:12px;opacity:.8}
+.go b{font-family:var(--font-display);font-size:30px;line-height:1.05;font-variant-numeric:tabular-nums}
+.go span{font-size:13px;font-weight:600}
+.recap{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:4px;font-size:14px}
+.recap li{display:grid;grid-template-columns:64px 1fr;gap:8px}
+.recap li span:first-child{color:var(--muted);font-size:13px}
+.pickbtn{appearance:none;text-align:left;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:10px;padding:10px 12px;font:600 16px var(--font-body);cursor:pointer;display:flex;justify-content:space-between;gap:8px;align-items:center}
+.pickbtn span{font-weight:500;font-size:13px;color:var(--muted)}
+.picker{display:flex;flex-direction:column;gap:12px;padding:12px;border-radius:12px;background:var(--bg)}
+.picker input[type=search]{font:500 16px var(--font-body);color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px 12px;width:100%}
+.regions{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.regions button{appearance:none;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:10px;padding:10px 6px;font:600 14px var(--font-body);cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:1px}
+.regions button span{font:500 11.5px var(--font-body);color:var(--muted)}
+.regions button[aria-pressed="true"]{border-color:var(--fairway);box-shadow:inset 0 0 0 1px var(--fairway)}
+.regions button:disabled{opacity:.5;cursor:default}
+.clist{display:flex;flex-direction:column;gap:6px}
+.clist button{appearance:none;text-align:left;border:0;background:var(--surface);color:var(--ink);border-radius:10px;padding:10px 12px;font:600 15px var(--font-body);cursor:pointer;display:flex;justify-content:space-between;gap:8px}
+.clist button span{font-weight:500;font-size:12.5px;color:var(--muted)}
+
+/* arrival */
+.board{background:var(--board);color:var(--board-ink);border-radius:18px;padding:18px;display:flex;flex-direction:column;gap:10px}
+.board .lbl{font-size:12px;color:var(--board-muted);letter-spacing:.08em}
+.depart{font-family:var(--font-display);font-weight:700;font-size:72px;line-height:.95;font-variant-numeric:tabular-nums}
+.depart small{font-size:22px;font-weight:600;margin-left:6px;color:var(--flag)}
+.board .sum{font-size:14px;color:var(--board-muted)}
+.board .sum b{color:var(--board-ink);font-weight:600}
+.tl{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
+.tl li{display:grid;grid-template-columns:60px 18px 1fr;align-items:start;gap:8px;min-height:44px}
+.tl .t{font-family:var(--font-display);font-weight:600;font-size:22px;line-height:1.1;font-variant-numeric:tabular-nums;text-align:right}
+.tl .dot{position:relative;height:100%;display:flex;justify-content:center}
+.tl .dot::before{content:"";position:absolute;top:14px;bottom:-4px;width:2px;background:var(--line)}
+.tl li:last-child .dot::before{display:none}
+.tl .dot i{position:relative;width:12px;height:12px;border-radius:50%;margin-top:6px;background:var(--surface);border:2.5px solid var(--fairway)}
+.tl li.stop .dot i{border-color:var(--flag);background:var(--flag)}
+.tl li.tee .dot i{background:var(--fairway)}
+.tl li.meal .dot i{border-color:var(--flag);background:var(--flag)}
+.tl li.sub .t{font-size:17px;color:var(--muted)}
+.tl li.sub .dot i{width:8px;height:8px;border-width:2px;border-color:var(--muted)}
+.tl .what{min-width:0;padding-bottom:10px}
+.tl .what b{display:block;font-weight:600}
+.tl .what span{font-size:13px;color:var(--muted)}
+.tl .what a{font-size:13px;color:var(--fairway);font-weight:600;text-decoration:none}
+.stepper{display:flex;align-items:center;gap:6px}
+.stepper button{width:40px;height:40px;border-radius:50%;border:1px solid var(--line);background:var(--bg);color:var(--ink);font-size:20px;cursor:pointer}
+.stepper output{font-family:var(--font-display);font-size:26px;font-weight:600;min-width:72px;text-align:center;font-variant-numeric:tabular-nums}
+.list{display:flex;flex-direction:column;gap:8px}
+.item{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;padding:10px 12px;border-radius:12px;background:var(--bg)}
+.item input[type=checkbox]{width:20px;height:20px;accent-color:var(--fairway)}
+.item .nm{font-weight:600}
+.item .nm span{display:block;font-weight:400;font-size:12px;color:var(--muted)}
+.item select{font-size:14px;padding:6px 8px;width:auto}
+.pk{display:flex;flex-direction:column;gap:8px;padding:12px;border-radius:12px;background:var(--bg)}
+.pk b{font-weight:600}
+.toggle{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;padding:12px 14px;border-radius:12px;background:var(--surface);border:1px solid var(--line);cursor:pointer}
+.toggle b{display:block;font-weight:600}
+.toggle span{font-size:12.5px;color:var(--muted)}
+.toggle input{width:22px;height:22px;accent-color:var(--fairway)}
+.check{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:1fr 1fr;gap:6px 12px}
+.check label{display:flex;gap:8px;align-items:center;font-size:14px;cursor:pointer}
+.check input{width:18px;height:18px;accent-color:var(--fairway)}
+
+/* score */
+.holehead{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.holeno{font-family:var(--font-display);font-weight:700;font-size:44px;line-height:1;font-variant-numeric:tabular-nums}
+.holeno small{font-size:18px;color:var(--muted);font-weight:600;margin-left:8px}
+.nav{display:flex;gap:6px}
+.nav button{width:44px;height:44px;border-radius:50%;border:1px solid var(--line);background:var(--bg);color:var(--ink);font-size:20px;cursor:pointer}
+.nav button:disabled{opacity:.35;cursor:default}
+.players{display:flex;flex-direction:column;gap:8px}
+.pl{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;padding:10px 12px;border-radius:12px;background:var(--bg)}
+.pl .who2{font-weight:600;min-width:0;overflow-wrap:anywhere}
+.pl .who2 span{display:block;font-weight:500;font-size:12.5px;color:var(--muted)}
+.pl .who2 span.u{color:var(--under)}
+.pl .who2 span.o{color:var(--over)}
+.step{display:flex;align-items:center;gap:6px}
+.step button{width:42px;height:42px;border-radius:50%;border:1px solid var(--line);background:var(--surface);color:var(--ink);font-size:20px;cursor:pointer}
+.step output{font-family:var(--font-display);font-size:30px;font-weight:700;min-width:40px;text-align:center;font-variant-numeric:tabular-nums}
+.sc-wrap{overflow-x:auto;margin-inline:-4px;padding-inline:4px}
+table.sc{border-collapse:collapse;font-variant-numeric:tabular-nums;font-size:14px;min-width:100%}
+.sc th,.sc td{text-align:center;padding:6px 4px;border-bottom:1px solid var(--line);min-width:30px}
+.sc th{font-size:12px;color:var(--muted);font-weight:600}
+.sc th.nm,.sc td.nm{text-align:left;position:sticky;left:0;background:var(--surface);min-width:72px;padding-right:8px;font-weight:600;font-size:13px}
+.sc td.sub,.sc th.sub{background:var(--bg);font-weight:700}
+.sc tr.par td{color:var(--muted);font-size:13px}
+.sc td.cur,.sc th.cur{box-shadow:inset 0 -2px 0 var(--flag)}
+.sc .mk{display:inline-flex;width:26px;height:26px;align-items:center;justify-content:center;line-height:1}
+.sc .mk.b{border:1.5px solid var(--under);border-radius:50%;color:var(--under)}
+.sc .mk.e{border:3px double var(--under);border-radius:50%;color:var(--under)}
+.sc .mk.bo{border:1.5px solid var(--over);color:var(--over)}
+.sc .mk.db{border:3px double var(--over);color:var(--over)}
+.sc button.cell{appearance:none;border:0;background:transparent;font:inherit;color:inherit;cursor:pointer;padding:0}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--muted);align-items:center}
+.legend i{display:inline-block;width:14px;height:14px;vertical-align:-2px;margin-right:4px}
+.legend i.b{border:1.5px solid var(--under);border-radius:50%}
+.legend i.bo{border:1.5px solid var(--over)}
+.parset{display:grid;grid-template-columns:repeat(9,minmax(0,1fr));gap:4px}
+.parset button{appearance:none;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:8px;padding:6px 0;font:600 15px var(--font-display);cursor:pointer;display:flex;flex-direction:column;align-items:center;line-height:1.1}
+.parset button span{font:500 10px var(--font-body);color:var(--muted)}
+.settle{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.settle li{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:baseline;padding:10px 12px;border-radius:12px;background:var(--bg)}
+.settle .nm{font-weight:600;min-width:0;overflow-wrap:anywhere}
+.settle .amt{font-family:var(--font-display);font-size:26px;font-weight:700;font-variant-numeric:tabular-nums}
+.settle .amt.plus{color:var(--under)}
+.settle .amt.minus{color:var(--over)}
+.settle .nm small{display:block;font-weight:500;font-size:12.5px;color:var(--muted)}
+.hs{display:flex;flex-direction:column;gap:8px;padding-top:4px;border-top:1px dashed var(--line)}
+.hs-top{display:flex;justify-content:space-between;align-items:baseline;gap:8px;padding-top:8px}
+.hs-top span{font-size:13px;font-weight:600;color:var(--over)}
+.rules{font-size:13.5px;background:var(--bg);border-radius:10px;padding:10px 12px;display:flex;justify-content:space-between;gap:8px;align-items:center;flex-wrap:wrap}
+details.card summary{cursor:pointer;font-weight:600;font-size:14px;list-style:none;display:flex;justify-content:space-between}
+details.card summary::after{content:"＋";color:var(--muted)}
+details.card[open] summary::after{content:"－"}
+.confirm{display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:13.5px;background:var(--bg);border-radius:10px;padding:10px 12px}
+.copybox{width:100%;font:13px/1.5 var(--font-body);min-height:110px;border:1px solid var(--line);border-radius:10px;padding:10px;background:var(--bg);color:var(--ink)}
+.games{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.games button{appearance:none;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);border-radius:12px;padding:10px 4px;font:600 15px var(--font-body);cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:1px}
+.games button span{font:500 11.5px var(--font-body);color:var(--muted)}
+.games button[aria-pressed="true"]{border-color:var(--fairway);background:var(--chip)}
+.games button:disabled{opacity:.5;cursor:default}
+.gdesc{background:var(--bg);border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:6px}
+.gdesc b{font-size:16px}
+.gdesc ol{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:4px;font-size:14px}
+.skrow{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin:4px 0}.skrow b{min-width:72px;font-size:14px}
+.gctl{display:flex;flex-direction:column;gap:6px;padding:10px 12px;border-radius:12px;background:var(--bg)}
+.bonus{display:flex;flex-direction:column;gap:8px}
+.bnrow{display:grid;grid-template-columns:72px 1fr;gap:6px 8px;align-items:center;padding:8px 10px;border-radius:10px;background:var(--bg)}
+.bnrow b{font-size:14px}
+.bnrow .quick .chip{padding:5px 10px;font-size:13px}
+.bnval{grid-column:2;display:flex;align-items:center;gap:6px}
+.bnval input{max-width:140px;font-size:18px!important;padding:4px 10px!important}
+.bnval span{font-size:13px;color:var(--muted)}
+.sticks{display:flex;gap:10px;justify-content:center;padding:6px 0}
+.stick{appearance:none;width:44px;height:132px;border-radius:22px;border:2px solid #CBB98F;background:#EAD9B0;color:#5A4A26;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:10px 2px 8px;font:600 12px var(--font-body);box-shadow:0 2px 0 #CBB98F}
+.stick i{font-style:normal;font-size:18px;font-weight:700}
+.stick span{font-size:11px;line-height:1.1;word-break:keep-all;text-align:center}
+.stick.taken{opacity:.55;transform:translateY(6px)}
+.stick.open{opacity:1;transform:none;background:linear-gradient(to bottom,var(--c) 0 55%,#EAD9B0 55%);border-color:var(--c);color:#5A4A26}
+.stick.open i{color:#fff;font-size:13px}
+.stick:disabled{cursor:default}
+.pl2{grid-template-columns:1fr auto;row-gap:8px}
+.pl2 .cur{font-family:var(--font-display);font-size:28px;font-weight:700;min-width:44px;text-align:right;font-variant-numeric:tabular-nums}
+.pl2 .cur.u{color:var(--under)}.pl2 .cur.o{color:var(--over)}
+.dots{grid-column:1/-1;display:grid;grid-template-columns:repeat(9,minmax(0,1fr));gap:3px}
+.dot{appearance:none;width:100%;height:38px;border-radius:999px;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);font:600 14px var(--font-display);cursor:pointer;padding:0;font-variant-numeric:tabular-nums}
+.dot.du{color:var(--under)}.dot.do{color:var(--over)}
+.dot.de{border-color:var(--ink)}
+.dot.on.du{background:var(--under);border-color:var(--under);color:#fff}
+.dot.on.de{background:var(--ink);border-color:var(--ink);color:var(--bg)}
+.dot.on.do{background:var(--over);border-color:var(--over);color:#fff}
+.dot:disabled{opacity:.25;cursor:default}
+.chem{background:var(--board);color:var(--board-ink);border-radius:var(--r);padding:16px;display:flex;flex-direction:column;gap:8px}
+.chem b{font-size:16px}
+.chem span{font-size:13.5px;color:var(--board-muted)}
+.chem .btn{align-self:flex-start;opacity:.85}
+.chem .btn:disabled{cursor:default}
+.chem small{font-size:11.5px;color:var(--board-muted)}
+#cityBox,#regionList,#courseBtn{scroll-margin-top:140px}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:999px;font-size:14px;font-weight:600;z-index:10}
+</style>
+
+<div class="wrap">
+  <div class="tabs">
+    <div class="brand"><b>슬기로운 라운드<span class="beta">시험판</span></b><span class="tag">이 기기에만 저장 · 돈은 계산만</span></div>
+    <div class="seg" role="tablist" aria-label="화면">
+      <button type="button" role="tab" id="tab-plan" data-tab="plan">다음 라운드</button>
+      <button type="button" role="tab" id="tab-go" data-tab="go">가는 길</button>
+      <button type="button" role="tab" id="tab-score" data-tab="score">스코어·정산</button>
+    </div>
+  </div>
+
+  <div class="sample" id="sampleBar" hidden>
+    <span>예시 라운드예요. 바꿔 보거나 새로 시작하세요.</span>
+    <button class="btn btn-plain" type="button" data-act="new">새 라운드 시작</button>
+  </div>
+
+  <!-- ===================== 다음 라운드 ===================== -->
+  <section id="view-plan" role="tabpanel" aria-labelledby="tab-plan" class="wrap">
+    <h1 class="ask">공치러 어디 가요?</h1>
+    <div class="card" id="levelAsk" hidden><b>골프 실력이 어느 정도예요?</b><span class="note">처음 한 번만 물어봐요. 준비물과 안내를 맞춰 드려요. 나중에 "가는 길"에서 바꿀 수 있어요.</span><div class="quick" id="levelChips"></div></div>
+    <div class="chem">
+      <b>공 치기 전에, 동반자 케미 한번 볼까요?</b>
+      <span>골프 유형 검사를 하고 서로 어떤 스타일인지 맞춰 보세요. 같이 치는 사람을 알면 라운드가 더 재밌어져요.</span>
+      <button type="button" class="btn btn-plain" disabled>골프 유형 검사 · 준비 중</button>
+      <small>19세 이상만 할 수 있어요.</small>
+    </div>
+
+    <div class="card">
+      <div class="q"><span class="ql">골프장</span>
+        <button type="button" class="pickbtn" data-act="togglePicker" id="courseBtn" aria-expanded="false"></button>
+        <div id="nineBox" class="q"></div>
+        <div id="picker" class="picker" hidden>
+          <input type="search" id="cq" autocomplete="off" placeholder="골프장 이름 검색 (예: 사천)" aria-label="골프장 이름 검색">
+          <div id="cResults" class="clist"></div>
+          <div id="recentBox" class="q"></div>
+          <div class="q"><span class="ql">지역에서 찾기</span><div class="regions" id="regions"></div></div>
+          <div id="cityBox" class="quick"></div><div id="regionList" class="clist"></div>
+          <div class="q"><span class="note">목록에 없으면 이름만 적고 파는 스코어 화면에서 맞춰요.</span><input type="text" id="course" autocomplete="off" placeholder="골프장 이름 직접 입력"></div>
+        </div>
+      </div>
+      <div class="row2">
+        <div class="q"><label class="ql" for="date">날짜</label><input type="date" id="date"></div>
+        <div class="q"><label class="ql" for="tee">티오프</label><input type="time" id="tee"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>같이 치는 사람</h2>
+      <div class="names" id="names"></div>
+      <p class="note">첫 칸이 나예요. 3·4번째는 비우면 빠져요.</p>
+    </div>
+
+    <div class="card">
+      <h2>어떻게 가요?</h2>
+      <div class="move" id="move"></div>
+      <div class="who" id="pickWho" hidden></div>
+    </div>
+
+    <div class="card">
+      <h2>내기 게임</h2>
+      <div class="games" id="games"></div>
+      <div id="betBox" class="q" hidden>
+        <div class="gdesc" id="gdesc"></div>
+        <div id="amtBox" class="q"></div>
+        <div class="q" id="skipRow"><span class="ql">첫 홀 · 마지막 홀</span><div class="quick" id="skipChips"></div><p class="note" id="skipNote">기본은 모든 홀 내기해요. 안 함을 고른 홀은 스코어만 적어요.</p></div>
+        <div id="tadOpts" class="q">
+          <div class="q"><span class="ql">배판 조건</span><div class="quick" id="bpChips"></div><p class="note">눌러서 켜고 끌 수 있어요.</p></div>
+          <div class="q" id="bpWhenRow"><span class="ql">배판 방식</span><div class="quick" data-g="bpWhen"></div><div class="quick" data-g="stack" style="margin-top:8px"></div><p class="note" id="bpWhenNote"></p></div>
+          <div class="q"><span class="ql">버디·이글·홀인원 보너스</span><div class="bonus"><div class="bnrow"><b>버디</b><div class="quick" id="bm-birdie"></div><div class="bnval" id="bvw-birdie"><input type="number" id="bv-birdie" data-bv="birdie" inputmode="numeric" min="0" step="1" aria-label="버디 값"><span id="bu-birdie"></span></div></div><div class="bnrow"><b>퍼트 이글</b><div class="quick" id="bm-putt"></div><div class="bnval" id="bvw-putt"><input type="number" id="bv-putt" data-bv="putt" inputmode="numeric" min="0" step="1" aria-label="퍼트 이글 값"><span id="bu-putt"></span></div></div><div class="bnrow"><b>샷 이글</b><div class="quick" id="bm-shot"></div><div class="bnval" id="bvw-shot"><input type="number" id="bv-shot" data-bv="shot" inputmode="numeric" min="0" step="1" aria-label="샷 이글 값"><span id="bu-shot"></span></div></div><div class="bnrow"><b>홀인원</b><div class="quick" id="bm-hio"></div><div class="bnval" id="bvw-hio"><input type="number" id="bv-hio" data-bv="hio" inputmode="numeric" min="0" step="1" aria-label="홀인원 값"><span id="bu-hio"></span></div></div></div><p class="note">타 더: 그 사람과 비교할 때 타당 몇 개 더 · 금액: 나머지 각자에게서 받기. 둘 다 보너스면 차이만큼만.</p></div>
+        </div>
+        <div id="nearOpts" class="q" hidden><span class="ql">파3 니어가 없으면</span><div class="quick" data-g="nearMode"></div><span class="note" id="nearInfo"></span></div>
+        <div id="drawOpts" class="q" hidden><span class="ql">뽑기 방법</span><div class="quick" data-g="drawMode"></div><p class="note" id="drawNote"></p></div>
+        <div id="vtOpts" class="q" hidden><span class="ql">비기면</span><div class="quick" data-g="vtie"></div><p class="note" id="vtNote"></p></div>
+        <div id="jkOpts" class="q" hidden><span class="ql">조커 뽑은 사람 타수</span><div class="quick" data-g="joker"></div><p class="note" id="jkNote"></p></div>
+        <div id="hzOpts" class="q" hidden><span class="ql">돈 방식</span><div class="quick" data-g="hzMode"></div><p class="note" id="hzNote"></p><span class="ql">후세인 정하기</span><div class="quick" data-g="hrank"></div><p class="note" id="hrNote"></p></div>
+        <label class="agree"><input type="checkbox" id="age19"><span>내기하는 사람은 모두 19세 이상이고, 위 규칙에 모두 동의했어요</span></label>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>이번 라운드</h2>
+      <ul class="recap" id="recap"></ul>
+      <div class="go">
+        <button type="button" class="g1" data-tab="go"><small>가는 길</small><b id="goDepart">--:--</b><span>출발 · 자세히 보기</span></button>
+        <button type="button" class="g2" data-tab="score"><small>스코어·정산</small><b id="goScore">시작 전</b><span>타수 적기</span></button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== 가는 길 ===================== -->
+  <section id="view-go" role="tabpanel" aria-labelledby="tab-go" class="wrap" hidden>
+    <section class="board" aria-live="polite">
+      <div class="lbl" id="goLbl">이 시간에 출발하세요</div>
+      <div class="depart" id="depart">--:--<small id="dayTag"></small></div>
+      <div class="sum" id="goSum"></div>
+      <div class="share">
+        <button class="btn btn-flag" type="button" data-act="copyGo">동반자에게 보낼 문구 복사</button>
+        <a class="btn btn-ghost" id="navNaver" href="https://map.naver.com" target="_blank" rel="noopener">네이버지도 길찾기</a>
+      </div>
+      <textarea class="copybox" id="goCopy" readonly hidden aria-label="보낼 문구"></textarea>
+    </section>
+
+    <label class="toggle" for="first"><div><b>처음 가는 골프장이에요</b><span>도착 여유를 넉넉히 잡아요(50분 이상).</span></div><input type="checkbox" id="first"></label>
+
+    <section class="card"><h2>아침 동선</h2><ol class="tl" id="timeline"></ol></section>
+
+    <section class="card" id="packCard" hidden><h2>출발 전 챙길 것</h2><div class="quick" id="packLevel"></div><p class="note" id="packNote"></p><ul class="check" id="pack"></ul></section>
+
+    <section class="card">
+      <div class="q"><span class="ql">티오프 몇 분 전에 도착할까요</span><div class="quick" id="bufferChips"></div></div>
+      <div class="q"><span class="ql">집에서 골프장까지</span>
+        <div class="stepper"><button type="button" data-act="driveMinus" aria-label="5분 줄이기">−</button><output id="driveOut">50분</output><button type="button" data-act="drivePlus" aria-label="5분 늘리기">+</button></div>
+        <div class="quick"><a class="chip" id="trafKakao" target="_blank" rel="noopener" style="text-decoration:none">카카오맵에서 지금 교통 보기</a><a class="chip" id="trafNaver" target="_blank" rel="noopener" style="text-decoration:none">네이버지도에서 보기</a></div>
+        <p class="note">지도에서 출발 시간 기준 예상 시간을 보고 위에 넣어 주세요. 막힘은 그 시간에 이미 들어 있어요. 시험판이라 아직 자동으로 가져오지는 못해요.</p></div>
+      <div class="q" id="pickBox"><span class="ql">픽업</span><div class="list" id="pickups"></div></div>
+      <div class="q"><span class="ql">가는 길에 들를 곳</span><div class="list" id="stops"></div><p class="note">들를 곳마다 길에서 벗어났다 돌아오는 3분을 더해요.</p></div>
+    </section>
+  </section>
+
+  <!-- ===================== 스코어·정산 ===================== -->
+  <section id="view-score" role="tabpanel" aria-labelledby="tab-score" class="wrap" hidden>
+    <section class="card" aria-label="지금 홀">
+      <div class="holehead">
+        <div class="holeno" id="holeNo">1</div>
+        <div class="nav"><button type="button" data-act="prev" id="prevH" aria-label="이전 홀">‹</button><button type="button" data-act="next" id="nextH" aria-label="다음 홀">›</button></div>
+      </div>
+      <div class="quick" id="parChips"></div>
+      <div class="players" id="players"></div>
+      <div id="holeSettle"></div>
+      <div class="quick" id="allPar"></div>
+      <p class="note">동그라미를 누르면 바로 들어가요. 홀마다 홀인원(파5는 알바트로스)부터 양파까지 떠요. 다시 누르면 지워져요. 누가 대신 넣어도 돼요.</p>
+    </section>
+
+    <section class="card" aria-label="스코어카드">
+      <h2>스코어카드</h2>
+      <div class="sc-wrap"><table class="sc" id="sc"></table></div>
+      <div class="legend"><span><i class="b"></i>버디 이하</span><span><i class="bo"></i>보기 이상</span><span>칸을 누르면 그 홀로 가요</span></div>
+    </section>
+
+    <section class="card" aria-label="정산">
+      <h2>정산</h2>
+      <div class="rules"><span id="ruleLine"></span><button type="button" class="btn btn-plain" data-tab="plan">규칙 바꾸기</button></div>
+      <div id="settle"></div>
+      <div class="share"><button class="btn btn-flag" type="button" data-act="copyScore">단톡방에 올릴 결과 복사</button></div>
+      <textarea class="copybox" id="scoreCopy" readonly hidden aria-label="복사할 결과"></textarea>
+    </section>
+
+    <details class="card" id="parBox">
+      <summary>홀별 파</summary>
+      <div class="q" style="margin-top:12px">
+        <span class="note">누르면 3 → 4 → 5로 바뀌어요.</span>
+        <div class="parset" id="parset"></div>
+        <span class="note" id="parTotal"></span>
+      </div>
+    </details>
+
+    <div id="resetArea"><button class="btn btn-plain" type="button" data-act="askNew">새 라운드 시작</button></div>
+  </section>
+
+  <p class="note">슬기로운골프생활 시험판입니다. 가입이나 서버 저장 없이 이 기기 브라우저에만 남습니다. 정산은 계산만 해 주고, 돈은 주고받지 않습니다.</p>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var KEY="golfround.v1";
+  var DEFAULT_PAR=[4,4,3,5,4,4,3,4,5, 4,3,4,5,4,4,3,5,4];
+  /* 골프장 데이터: 공식 홈페이지 등에서 모은 홀별 파. 지역별로 채워 넣는다. */
+  var COURSES=[{"name":"서경타니CC","aliases":["타니CC","서경타니컨트리클럽"],"region":"경남","city":"사천시","courses":[{"name":"청룡","par":[4,5,4,4,5,3,4,3,4]},{"name":"백호","par":[4,4,4,5,4,3,5,3,4]},{"name":"주작","par":[5,4,4,4,3,4,4,3,5]},{"name":"현무","par":[4,4,4,5,3,4,4,3,5]}]},{"name":"골프존카운티 사천","aliases":[],"region":"경남","city":"사천시","courses":[{"name":"Dragon","par":[5,4,4,3,4,5,3,4,4]},{"name":"Pine","par":[4,4,5,3,4,5,3,4,4]},{"name":"Rabbit","par":[4,4,5,3,4,4,3,4,5]}]},{"name":"삼삼CC","aliases":["삼삼컨트리클럽"],"region":"경남","city":"사천시","courses":[{"name":"9H","par":[4,5,4,4,3,4,4,3,5]}]},{"name":"사천 공군 체력단련장","aliases":[],"region":"경남","city":"사천시","courses":[{"name":"OUT","par":[4,4,3,5,4,4,3,5,4]},{"name":"IN","par":[4,4,3,5,4,4,3,5,4]}]},{"name":"진주컨트리클럽","aliases":["진주CC"],"region":"경남","city":"진주시","courses":[{"name":"OUT","par":[4,4,3,5,4,5,3,4,4]},{"name":"IN","par":[4,5,4,3,4,4,3,4,5]}]},{"name":"진주나인힐스","aliases":["진산골프클럽"],"region":"경남","city":"산청군","courses":[{"name":"HILL","par":[4,4,4,3,3,5,4,5,3]},{"name":"PINE","par":[4,4,4,3,3,5,4,5,3]}]},{"name":"노벨컨트리클럽","aliases":["노벨CC","고성노벨CC"],"region":"경남","city":"고성군","courses":[{"name":"충무","par":[4,3,5,4,4,5,3,4,4]},{"name":"공룡","par":[5,4,4,3,4,4,5,3,4]},{"name":"가야","par":[4,5,3,5,4,4,4,3,4]}]},{"name":"고성CC","aliases":["고성컨트리클럽"],"region":"경남","city":"고성군","courses":[{"name":"9H","par":[4,3,4,5,4,3,5,4,4]}]},{"name":"쥬라기 골프&리조트","aliases":[],"region":"경남","city":"고성군","courses":[{"name":"9H","par":[3,4,3,3,3,3,3,4,3]}]},{"name":"하동CC","aliases":[],"region":"경남","city":"하동군","courses":[{"name":"9H","par":[4,4,5,3,3,4,3,3,3]}]},{"name":"사우스케이프 오너스클럽","aliases":["사우스케이프"],"region":"경남","city":"남해군","courses":[{"name":"OUT","par":[4,4,4,3,5,3,4,4,5]},{"name":"IN","par":[4,5,4,4,3,4,3,4,5]}]},{"name":"아난티 남해","aliases":["아난티 남해 골프클럽"],"region":"경남","city":"남해군","courses":[{"name":"OUT","par":[4,5,4,3,5,4,3,4,5]},{"name":"IN","par":[5,4,4,3,4,4,3,5,4]}]},{"name":"통영동원로얄컨트리클럽","aliases":["통영 동원로얄CC"],"region":"경남","city":"통영시","courses":[{"name":"OUT","par":[4,4,4,3,5,4,3,5,4]},{"name":"IN","par":[4,3,4,5,3,4,5,4,4]}]},{"name":"드비치골프클럽","aliases":["드비치GC","드비치CC"],"region":"경남","city":"거제시","courses":[{"name":"OUT","par":[4,5,4,4,4,3,5,3,4]},{"name":"IN","par":[4,4,5,3,4,4,4,3,5]}]},{"name":"거제뷰CC","aliases":["거제뷰컨트리클럽"],"region":"경남","city":"거제시","courses":[{"name":"OUT","par":[4,4,5,4,3,4,3,4,5]},{"name":"IN","par":[4,4,3,5,3,4,5,4,4]}]},{"name":"창원컨트리클럽","aliases":["창원CC"],"region":"경남","city":"창원시","courses":[{"name":"OUT","par":[4,4,3,5,4,3,4,4,5]},{"name":"IN","par":[5,4,3,4,4,5,3,4,4]}]},{"name":"골프존카운티 경남","aliases":["레이크힐스경남CC","레이크힐스경남컨트리클럽"],"region":"경남","city":"함안군","courses":[{"name":"Jade","par":[4,4,3,5,4,5,3,4,4]},{"name":"Peridot","par":[4,3,4,5,4,5,3,4,4]}]},{"name":"용원골프클럽","aliases":["용원GC","용원CC"],"region":"경남","city":"창원시","courses":[{"name":"백구","par":[5,4,5,4,4,3,4,3,4]},{"name":"백로","par":[4,4,3,5,3,5,4,4,4]},{"name":"무학","par":[4,4,3,5,3,4,4,5,4]}]},{"name":"진해신항CC","aliases":["아라미르 골프앤리조트","아라미르CC"],"region":"경남","city":"창원시","courses":[{"name":"진해 OUT","par":[4,4,5,3,4,4,4,3,5]},{"name":"진해 IN","par":[4,4,3,5,4,4,4,3,5]},{"name":"신항 OUT","par":[4,5,4,3,5,4,3,4,4]},{"name":"신항 IN","par":[4,4,3,4,4,3,5,4,5]}]},{"name":"진해 체력단련장","aliases":["진해체력단련장"],"region":"경남","city":"창원시","courses":[{"name":"OUT","par":[4,3,4,4,4,4,4,5,5]},{"name":"IN","par":[4,3,4,4,5,4,4,3,4]}]},{"name":"함안대 체력단련장","aliases":[],"region":"경남","city":"함안군","courses":[{"name":"L","par":[5,4,4,3,4,4,3,4,5]}],"chk":1},{"name":"칠원골프","aliases":[],"region":"경남","city":"함안군","courses":[{"name":"9H","par":[3,3,3,3,3,3,3,3,3]}]},{"name":"의령친환경골프장","aliases":["의령골프장"],"region":"경남","city":"의령군","courses":[{"name":"9H","par":[4,3,5,4,3,4,5,4,4]}]},{"name":"리온CC","aliases":["리온컨트리클럽"],"region":"경남","city":"의령군","courses":[{"name":"OUT","par":[4,4,3,4,5,4,3,4,5]},{"name":"IN","par":[5,4,3,4,4,4,3,5,4]}]},{"name":"부곡컨트리클럽","aliases":["부곡CC"],"region":"경남","city":"창녕군","courses":[{"name":"OUT","par":[4,5,4,3,4,4,5,3,4]},{"name":"IN","par":[5,3,4,4,3,4,4,5,4]}]},{"name":"힐마루CC","aliases":["힐마루컨트리클럽"],"region":"경남","city":"창녕군","courses":[{"name":"Hill OUT","par":[4,4,4,5,4,3,5,3,4]},{"name":"Hill IN","par":[4,4,5,4,3,4,4,3,5]},{"name":"Maru OUT","par":[4,5,3,4,4,4,5,3,4]},{"name":"Maru IN","par":[4,3,4,4,5,3,5,4,4]}]},{"name":"가야컨트리클럽","aliases":["가야CC"],"region":"경남","city":"김해시","courses":[{"name":"신어","par":[4,3,5,4,4,3,4,4,5]},{"name":"낙동","par":[5,4,4,3,4,4,5,3,4]},{"name":"가락","par":[4,3,5,4,4,4,5,3,4]},{"name":"김해","par":[5,4,4,3,4,4,4,3,5]},{"name":"수로","par":[4,4,5,3,4,4,3,4,5]},{"name":"퍼블릭","par":[4,4,5,4,4,3,3,4,3]}]},{"name":"정산컨트리클럽","aliases":["정산CC"],"region":"경남","city":"김해시","courses":[{"name":"해우","par":[4,5,3,5,4,3,4,4,4]},{"name":"달우","par":[5,3,4,4,5,4,4,3,4]},{"name":"별우","par":[5,3,4,4,5,4,4,3,4]}]},{"name":"김해 상록GC","aliases":["상록골프장"],"region":"경남","city":"김해시","courses":[{"name":"OUT","par":[4,4,3,4,5,3,4,5,4]},{"name":"IN","par":[4,5,4,4,3,4,4,3,5]}]},{"name":"포웰컨트리클럽","aliases":["포웰CC","롯데스카이힐 김해CC"],"region":"경남","city":"김해시","courses":[{"name":"SKY","par":[4,4,3,5,4,4,3,5,4]},{"name":"HILL","par":[4,4,4,3,5,4,4,3,5]}]},{"name":"피플레이 골프클럽","aliases":[],"region":"경남","city":"김해시","courses":[{"name":"Korea Public","par":[5,4,3,5,4,3,4,3,5]}],"chk":1},{"name":"리더스컨트리클럽","aliases":["리더스CC"],"region":"경남","city":"밀양시","courses":[{"name":"Hill","par":[5,4,4,4,3,4,3,5,4]},{"name":"Lake","par":[4,4,3,4,5,4,4,5,3]},{"name":"Pine","par":[4,5,4,4,3,5,3,4,4]}]},{"name":"아델스코트CC","aliases":["아델스코트컨트리클럽"],"region":"경남","city":"합천군","courses":[{"name":"Hill","par":[4,5,3,4,4,5,3,4,4]},{"name":"Lake","par":[4,5,3,4,4,4,5,3,4]},{"name":"Mountain","par":[4,5,4,3,4,4,4,3,5]}]},{"name":"스카이뷰CC","aliases":["스카이뷰컨트리클럽"],"region":"경남","city":"함양군","courses":[{"name":"OUT","par":[4,4,5,4,3,5,4,3,4]},{"name":"IN","par":[4,3,4,5,4,3,5,4,4]}]},{"name":"에이원컨트리클럽","aliases":["에이원CC"],"region":"경남","city":"양산시","courses":[{"name":"동","par":[4,3,4,4,5,4,5,4,3]},{"name":"남","par":[4,4,5,3,4,3,4,4,5]}]},{"name":"동부산컨트리클럽","aliases":["동부산CC"],"region":"경남","city":"양산시","courses":[{"name":"Hill","par":[4,5,3,4,5,4,4,3,4]},{"name":"Lake","par":[4,3,5,3,4,4,4,5,4]},{"name":"Valley","par":[4,5,4,3,4,5,3,4,4]}]},{"name":"에덴밸리CC","aliases":["에덴밸리컨트리클럽"],"region":"경남","city":"양산시","courses":[{"name":"OUT","par":[4,5,4,3,4,4,3,5,4]},{"name":"IN","par":[4,5,3,4,4,3,4,4,5]}]},{"name":"다이아몬드CC","aliases":["다이아몬드컨트리클럽"],"region":"경남","city":"양산시","courses":[{"name":"OUT","par":[4,5,4,4,3,5,3,4,4]},{"name":"IN","par":[4,5,3,4,4,5,3,4,4]}]},{"name":"통도파인이스트CC","aliases":["통도파인이스트컨트리클럽"],"region":"경남","city":"양산시","courses":[{"name":"North OUT","par":[5,4,3,4,5,4,3,4,4]},{"name":"North IN","par":[4,5,3,4,4,5,4,3,4]},{"name":"South OUT","par":[4,4,3,5,4,4,5,3,4]},{"name":"South IN","par":[4,3,5,4,4,4,5,3,4]}]},{"name":"양산컨트리클럽","aliases":["양산CC"],"region":"경남","city":"양산시","courses":[{"name":"누리","par":[5,4,4,3,4,5,4,3,4]},{"name":"가온","par":[5,3,4,4,4,4,4,3,5]},{"name":"마루","par":[4,4,3,5,4,5,4,3,4]}]},{"name":"양산동원로얄컨트리클럽","aliases":["양산 동원로얄CC"],"region":"경남","city":"양산시","courses":[{"name":"OUT","par":[4,4,5,4,3,4,4,3,5]},{"name":"IN","par":[4,4,3,5,4,4,3,5,4]}]},{"name":"LPGA 인터내셔널 부산","aliases":["아시아드CC","아시아드컨트리클럽"],"region":"경남","city":"부산 기장군","courses":[{"name":"Lake","par":[4,5,4,3,4,5,3,4,4]},{"name":"Pine","par":[4,4,3,4,5,3,4,4,5]},{"name":"Valley","par":[4,4,3,5,4,3,4,4,5]}]},{"name":"베이사이드골프클럽","aliases":["베이사이드GC"],"region":"경남","city":"부산 기장군","courses":[{"name":"Lake","par":[4,3,5,4,4,4,5,3,4]},{"name":"Canyon","par":[4,3,4,5,4,3,4,4,5]},{"name":"Park","par":[4,4,5,4,3,4,3,4,5]}]},{"name":"부산컨트리클럽","aliases":["부산CC"],"region":"경남","city":"부산 금정구","courses":[{"name":"OUT","par":[4,3,5,4,3,4,4,5,4]},{"name":"IN","par":[5,4,3,4,4,4,4,3,5]}]},{"name":"동래베네스트골프클럽","aliases":["동래베네스트"],"region":"경남","city":"부산 금정구","courses":[{"name":"OUT","par":[4,4,3,5,3,4,4,4,5]},{"name":"IN","par":[4,4,4,3,4,5,4,3,5]},{"name":"Par-3","par":[3,3,3,3,3,3,3,3,3]}]},{"name":"해라CC","aliases":[],"region":"경남","city":"부산 강서구","courses":[{"name":"9H","par":[4,4,4,5,3,5,4,4,3]}]},{"name":"해운대비치골프앤리조트","aliases":["해운대비치CC"],"region":"경남","city":"부산 기장군","courses":[{"name":"OUT","par":[5,4,3,5,4,4,3,4,4]},{"name":"IN","par":[4,3,5,4,4,3,5,4,4]}]},{"name":"해운대컨트리클럽","aliases":["해운대CC"],"region":"경남","city":"부산 기장군","courses":[{"name":"Golden","par":[5,3,4,5,4,4,3,4,4]},{"name":"Royal","par":[4,5,3,4,4,5,4,4,3]},{"name":"Silk","par":[4,3,4,4,4,5,4,3,5]}]},{"name":"하이스트컨트리클럽","aliases":["하이스트CC"],"region":"경남","city":"부산 강서구","courses":[{"name":"9H","par":[4,4,4,5,4,3,5,3,4]}]},{"name":"김해 공군 체력단련장","aliases":["김해체력단련장"],"region":"경남","city":"부산 강서구","courses":[{"name":"9H","par":[4,4,4,3,5,4,3,4,5]}]},{"name":"스톤게이트컨트리클럽","aliases":["스톤게이트CC"],"region":"경남","city":"부산 기장군","courses":[{"name":"OUT","par":[4,5,4,3,4,3,4,5,4]},{"name":"IN","par":[3,4,4,5,3,4,5,4,4]}]},{"name":"기장동원로얄컨트리클럽","aliases":["기장 동원로얄CC"],"region":"경남","city":"부산 기장군","courses":[{"name":"OUT","par":[4,4,5,3,5,3,4,3,4]},{"name":"IN","par":[4,4,5,3,5,3,4,5,4]}],"chk":1},{"name":"보라컨트리클럽","aliases":["보라CC"],"region":"경남","city":"울산 울주군","courses":[{"name":"Edward","par":[4,3,5,4,4,5,3,4,4]},{"name":"Henry","par":[4,5,4,3,4,5,3,4,4]}]},{"name":"골드그린골프클럽","aliases":["골드그린GC"],"region":"경남","city":"울산 울주군","courses":[{"name":"9H","par":[5,4,4,4,3,5,4,3,4]}]},{"name":"더골프클럽","aliases":[],"region":"경남","city":"울산 울주군","courses":[{"name":"OUT","par":[4,5,3,5,4,4,3,4,4]},{"name":"IN","par":[4,4,4,4,3,5,3,4,5]}]},{"name":"울산컨트리클럽","aliases":["울산CC"],"region":"경남","city":"울산 울주군","courses":[{"name":"동","par":[4,5,4,3,4,5,4,3,4]},{"name":"남","par":[4,4,3,5,4,4,3,5,4]},{"name":"서","par":[4,5,4,5,3,4,4,3,4]}],"chk":1},{"name":"오르비스GC","aliases":[],"region":"경남","city":"울산 울주군","courses":[{"name":"OUT","par":[4,4,3,4,5,4,4,3,5]},{"name":"IN","par":[4,4,4,3,5,4,3,5,4]}]},{"name":"영남알프스골프파크","aliases":[],"region":"경남","city":"울산 울주군","courses":[{"name":"9H","par":[4,3,3,3,3,3,3,5,3]}]},{"name":"거창골프랜드","aliases":[],"region":"경남","city":"거창군","courses":[],"chk":1},{"name":"덕포골프랜드","aliases":[],"region":"경남","city":"거제시","courses":[],"chk":1},{"name":"어등산CC","aliases":["어등산컨트리클럽"],"region":"전남","city":"광주 광산구","courses":[{"name":"어등","par":[4,4,3,4,5,4,4,3,5]},{"name":"송정","par":[4,5,4,3,4,4,3,5,4]},{"name":"하남","par":[4,4,5,3,4,4,3,5,4]}]},{"name":"빛고을CC","aliases":["빛고을골프장"],"region":"전남","city":"광주 남구","courses":[{"name":"빛고을","par":[4,5,3,4,5,4,3,4,4]}],"chk":1},{"name":"에콜리안 광산CC","aliases":["에콜리안광산","광산CC"],"region":"전남","city":"광주 광산구","courses":[{"name":"광산","par":[5,4,3,5,4,4,4,3,4]}]},{"name":"광주 공군 체력단련장","aliases":["광주체력단련장"],"region":"전남","city":"광주 광산구","courses":[{"name":"OUT","par":[5,4,4,3,4,3,5,4,4]},{"name":"IN","par":[5,4,4,3,4,3,4,4,5]}]},{"name":"골프존카운티 영암45","aliases":["사우스링스 영암","사우스링스영암"],"region":"전남","city":"영암군","courses":[{"name":"짐앵A","par":[5,4,4,4,3,4,3,5,4]},{"name":"짐앵B","par":[4,3,4,5,3,5,5,3,4]},{"name":"짐앵C","par":[5,4,4,4,5,3,4,3,4]},{"name":"카일필립스A","par":[4,3,4,4,3,5,4,5,4]},{"name":"카일필립스B","par":[5,4,4,4,3,5,4,3,4]}]},{"name":"코스모스링스","aliases":["코스모스링스CC","솔라시도 영암 코스모스링스"],"region":"전남","city":"영암군","courses":[{"name":"OUT","par":[4,4,5,4,3,4,3,5,4]},{"name":"IN","par":[4,4,4,5,3,4,4,3,5]}]},{"name":"아크로CC","aliases":["아크로컨트리클럽"],"region":"전남","city":"영암군","courses":[{"name":"Challenge","par":[5,4,4,3,4,4,3,4,5]},{"name":"Master","par":[4,3,5,4,3,4,4,4,5]},{"name":"Sky","par":[4,5,4,3,4,5,4,3,4]}]},{"name":"솔라시도CC","aliases":["솔라시도 컨트리클럽"],"region":"전남","city":"해남군","courses":[{"name":"Sola","par":[4,5,3,4,4,5,3,4,4]},{"name":"Seado","par":[5,4,3,4,4,4,3,5,4]}]},{"name":"파인비치 골프링크스","aliases":["파인비치CC","파인비치골프링크스"],"region":"전남","city":"해남군","courses":[{"name":"파인","par":[4,5,3,4,4,5,4,3,4]},{"name":"비치","par":[4,4,5,3,4,3,4,5,4]},{"name":"오시아노","par":[4,5,3,4,4,3,4,5,4]}]},{"name":"골드레이크CC","aliases":["골드레이크컨트리클럽"],"region":"전남","city":"나주시","courses":[{"name":"Gold","par":[5,4,3,4,4,5,3,4,4]},{"name":"Lake","par":[4,3,5,4,4,3,4,4,5]},{"name":"Hill","par":[4,5,4,3,4,5,3,4,4]},{"name":"Valley","par":[4,3,4,5,4,4,4,3,5]}]},{"name":"해피니스CC","aliases":["해피니스컨트리클럽"],"region":"전남","city":"나주시","courses":[{"name":"휴먼","par":[5,4,4,4,3,4,5,3,4]},{"name":"해피","par":[4,4,3,5,4,3,4,5,4]},{"name":"하트","par":[4,3,4,5,4,4,5,3,4]},{"name":"힐링","par":[4,4,3,4,4,5,3,4,5]},{"name":"히든","par":[4,5,4,3,4,4,5,3,4]}]},{"name":"나주부영CC","aliases":["부영CC 나주","부영컨트리클럽 나주"],"region":"전남","city":"나주시","courses":[{"name":"OUT","par":[4,4,5,4,3,4,5,3,4]},{"name":"IN","par":[4,5,4,4,4,3,4,3,5]}]},{"name":"나주CC","aliases":["나주컨트리클럽"],"region":"전남","city":"나주시","courses":[{"name":"나주","par":[4,4,4,4,3,5,3,4,5]}]},{"name":"나주힐스CC","aliases":["나주힐스컨트리클럽"],"region":"전남","city":"나주시","courses":[{"name":"나주힐스","par":[5,4,3,4,3,5,4,4,4]}]},{"name":"남평골프","aliases":[],"region":"전남","city":"나주시","courses":[{"name":"남평","par":[3,4,4,3,3,3,3,3,3]}]},{"name":"화순CC","aliases":["화순컨트리클럽"],"region":"전남","city":"화순군","courses":[{"name":"Spring","par":[4,5,3,4,3,4,4,4,5]},{"name":"Summer","par":[4,4,4,3,5,4,3,5,4]},{"name":"Autumn","par":[5,4,4,4,3,4,5,3,4]}]},{"name":"화순엘리체CC","aliases":["화순 엘리체 컨트리클럽"],"region":"전남","city":"화순군","courses":[{"name":"South","par":[4,4,3,5,4,3,4,4,5]},{"name":"East","par":[5,4,4,4,3,4,5,4,3]}]},{"name":"무등산CC","aliases":["무등산컨트리클럽","골프존카운티 무등산"],"region":"전남","city":"화순군","courses":[{"name":"천왕봉","par":[4,4,3,4,4,5,3,4,5]},{"name":"지왕봉","par":[5,4,4,3,4,5,3,4,4]},{"name":"인왕봉","par":[5,4,3,4,5,3,4,4,4]}]},{"name":"조아밸리CC","aliases":["조아밸리컨트리클럽"],"region":"전남","city":"화순군","courses":[{"name":"조아밸리","par":[4,5,4,3,4,4,5,3,4]}]},{"name":"화순 PGA 골프장","aliases":[],"region":"전남","city":"화순군","courses":[]},{"name":"광주CC","aliases":["광주컨트리클럽"],"region":"전남","city":"곡성군","courses":[{"name":"동악","par":[4,4,5,4,3,5,4,3,4]},{"name":"섬진","par":[4,4,3,5,4,5,4,3,4]},{"name":"설산","par":[4,4,3,5,4,3,5,4,4]}]},{"name":"옥과기안CC","aliases":["옥과기안컨트리클럽","기안컨트리클럽"],"region":"전남","city":"곡성군","courses":[{"name":"옥과기안","par":[4,4,4,3,5,5,4,3,4]}],"chk":1},{"name":"르오네뜨CC","aliases":["르오네뜨컨트리클럽"],"region":"전남","city":"곡성군","courses":[{"name":"OUT","par":[4,4,4,3,5,4,3,5,4]},{"name":"IN","par":[4,5,4,3,4,4,4,3,5]}]},{"name":"담양레이나CC","aliases":["담양 레이나 컨트리클럽"],"region":"전남","city":"담양군","courses":[{"name":"임페리얼","par":[4,5,3,4,4,4,3,4,5]},{"name":"마제스티","par":[4,5,4,3,4,5,4,3,4]}]},{"name":"창평CC","aliases":["창평컨트리클럽"],"region":"전남","city":"담양군","courses":[{"name":"창평","par":[5,4,3,4,4,4,5,3,4]}]},{"name":"죽향CC","aliases":["죽향컨트리클럽"],"region":"전남","city":"담양군","courses":[{"name":"죽향","par":[4,5,3,5,4,4,3,4,4]}]},{"name":"푸른솔GC 장성","aliases":["푸른솔장성","푸른솔골프클럽 장성"],"region":"전남","city":"장성군","courses":[{"name":"레이크","par":[4,5,3,5,4,4,4,3,4]},{"name":"마운틴","par":[5,4,3,4,4,4,4,3,5]},{"name":"힐","par":[4,4,3,5,4,3,4,4,5]}]},{"name":"백양우리CC","aliases":["백양우리컨트리클럽","백양CC"],"region":"전남","city":"장성군","courses":[{"name":"백양우리","par":[4,4,3,4,5,4,4,3,5]}]},{"name":"상무대 체력단련장","aliases":["상무대체력단련장","상무대CC"],"region":"전남","city":"영광군","courses":[{"name":"상무대","par":[4,4,5,3,4,4,5,3,4]}]},{"name":"웨스트오션CC","aliases":["영광CC","영광컨트리클럽"],"region":"전남","city":"영광군","courses":[{"name":"밸리","par":[4,4,5,3,4,5,3,4,4]},{"name":"오션","par":[5,4,4,3,4,3,5,4,4]}]},{"name":"에콜리안 영광","aliases":["에콜리안영광CC"],"region":"전남","city":"영광군","courses":[{"name":"영광","par":[4,4,3,4,5,3,4,4,5]}]},{"name":"함평엘리체CC","aliases":["함평 엘리체 컨트리클럽"],"region":"전남","city":"함평군","courses":[{"name":"Imperial","par":[4,5,4,3,5,4,3,4,4]},{"name":"Majesty","par":[5,4,3,4,4,3,4,5,4]},{"name":"Palace","par":[4,3,5,4,3,4,4,5,4]}]},{"name":"함평나비CC","aliases":[],"region":"전남","city":"함평군","courses":[{"name":"나비","par":[5,3,4,4,4,3,4,4,5]}]},{"name":"베르힐CC 함평","aliases":["베르힐컨트리클럽 함평","베르힐CC"],"region":"전남","city":"함평군","courses":[{"name":"레이크","par":[4,5,4,4,3,4,3,5,4]},{"name":"스카이","par":[4,4,5,4,3,4,3,5,4]},{"name":"베르힐","par":[4,5,4,3,4,4,3,4,5]}]},{"name":"무안CC","aliases":["무안컨트리클럽"],"region":"전남","city":"무안군","courses":[{"name":"동A","par":[5,4,3,4,4,4,3,4,5]},{"name":"동B","par":[4,3,5,4,3,4,5,4,4]},{"name":"남A","par":[4,4,4,5,4,3,4,4,5]},{"name":"남B","par":[4,3,4,4,3,4,5,4,5]},{"name":"서A","par":[5,4,3,4,4,5,4,3,4]},{"name":"서B","par":[4,3,4,4,5,3,4,4,5]}]},{"name":"무안클린밸리CC","aliases":["무안클린밸리"],"region":"전남","city":"무안군","courses":[{"name":"클린","par":[5,4,3,4,4,4,3,5,4]},{"name":"밸리","par":[4,5,3,4,5,4,4,3,4]}]},{"name":"JNJ골프리조트","aliases":["정남진골프리조트","정남진CC"],"region":"전남","city":"장흥군","courses":[{"name":"정","par":[4,4,3,5,4,5,4,3,4]},{"name":"남","par":[5,3,4,5,4,4,3,4,4]},{"name":"진","par":[4,4,3,5,4,3,4,5,4]}]},{"name":"다산베아채 골프앤리조트","aliases":["다산베아채CC","다산베아체"],"region":"전남","city":"강진군","courses":[{"name":"다산","par":[4,5,3,4,4,3,4,5,4]},{"name":"베아채","par":[5,4,3,4,4,4,4,3,5]},{"name":"장보고","par":[4,5,4,3,5,3,4,3,5]}]},{"name":"보성CC","aliases":["보성컨트리클럽"],"region":"전남","city":"보성군","courses":[{"name":"Lake","par":[5,4,3,4,4,4,3,5,4]},{"name":"Mountain","par":[4,5,3,4,5,4,3,4,4]}]},{"name":"보성에덴CC","aliases":["보성에덴컨트리클럽"],"region":"전남","city":"보성군","courses":[{"name":"에덴","par":[4,3,4,4,5,5,3,4,4]}]},{"name":"골프존카운티 순천","aliases":["레이크힐스순천","레이크힐스순천CC"],"region":"전남","city":"순천시","courses":[{"name":"루비","par":[5,4,4,3,5,4,3,4,4]},{"name":"에메랄드","par":[4,3,4,5,3,4,4,4,5]},{"name":"다이아몬드","par":[4,4,4,5,3,4,4,3,5]},{"name":"토파즈","par":[5,4,4,4,3,4,4,3,5]}]},{"name":"파인힐스 골프&호텔","aliases":["파인힐스CC","파인힐스 컨트리클럽"],"region":"전남","city":"순천시","courses":[{"name":"파인","par":[4,4,4,5,3,4,4,3,5]},{"name":"레이크","par":[4,5,3,4,5,4,4,3,4]},{"name":"힐스","par":[4,5,3,4,4,5,3,4,4]}]},{"name":"포라이즌","aliases":["포라이즌CC","포라이즌 골프","승주CC","승주골프장","승주컨트리클럽"],"region":"전남","city":"순천시","courses":[{"name":"동","par":[4,5,4,3,5,4,3,4,4]},{"name":"남","par":[4,4,5,4,3,4,4,3,5]},{"name":"중","par":[4,5,4,3,4,5,4,3,4]}]},{"name":"순천부영CC","aliases":["부영CC순천","순천부영컨트리클럽"],"region":"전남","city":"순천시","courses":[{"name":"OUT","par":[5,4,4,3,4,4,5,3,4]},{"name":"IN","par":[4,5,4,4,3,4,4,3,5]}]},{"name":"순천CC","aliases":["순천컨트리클럽"],"region":"전남","city":"순천시","courses":[{"name":"순천","par":[4,4,4,3,5,4,5,3,4]}],"chk":1},{"name":"세이지우드 여수경도","aliases":["세이지우드CC 여수경도","여수경도CC","경도골프앤리조트"],"region":"전남","city":"여수시","courses":[{"name":"금오도","par":[4,4,3,4,5,4,3,5,4]},{"name":"오동도","par":[4,3,5,4,4,5,4,4,3]},{"name":"돌산도","par":[4,4,4,3,4,5,3,4,5]}]},{"name":"디오션CC","aliases":["디오션컨트리클럽","디오션리조트 골프"],"region":"전남","city":"여수시","courses":[{"name":"웨스트","par":[4,4,3,5,4,3,4,4,5]},{"name":"이스트","par":[4,4,5,4,3,5,3,4,4]}]},{"name":"여수 시티파크","aliases":["시티파크CC","여수시티파크CC","시티파크 골프&호텔"],"region":"전남","city":"여수시","courses":[{"name":"Park","par":[4,4,3,4,5,3,4,5,4]},{"name":"City","par":[4,3,4,5,4,3,5,4,4]}]},{"name":"해양경찰교육원 체력단련장","aliases":[],"region":"전남","city":"여수시","courses":[{"name":"해경","par":[4,5,4,3,4,4,3,5,4]}],"chk":1},{"name":"광양CC","aliases":["광양골프장"],"region":"전남","city":"광양시","courses":[]},{"name":"군산CC","aliases":["군산컨트리클럽","군산 골프&리조트","군산 골프 앤 리조트"],"region":"전북","city":"군산시","courses":[{"name":"전주","par":[4,5,4,3,4,4,3,5,4]},{"name":"익산","par":[4,5,4,3,5,4,4,3,4]},{"name":"김제","par":[6,4,4,3,4,4,3,5,4]},{"name":"정읍","par":[4,3,7,4,4,3,4,3,4]},{"name":"남원","par":[5,4,3,4,4,4,5,3,4]},{"name":"순창","par":[4,5,4,3,4,5,4,3,4]},{"name":"부안","par":[4,4,4,5,3,5,4,3,4]},{"name":"레이크","par":[4,5,4,3,4,4,5,3,4]},{"name":"리드","par":[4,5,4,4,3,4,4,3,5]}]},{"name":"포세븐금강CC","aliases":["포세븐금강컨트리클럽","클럽디 금강","CLUBD 금강","웅포CC 리버코스","베어리버골프리조트 리버코스"],"region":"전북","city":"익산시","courses":[{"name":"서","par":[4,4,5,3,4,4,4,3,5]},{"name":"동","par":[5,4,4,4,3,4,4,3,5]}]},{"name":"웅포CC","aliases":["베어포트CC","베어포트컨트리클럽","베어포트리조트","웅포골프장","베어리버골프리조트 베어코스"],"region":"전북","city":"익산시","courses":[{"name":"OUT","par":[4,4,4,3,5,4,5,3,4]},{"name":"IN","par":[5,3,4,4,3,4,4,4,5]}],"chk":1},{"name":"익산CC","aliases":["상떼힐익산CC","상떼힐 익산 컨트리클럽","익산팔봉골프장"],"region":"전북","city":"익산시","courses":[{"name":"OUT","par":[4,5,4,3,4,5,4,3,4]},{"name":"IN","par":[5,4,4,3,4,4,3,5,4]}]},{"name":"골프존카운티 드래곤","aliases":["골프존카운티 드래곤CC","드래곤레이크CC","드레곤레이크CC"],"region":"전북","city":"남원시","courses":[{"name":"드래곤","par":[4,5,4,3,4,4,5,3,4]},{"name":"레이크","par":[4,4,3,5,4,3,4,4,5]},{"name":"스카이","par":[4,3,4,4,5,3,4,4,5]}]},{"name":"골프존카운티 무주","aliases":["무주안성CC","무주안성컨트리클럽"],"region":"전북","city":"무주군","courses":[{"name":"레이크","par":[4,5,3,4,4,4,3,5,4]},{"name":"마운틴","par":[4,5,3,4,4,3,5,4,4]}]},{"name":"무주덕유산CC","aliases":["무주덕유산리조트CC","덕유산CC","덕유산컨트리클럽"],"region":"전북","city":"무주군","courses":[{"name":"OUT","par":[5,4,3,4,3,4,5,4,4]},{"name":"IN","par":[4,5,4,4,4,3,4,3,5]}]},{"name":"전주샹그릴라CC","aliases":["전주샹그릴라컨트리클럽","샹그릴라CC","임실 샹그릴라골프장","전주CC"],"region":"전북","city":"임실군","courses":[{"name":"엔젤","par":[4,5,4,4,3,4,5,3,4]},{"name":"드림","par":[4,5,3,4,5,3,4,3,5]},{"name":"레이크","par":[4,3,4,4,3,5,4,4,5]}]},{"name":"남원상록골프장","aliases":["남원상록CC","남원상록골프클럽"],"region":"전북","city":"남원시","courses":[{"name":"OUT","par":[4,3,4,4,5,3,4,4,5]},{"name":"춘향","par":[4,4,5,3,4,5,3,4,4]}]},{"name":"고창CC","aliases":["고창컨트리클럽"],"region":"전북","city":"고창군","courses":[{"name":"비치","par":[5,4,4,3,5,4,3,4,4]},{"name":"블루","par":[4,3,4,5,3,4,4,5,4]}]},{"name":"석정힐CC","aliases":["석정힐컨트리클럽","석정힐 컨트리클럽"],"region":"전북","city":"고창군","courses":[{"name":"마운틴","par":[4,5,4,5,3,4,3,4,4]},{"name":"레이크","par":[4,4,4,5,3,4,4,3,5]}]},{"name":"골프존카운티 선운","aliases":["선운산CC","선운산컨트리클럽","선운레이크CC"],"region":"전북","city":"고창군","courses":[{"name":"OUT","par":[4,5,4,3,4,4,4,3,5]},{"name":"IN","par":[4,3,5,4,4,4,3,5,4]}]},{"name":"장수골프리조트","aliases":["장수CC","장수컨트리클럽"],"region":"전북","city":"장수군","courses":[{"name":"OUT","par":[5,4,3,5,3,4,3,4,5]},{"name":"IN","par":[5,4,3,4,3,4,5,4,4]}]},{"name":"전주월드컵골프장","aliases":["전주월드컵골프클럽","전주 월드컵 골프장"],"region":"전북","city":"전주시","courses":[{"name":"월드컵","par":[4,4,4,4,5,3,4,5,3]}],"chk":1},{"name":"내장산골프&리조트","aliases":["내장산CC","내장산골프클럽","내장산 골프 앤 리조트"],"region":"전북","city":"정읍시","courses":[{"name":"OUT","par":[4,4,5,3,4,4,5,3,4]},{"name":"IN","par":[4,5,4,3,5,4,4,3,4]}]},{"name":"태인CC","aliases":["태인컨트리클럽","정읍 태인컨트리클럽"],"region":"전북","city":"정읍시","courses":[{"name":"레이크","par":[4,3,5,4,4,5,3,4,4]},{"name":"마운틴","par":[4,5,4,3,4,4,3,5,4]},{"name":"대중 9홀","par":[4,3,4,4,3,5,4,4,5]}],"chk":1},{"name":"OK CC","aliases":["OK컨트리클럽","오케이CC"],"region":"전북","city":"완주군","courses":[{"name":"OK","par":[5,4,3,4,5,3,4,4,4]}]},{"name":"써미트CC","aliases":["써미트컨트리클럽","서밋CC"],"region":"전북","city":"진안군","courses":[{"name":"K","par":[5,4,3,4,4,4,3,5,4]},{"name":"M","par":[4,4,3,5,4,4,3,4,5]},{"name":"S","par":[4,3,4,5,3,4,4,4,5]}]},{"name":"스파힐스CC","aliases":["스파힐스컨트리클럽","김제스파힐스컨트리클럽"],"region":"전북","city":"김제시","courses":[{"name":"카운티","par":[4,4,3,4,3,5,4,4,5]},{"name":"힐","par":[5,4,3,4,5,4,4,3,4]}]},{"name":"아네스빌CC","aliases":["아네스빌컨트리클럽","아네스빌GC","김제 아네스빌"],"region":"전북","city":"김제시","courses":[{"name":"아네스빌","par":[5,4,3,4,4,4,3,4,5]}]},{"name":"더나인CC","aliases":["더나인GC","더나인골프클럽"],"region":"전북","city":"김제시","courses":[{"name":"더나인","par":[4,4,3,5,4,4,3,5,4]}]},{"name":"에스페란사GC","aliases":["에스페란사골프장","에스페란사"],"region":"전북","city":"김제시","courses":[{"name":"에스페란사","par":[3,4,3,3,3,4,3,4,5]}],"chk":1},{"name":"케이밸리CC","aliases":["K밸리컨트리클럽","케이밸리"],"region":"전북","city":"완주군","courses":[{"name":"케이밸리","par":[4,3,4,5,4,4,5,3,4]}]},{"name":"순창CC","aliases":["순창컨트리클럽","순창 금과레저타운"],"region":"전북","city":"순창군","courses":[]},{"name":"파인파크 AT 군산파3","aliases":["파인파크AT군산파3"],"region":"전북","city":"군산시","courses":[]},{"name":"클럽72","aliases":["원더클럽 클럽72","스카이72","스카이72골프앤리조트"],"region":"경기","city":"인천 중구","courses":[{"name":"하늘A","par":[4,4,5,3,4,5,4,3,4]},{"name":"하늘B","par":[5,4,3,4,4,4,3,4,5]},{"name":"오션A","par":[4,4,3,4,5,4,5,3,4]},{"name":"오션B","par":[4,4,3,5,4,4,4,3,5]},{"name":"레이크A","par":[4,4,5,3,4,5,3,4,4]},{"name":"레이크B","par":[4,4,5,4,3,4,4,3,5]},{"name":"클래식A","par":[5,3,4,4,4,3,5,4,4]},{"name":"클래식B","par":[4,4,4,5,3,4,4,3,5]}]},{"name":"드림파크CC","aliases":["드림파크컨트리클럽"],"region":"경기","city":"인천 서구","courses":[{"name":"드림A","par":[4,4,4,5,3,4,4,3,5]},{"name":"드림B","par":[4,4,5,3,4,4,5,3,4]},{"name":"파크A","par":[4,4,5,4,3,4,5,3,4]},{"name":"파크B","par":[4,5,3,4,4,3,5,4,4]}]},{"name":"베어즈베스트청라GC","aliases":["베어즈베스트 청라","베어즈베스트청라 골프클럽"],"region":"경기","city":"인천 서구","courses":[{"name":"USA","par":[4,5,3,4,4,5,3,4,4]},{"name":"유럽","par":[4,4,3,5,3,5,4,4,4]},{"name":"오스트랄아시아","par":[5,4,3,4,4,4,3,4,5]}]},{"name":"잭니클라우스GC코리아","aliases":["잭니클라우스 골프클럽 코리아","잭 니클라우스 골프클럽"],"region":"경기","city":"인천 연수구","courses":[{"name":"어반","par":[4,4,5,4,3,4,5,3,4]},{"name":"링크스","par":[4,4,4,3,4,5,4,3,5]}]},{"name":"인천국제CC","aliases":["인천국제컨트리클럽"],"region":"경기","city":"인천 서구","courses":[{"name":"OUT","par":[4,5,4,3,4,4,3,4,5]},{"name":"IN","par":[4,4,4,3,5,4,3,4,5]}]},{"name":"인천그랜드CC","aliases":["인천그랜드컨트리클럽"],"region":"경기","city":"인천 서구","courses":[{"name":"OUT","par":[5,4,4,3,4,4,5,4,4]},{"name":"IN","par":[4,5,3,4,3,4,3,4,5]}]},{"name":"골프존카운티 송도","aliases":["오렌지듄스 송도","오렌지듄스GC","오렌지듄스 골프클럽"],"region":"경기","city":"인천 연수구","courses":[{"name":"동","par":[4,3,5,4,4,3,4,4,5]},{"name":"서","par":[4,4,5,3,4,4,4,3,4]}]},{"name":"오렌지듄스 영종","aliases":["오렌지듄스영종GC"],"region":"경기","city":"인천 중구","courses":[{"name":"OUT","par":[4,4,3,5,3,4,5,4,4]},{"name":"IN","par":[4,4,3,4,4,3,5,4,5]}],"chk":1},{"name":"베르힐CC 영종","aliases":["베르힐 영종","베르힐컨트리클럽 영종"],"region":"경기","city":"인천 중구","courses":[{"name":"오션","par":[5,4,4,3,4,3,4,4,5]},{"name":"레이크","par":[4,5,4,3,5,4,3,4,4]}],"chk":1,"part":1},{"name":"송도GC","aliases":["송도골프클럽"],"region":"경기","city":"인천 연수구","courses":[]},{"name":"태릉CC","aliases":["태릉골프장","태릉체력단련장","육군 태릉 체력단련장"],"region":"경기","city":"서울 노원구","courses":[{"name":"OUT","par":[4,5,5,4,3,4,3,4,4]},{"name":"IN","par":[4,4,5,3,5,4,3,4,4]}]},{"name":"인서울27GC","aliases":["인서울27골프클럽","인서울72"],"region":"경기","city":"서울 강서구","courses":[{"name":"동","par":[4,5,4,4,4,3,4,3,5]},{"name":"서","par":[4,5,3,4,3,4,4,5,4]},{"name":"남","par":[4,3,4,3,5,5,4,4,4]}]},{"name":"월드컵공원 골프장","aliases":["상암 월드컵공원 골프장"],"region":"경기","city":"서울 마포구","courses":[]},{"name":"포천아도니스CC","aliases":["아도니스CC","아도니스컨트리클럽"],"region":"경기","city":"포천시","courses":[{"name":"동","par":[4,5,3,4,4,5,4,3,4]},{"name":"서","par":[4,5,3,4,4,5,3,4,4]},{"name":"중","par":[4,4,3,4,5,4,4,3,5]}]},{"name":"아도니스 퍼블릭","aliases":["아도니스CC 퍼블릭"],"region":"경기","city":"포천시","courses":[{"name":"퍼블릭","par":[4,4,3,5,4,3,4,5,4]}]},{"name":"베어크리크GC 포천","aliases":["베어크리크 골프클럽","베어크리크 포천"],"region":"경기","city":"포천시","courses":[{"name":"베어A","par":[4,3,4,5,4,3,4,5,4]},{"name":"베어B","par":[4,5,4,3,4,5,4,3,4]},{"name":"크리크A","par":[4,4,3,5,4,3,4,5,4]},{"name":"크리크B","par":[5,4,3,4,4,3,4,4,5]}]},{"name":"포천힐스CC","aliases":["포천힐스컨트리클럽","포천 힐스"],"region":"경기","city":"포천시","courses":[{"name":"캐슬","par":[5,4,3,4,4,4,3,4,5]},{"name":"팰리스","par":[5,3,4,5,3,4,3,4,5]},{"name":"가든","par":[5,4,5,3,4,3,4,4,4]}]},{"name":"포레스트힐CC","aliases":["포레스트힐컨트리클럽","포레스트힐 포천"],"region":"경기","city":"포천시","courses":[{"name":"락","par":[5,3,5,4,4,4,3,4,4]},{"name":"힐","par":[4,4,3,4,4,5,4,3,5]}]},{"name":"푸른솔GC 포천","aliases":["푸른솔포천","푸른솔골프클럽 포천","가산노블리제CC","가산 노블리제 컨트리클럽"],"region":"경기","city":"포천시","courses":[{"name":"레이크","par":[5,4,4,3,4,4,4,3,5]},{"name":"마운틴","par":[5,4,4,4,3,5,4,3,4]},{"name":"밸리","par":[5,4,4,3,5,3,4,4,4]}]},{"name":"일동레이크GC","aliases":["일동레이크골프클럽"],"region":"경기","city":"포천시","courses":[{"name":"마운틴","par":[4,5,3,4,4,4,3,5,4]},{"name":"힐","par":[4,4,5,3,4,5,4,4,3]}]},{"name":"락가든GC","aliases":["락가든골프클럽"],"region":"경기","city":"포천시","courses":[{"name":"락가든","par":[5,4,4,5,4,4,4,3,3]}]},{"name":"필로스CC","aliases":["필로스골프클럽"],"region":"경기","city":"포천시","courses":[{"name":"동","par":[4,5,3,4,4,3,4,5,4]},{"name":"서","par":[4,3,5,4,3,4,5,4,4]},{"name":"남","par":[4,4,5,3,4,5,4,3,4]}]},{"name":"라싸GC","aliases":["라싸골프클럽"],"region":"경기","city":"포천시","courses":[{"name":"레이크","par":[4,4,3,5,3,5,4,3,5]},{"name":"밸리","par":[4,3,4,5,3,4,4,5,4]},{"name":"마운틴","par":[4,4,5,4,3,4,3,4,5]}]},{"name":"샴발라CC","aliases":["샴발라컨트리클럽"],"region":"경기","city":"포천시","courses":[{"name":"OUT","par":[4,4,5,4,4,3,4,3,5]},{"name":"IN","par":[4,3,5,3,4,4,5,4,4]}]},{"name":"코브스윙GC","aliases":["참밸리CC","참밸리컨트리클럽"],"region":"경기","city":"포천시","courses":[{"name":"OUT","par":[4,4,4,4,3,4,5,3,5]},{"name":"IN","par":[4,4,3,5,4,4,3,4,5]}]},{"name":"베어스타운 골프장","aliases":["베어스타운리조트 골프"],"region":"경기","city":"포천시","courses":[{"name":"베어스타운","par":[4,4,4,4,3,5,3,4,5]}],"chk":1},{"name":"티클라우드CC","aliases":["티클라우드컨트리클럽"],"region":"경기","city":"동두천시","courses":[{"name":"해밀","par":[4,4,5,3,4,5,4,3,4]},{"name":"비체","par":[4,3,4,5,4,4,5,3,4]}]},{"name":"레이크우드CC","aliases":["레이크우드컨트리클럽"],"region":"경기","city":"양주시","courses":[{"name":"숲길","par":[4,5,3,4,4,5,4,3,4]},{"name":"산길","par":[5,3,4,4,3,4,5,4,4]},{"name":"물길","par":[4,4,3,5,4,3,5,4,4]},{"name":"꽃길","par":[4,4,3,4,4,5,3,5,4]}],"chk":1},{"name":"자유로CC","aliases":["자유로컨트리클럽"],"region":"경기","city":"연천군","courses":[{"name":"대한","par":[5,4,3,4,4,3,4,5,4]},{"name":"민국","par":[4,5,3,4,4,4,3,5,4]},{"name":"통일","par":[5,4,3,5,4,4,3,4,4]}]},{"name":"해비치CC 서울","aliases":["해비치컨트리클럽 서울","남양주해비치","해비치 남양주"],"region":"경기","city":"남양주시","courses":[]},{"name":"비전힐스CC","aliases":["비전힐스컨트리클럽"],"region":"경기","city":"남양주시","courses":[{"name":"동","par":[5,4,4,3,5,4,4,3,4]},{"name":"서","par":[4,5,4,3,5,4,3,4,4]}]},{"name":"양주CC","aliases":["양주컨트리클럽"],"region":"경기","city":"남양주시","courses":[{"name":"OUT","par":[4,4,5,3,4,5,4,3,4]},{"name":"IN","par":[4,4,3,4,4,3,5,4,5]}]},{"name":"남양주CC","aliases":["남양주컨트리클럽"],"region":"경기","city":"남양주시","courses":[{"name":"남양주","par":[5,3,4,4,4,3,5,4,4]}]},{"name":"한림광릉CC","aliases":["광릉CC","광릉컨트리클럽"],"region":"경기","city":"남양주시","courses":[{"name":"글렌","par":[5,4,4,4,3,5,3,4,4]},{"name":"파인","par":[5,4,3,4,5,4,4,3,4]}]},{"name":"크리스탈밸리CC","aliases":["크리스탈밸리컨트리클럽"],"region":"경기","city":"가평군","courses":[{"name":"OUT","par":[4,5,3,4,4,4,5,3,4]},{"name":"IN","par":[5,3,4,4,4,3,5,4,4]}]},{"name":"가평베네스트GC","aliases":["가평베네스트","가평 베네스트 골프클럽"],"region":"경기","city":"가평군","courses":[{"name":"버치","par":[5,3,4,4,3,4,5,3,5]},{"name":"파인","par":[4,5,3,4,4,4,3,4,5]},{"name":"메이플","par":[5,4,3,4,4,3,5,4,4]}]},{"name":"썬힐GC","aliases":["썬힐골프클럽","썬힐CC"],"region":"경기","city":"가평군","courses":[{"name":"힐","par":[4,5,4,3,4,4,5,3,4]},{"name":"파인","par":[5,4,4,3,4,3,4,4,5]},{"name":"썬","par":[4,3,4,5,3,4,5,4,4]},{"name":"밸리","par":[4,4,3,5,4,5,3,4,4]}]},{"name":"리앤리CC","aliases":["리앤리컨트리클럽"],"region":"경기","city":"가평군","courses":[{"name":"레이크","par":[4,4,4,3,5,3,5,4,4]},{"name":"하이랜드","par":[4,4,4,3,5,4,4,3,5]},{"name":"스카이","par":[5,4,3,5,4,3,4,3,5]}]},{"name":"베뉴지CC","aliases":["베뉴지컨트리클럽"],"region":"경기","city":"가평군","courses":[{"name":"힐","par":[4,4,3,5,4,3,4,4,5]},{"name":"휴","par":[4,3,4,4,3,4,5,4,5]}],"part":1},{"name":"마이다스밸리 청평","aliases":["마이다스밸리GC","마이다스밸리골프클럽"],"region":"경기","city":"가평군","courses":[{"name":"밸리","par":[4,3,4,4,5,4,3,5,4]},{"name":"마이다스","par":[4,5,3,4,5,4,3,4,4]}]},{"name":"프리스틴밸리CC","aliases":["프리스틴밸리컨트리클럽"],"region":"경기","city":"가평군","courses":[{"name":"OUT","par":[5,4,3,4,5,3,4,4,4]},{"name":"IN","par":[5,3,4,4,5,4,4,3,4]}]},{"name":"아난티 코드","aliases":["아난티클럽 서울","아난티 클럽 서울"],"region":"경기","city":"가평군","courses":[{"name":"자작나무","par":[4,4,5,3,4,4,3,4,5]},{"name":"잣나무","par":[5,3,4,4,4,3,4,5,4]},{"name":"느티나무","par":[4,4,3,4,3,4,5,4,4]}],"chk":1},{"name":"몽베르CC","aliases":["대유몽베르CC","대유 몽베르 컨트리클럽"],"region":"경기","city":"포천시","courses":[{"name":"쁘렝땅","par":[4,4,5,3,4,5,4,3,4]},{"name":"오똔","par":[4,4,5,3,4,3,4,4,5]},{"name":"이베르","par":[4,4,3,5,4,5,3,4,4]},{"name":"에떼","par":[4,4,5,4,5,3,4,3,4]}],"chk":1},{"name":"서울한양CC","aliases":["서울컨트리클럽","서울CC","한양컨트리클럽","한양CC"],"region":"경기","city":"고양시","courses":[{"name":"구A","par":[4,4,3,4,4,5,4,3,5]},{"name":"구B","par":[5,4,5,4,3,4,4,3,4]},{"name":"신A","par":[4,4,4,3,5,3,5,4,4]},{"name":"신B","par":[3,5,4,4,3,5,4,4,4]}]},{"name":"한양파인CC","aliases":["한양파인컨트리클럽"],"region":"경기","city":"고양시","courses":[]},{"name":"뉴코리아CC","aliases":["뉴코리아컨트리클럽"],"region":"경기","city":"고양시","courses":[{"name":"OUT","par":[4,4,4,3,5,4,3,5,4]},{"name":"IN","par":[4,3,4,5,4,3,4,5,4]}]},{"name":"고양CC","aliases":["고양컨트리클럽"],"region":"경기","city":"고양시","courses":[{"name":"고양","par":[5,3,4,5,3,4,3,4,5]}]},{"name":"올림픽CC","aliases":["올림픽컨트리클럽"],"region":"경기","city":"고양시","courses":[{"name":"올림픽","par":[4,4,3,4,5,4,4,5,3]}]},{"name":"스프링힐스CC","aliases":["스프링힐스컨트리클럽"],"region":"경기","city":"고양시","courses":[{"name":"스프링힐스","par":[4,4,4,3,5,5,4,3,4]}]},{"name":"123골프클럽","aliases":[],"region":"경기","city":"고양시","courses":[]},{"name":"서원밸리CC","aliases":["서원밸리컨트리클럽"],"region":"경기","city":"파주시","courses":[{"name":"A","par":[4,5,4,3,4,4,5,3,4]},{"name":"B","par":[4,3,5,4,4,4,5,3,4]}]},{"name":"서원힐스CC","aliases":["서원힐스컨트리클럽","서원힐스"],"region":"경기","city":"파주시","courses":[{"name":"동","par":[4,3,4,4,5,4,4,3,5]},{"name":"서","par":[5,4,4,3,4,4,3,5,4]}],"chk":1,"part":1},{"name":"서서울CC","aliases":["서서울컨트리클럽"],"region":"경기","city":"파주시","courses":[{"name":"레이크","par":[4,5,4,3,4,5,4,3,4]},{"name":"힐","par":[4,5,4,3,4,5,4,3,4]}],"chk":1},{"name":"노스팜CC","aliases":["노스팜컨트리클럽","파주프리스틴밸리GC","파주 프리스틴밸리"],"region":"경기","city":"파주시","courses":[{"name":"OUT","par":[4,5,4,4,3,4,4,3,5]},{"name":"IN","par":[5,4,3,4,5,3,4,4,4]}]},{"name":"파주CC","aliases":["파주컨트리클럽"],"region":"경기","city":"파주시","courses":[{"name":"동","par":[4,4,3,5,3,5,4,4,4]},{"name":"서","par":[4,4,5,3,4,4,3,5,4]}]},{"name":"원더클럽 파주","aliases":[],"region":"경기","city":"파주시","courses":[{"name":"OUT","par":[4,4,3,5,3,5,4,4,4]},{"name":"IN","par":[4,4,5,3,4,4,3,5,4]}],"chk":1},{"name":"베스트밸리GC","aliases":["베스트밸리골프클럽"],"region":"경기","city":"파주시","courses":[{"name":"베스트밸리","par":[5,4,4,4,3,4,5,4,3]}]},{"name":"스마트KU 골프파빌리온","aliases":["스마트KU","스마트KU골프파빌리온","건국대 골프장"],"region":"경기","city":"파주시","courses":[{"name":"호네스타","par":[4,4,3,3,4,4,5,4,5]},{"name":"저스티시아","par":[4,3,5,4,4,4,4,3,5]},{"name":"트러스트","par":[4,5,4,4,3,4,3,4,5]}]},{"name":"J퍼블릭GC","aliases":["제이퍼블릭"],"region":"경기","city":"파주시","courses":[]},{"name":"송추CC","aliases":["송추컨트리클럽"],"region":"경기","city":"양주시","courses":[{"name":"서","par":[4,5,4,3,4,5,3,4,4]},{"name":"동","par":[5,3,4,4,3,4,5,4,4]}]},{"name":"김포씨사이드CC","aliases":["김포씨사이드컨트리클럽"],"region":"경기","city":"김포시","courses":[{"name":"서","par":[4,3,4,5,4,4,3,5,4]},{"name":"남","par":[5,4,3,4,4,3,4,5,4]}]},{"name":"힐마루CC 포천","aliases":["힐마루포천","힐마루 골프앤리조트"],"region":"경기","city":"포천시","courses":[]},{"name":"강화웰빙GC","aliases":["강화웰빙골프장","강화웰빙"],"region":"경기","city":"인천 강화군","courses":[]},{"name":"88CC","aliases":["88컨트리클럽","팔팔CC"],"region":"경기","city":"용인시","courses":[{"name":"동 OUT","par":[4,4,5,3,4,3,4,5,4]},{"name":"동 IN","par":[5,4,3,4,4,4,5,3,4]},{"name":"서 OUT","par":[4,4,3,5,4,4,3,5,4]},{"name":"서 IN","par":[5,4,4,3,4,3,4,4,5]}]},{"name":"골드CC","aliases":["골드컨트리클럽"],"region":"경기","city":"용인시","courses":[{"name":"챔피언 OUT","par":[4,3,5,3,4,5,3,5,4]},{"name":"챔피언 IN","par":[3,4,4,5,3,4,4,5,4]},{"name":"마스터 OUT","par":[4,3,4,5,4,4,3,4,5]},{"name":"마스터 IN","par":[3,5,4,5,3,4,3,4,5]}]},{"name":"아시아나CC","aliases":["아시아나컨트리클럽"],"region":"경기","city":"용인시","courses":[{"name":"동 OUT","par":[4,4,4,5,4,3,5,3,4]},{"name":"동 IN","par":[5,3,4,4,4,5,3,4,4]},{"name":"서 OUT","par":[5,4,4,4,3,5,4,3,4]},{"name":"서 IN","par":[4,4,5,3,4,4,3,4,5]}]},{"name":"블루원 용인CC","aliases":["블루원용인컨트리클럽"],"region":"경기","city":"용인시","courses":[{"name":"동","par":[5,4,3,4,5,3,4,4,4]},{"name":"중","par":[4,4,3,5,4,3,4,4,5]},{"name":"서","par":[5,4,3,4,4,4,3,5,4]}]},{"name":"은화삼CC","aliases":["은화삼컨트리클럽"],"region":"경기","city":"용인시","courses":[{"name":"동","par":[4,4,5,4,3,5,4,3,4]},{"name":"서","par":[5,4,4,4,3,4,5,3,4]}]},{"name":"글렌로스GC","aliases":["글렌로스골프클럽"],"region":"경기","city":"용인시","courses":[{"name":"글렌로스","par":[5,4,3,4,4,4,3,4,5]}]},{"name":"해솔리아CC","aliases":["해솔리아컨트리클럽"],"region":"경기","city":"용인시","courses":[{"name":"해","par":[4,5,4,4,3,5,4,3,4]},{"name":"솔","par":[5,4,4,3,4,4,5,3,4]},{"name":"리아","par":[5,4,5,4,3,4,4,4,3]}]},{"name":"한성CC","aliases":["한성컨트리클럽"],"region":"경기","city":"용인시","courses":[{"name":"블루","par":[4,5,4,3,4,4,3,5,4]},{"name":"그린","par":[4,4,5,3,4,5,3,4,4]},{"name":"오렌지","par":[4,4,5,4,3,4,3,5,4]}]},{"name":"한원CC","aliases":["한원컨트리클럽"],"region":"경기","city":"용인시","courses":[{"name":"백제","par":[5,4,3,4,4,4,3,5,4]}],"part":1},{"name":"화산CC","aliases":["화산컨트리클럽"],"region":"경기","city":"용인시","courses":[{"name":"OUT","par":[5,4,4,4,3,4,3,4,5]},{"name":"IN","par":[4,3,4,4,3,5,4,5,4]}]},{"name":"지산CC","aliases":["지산컨트리클럽","지산 퍼블릭CC"],"region":"경기","city":"용인시","courses":[{"name":"동","par":[4,5,4,3,4,4,3,5,4]},{"name":"남","par":[4,4,3,5,4,4,3,5,4]},{"name":"서","par":[4,5,3,4,4,3,4,5,4]},{"name":"퍼블릭","par":[4,5,4,5,3,4,4,4,3]}]},{"name":"코리아CC","aliases":["코리아컨트리클럽"],"region":"경기","city":"용인시","courses":[{"name":"챌린지","par":[4,3,5,4,5,3,4,4,4]},{"name":"크릭","par":[5,4,4,3,4,3,5,4,4]},{"name":"레이크","par":[5,4,3,4,4,4,5,3,4]}],"chk":1},{"name":"코리아퍼블릭GC","aliases":["코리아퍼블릭골프장"],"region":"경기","city":"용인시","courses":[{"name":"9H","par":[5,4,3,5,4,3,4,3,5]}]},{"name":"한림용인CC","aliases":["레이크힐스 용인CC","레이크힐스용인"],"region":"경기","city":"용인시","courses":[{"name":"다이아몬드","par":[4,5,4,3,5,4,4,3,4]},{"name":"루비","par":[4,4,5,3,4,4,3,5,4]},{"name":"사파이어","par":[4,4,3,5,4,3,4,5,4]}],"chk":1},{"name":"레이크사이드CC","aliases":["레이크사이드컨트리클럽"],"region":"경기","city":"용인시","courses":[{"name":"서 OUT","par":[5,4,3,4,4,3,4,5,4]},{"name":"서 IN","par":[4,5,3,4,4,5,4,3,4]},{"name":"동 OUT","par":[4,5,4,3,4,4,5,3,4]},{"name":"동 IN","par":[4,4,3,4,5,4,3,4,5]},{"name":"남 OUT","par":[4,4,3,4,4,5,3,4,5]},{"name":"남 IN","par":[4,5,3,4,5,3,4,4,4]}]},{"name":"플라자CC 용인","aliases":["플라자컨트리클럽 용인"],"region":"경기","city":"용인시","courses":[{"name":"라이온 OUT","par":[4,4,5,3,5,4,3,4,4]},{"name":"라이온 IN","par":[5,4,3,5,4,4,3,4,4]},{"name":"타이거 OUT","par":[5,4,3,4,4,4,3,4,5]},{"name":"타이거 IN","par":[4,4,4,3,4,5,3,5,4]}]},{"name":"신원CC","aliases":["신원컨트리클럽"],"region":"경기","city":"용인시","courses":[{"name":"에벤에셀","par":[4,5,4,4,3,4,5,3,4]},{"name":"데이비드","par":[4,5,4,3,4,4,3,5,4]},{"name":"솔로몬","par":[4,4,3,5,4,4,3,5,4]}]},{"name":"태광CC","aliases":["태광컨트리클럽"],"region":"경기","city":"용인시","courses":[{"name":"남","par":[4,4,4,4,5,3,5,3,4]},{"name":"북","par":[4,5,4,3,4,4,5,3,4]},{"name":"동","par":[4,5,4,3,5,4,4,3,4]},{"name":"서","par":[4,5,3,5,4,4,4,3,4]}]},{"name":"수원CC","aliases":["수원컨트리클럽"],"region":"경기","city":"용인시","courses":[{"name":"신 OUT","par":[4,4,3,5,3,4,4,5,4]},{"name":"신 IN","par":[4,5,4,3,4,4,3,5,4]},{"name":"구 OUT","par":[5,4,3,4,3,4,5,4,4]},{"name":"구 IN","par":[4,3,4,5,4,4,3,5,4]}]},{"name":"남부CC","aliases":["남부컨트리클럽"],"region":"경기","city":"용인시","courses":[{"name":"OUT","par":[4,4,3,5,4,3,5,4,4]},{"name":"IN","par":[4,3,5,4,4,3,4,5,4]}]},{"name":"세현CC","aliases":["세현컨트리클럽"],"region":"경기","city":"용인시","courses":[{"name":"밸리","par":[4,4,4,3,4,3,5,4,5]},{"name":"레이크","par":[4,4,5,4,3,4,5,3,4]}]},{"name":"써닝포인트CC","aliases":["써닝포인트컨트리클럽"],"region":"경기","city":"용인시","courses":[{"name":"OUT","par":[4,3,5,4,3,4,4,4,6]},{"name":"IN","par":[4,4,3,4,5,4,3,4,5]}]},{"name":"양지파인CC","aliases":["양지파인리조트","양지파인골프장"],"region":"경기","city":"용인시","courses":[{"name":"동","par":[3,4,4,5,4,5,4,4,3]},{"name":"서","par":[4,3,5,4,4,4,4,3,5]}],"part":1},{"name":"용인CC","aliases":["용인컨트리클럽"],"region":"경기","city":"용인시","courses":[{"name":"OUT","par":[4,5,4,3,4,4,3,4,5]},{"name":"IN","par":[4,4,4,4,5,3,4,3,5]}]},{"name":"강남300CC","aliases":["강남300컨트리클럽"],"region":"경기","city":"광주시","courses":[{"name":"OUT","par":[5,4,3,4,3,4,4,4,5]},{"name":"IN","par":[5,4,3,4,4,4,3,4,5]}]},{"name":"곤지암CC","aliases":["곤지암컨트리클럽"],"region":"경기","city":"광주시","courses":[{"name":"레이크","par":[5,4,3,4,4,3,4,5,4]},{"name":"마운틴","par":[5,4,4,4,4,3,4,3,5]}]},{"name":"남촌CC","aliases":["남촌컨트리클럽","남촌골프클럽"],"region":"경기","city":"광주시","courses":[{"name":"OUT","par":[5,4,4,3,5,4,4,3,4]},{"name":"IN","par":[4,4,3,4,3,5,4,5,4]}]},{"name":"뉴서울CC","aliases":["뉴서울컨트리클럽"],"region":"경기","city":"광주시","courses":[{"name":"북 OUT","par":[4,4,3,5,4,5,4,3,4]},{"name":"북 IN","par":[4,5,3,4,4,5,3,4,4]},{"name":"남 OUT","par":[4,5,3,4,4,5,4,3,4]},{"name":"남 IN","par":[5,4,4,3,5,4,4,3,4]}]},{"name":"이스트밸리CC","aliases":["이스트밸리컨트리클럽"],"region":"경기","city":"광주시","courses":[{"name":"동","par":[4,5,4,3,4,5,3,4,4]},{"name":"남","par":[4,5,3,4,4,5,4,3,4]},{"name":"서","par":[5,4,3,4,3,4,5,4,4]}]},{"name":"더시에나 서울CC","aliases":["중부CC","중부컨트리클럽"],"region":"경기","city":"광주시","courses":[{"name":"동","par":[4,5,4,3,4,5,3,4,4]},{"name":"서","par":[4,4,5,3,4,4,5,3,4]}]},{"name":"로제비앙GC","aliases":["큐로CC","큐로컨트리클럽","로제비앙 골프클럽"],"region":"경기","city":"광주시","courses":[]},{"name":"그린힐CC","aliases":["그린힐컨트리클럽"],"region":"경기","city":"광주시","courses":[]},{"name":"남서울CC","aliases":["남서울컨트리클럽"],"region":"경기","city":"성남시","courses":[{"name":"OUT","par":[4,4,3,5,4,3,4,4,5]},{"name":"IN","par":[4,3,4,4,5,4,5,3,4]}]},{"name":"성남 군 체력단련장","aliases":[],"region":"경기","city":"성남시","courses":[]},{"name":"캐슬렉스 서울GC","aliases":["캐슬렉스서울","캐슬렉스 서울 골프클럽"],"region":"경기","city":"하남시","courses":[{"name":"OUT","par":[4,3,5,5,4,3,5,4,3]},{"name":"IN","par":[4,5,3,4,5,4,3,4,4]}]},{"name":"비에이비스타CC","aliases":["비에이비스타컨트리클럽","BA비스타CC"],"region":"경기","city":"이천시","courses":[{"name":"벨라","par":[4,5,4,3,4,5,3,4,4]},{"name":"라고","par":[4,3,5,4,3,4,5,4,4]},{"name":"몬티","par":[4,5,4,3,4,5,4,3,4]},{"name":"비스타","par":[4,4,3,5,4,4,4,3,5]},{"name":"부오나","par":[4,3,4,4,5,4,3,5,4]}],"part":1},{"name":"블랙스톤이천GC","aliases":["블랙스톤 이천","블랙스톤골프클럽 이천"],"region":"경기","city":"이천시","courses":[{"name":"동","par":[5,4,4,3,4,4,3,4,5]},{"name":"서","par":[4,4,4,3,4,5,3,4,5]},{"name":"북","par":[5,4,3,4,5,4,3,4,4]}]},{"name":"H1클럽","aliases":["H1 클럽","에이치원클럽","에이치원골프클럽","덕평힐뷰CC","덕평힐뷰 컨트리클럽","덕평CC"],"region":"경기","city":"이천시","courses":[{"name":"마운틴","par":[4,4,4,4,3,5,4,3,5]},{"name":"레이크","par":[4,5,4,4,3,4,5,3,4]}],"chk":1},{"name":"마이다스레이크 이천","aliases":["이천마이다스골프앤리조트","이천 마이다스 골프&리조트","마이다스CC 이천"],"region":"경기","city":"이천시","courses":[{"name":"마이다스","par":[4,4,3,5,4,3,5,4,4]},{"name":"올림푸스","par":[5,4,3,4,4,3,5,4,4]},{"name":"타이탄","par":[4,4,4,5,3,4,4,3,5]}]},{"name":"이천실크밸리GC","aliases":["실크밸리GC","실크밸리골프클럽"],"region":"경기","city":"이천시","courses":[{"name":"레이크","par":[4,4,5,3,4,3,5,4,4]},{"name":"실크","par":[5,4,3,4,4,5,3,4,4]},{"name":"밸리","par":[5,4,4,5,4,3,4,3,4]}]},{"name":"웰링턴CC","aliases":["웰링턴컨트리클럽"],"region":"경기","city":"이천시","courses":[{"name":"그리핀","par":[4,5,4,4,3,5,4,3,4]},{"name":"피닉스","par":[4,4,3,4,5,3,4,4,5]}],"part":1},{"name":"사우스스프링스CC","aliases":["사우스스프링스컨트리클럽","휘닉스스프링스CC","휘닉스스프링스"],"region":"경기","city":"이천시","courses":[{"name":"레이크","par":[4,5,4,4,3,4,5,3,4]},{"name":"마운틴","par":[4,4,5,4,3,5,4,3,4]}]},{"name":"뉴스프링빌CC","aliases":["뉴스프링빌컨트리클럽","뉴스프링빌 이천"],"region":"경기","city":"이천시","courses":[{"name":"몽블랑","par":[4,3,4,5,4,3,4,4,5]},{"name":"알프스","par":[4,4,5,3,4,4,3,5,4]},{"name":"화이트혼","par":[3,4,3,4,4,4,5,4,4]},{"name":"올림푸스","par":[4,3,4,4,4,3,4,5,4]},{"name":"로키","par":[4,3,4,4,4,3,5,4,5]}],"chk":1,"part":1},{"name":"더크로스비GC","aliases":["더크로스비골프클럽","더크로스비CC"],"region":"경기","city":"이천시","courses":[{"name":"샬롯","par":[4,4,3,4,5,4,3,4,5]},{"name":"아리아","par":[4,3,4,5,4,5,3,4,4]},{"name":"빌리","par":[5,4,5,3,4,4,3,4,4]}]},{"name":"더반CC","aliases":["더반컨트리클럽"],"region":"경기","city":"이천시","courses":[{"name":"OUT","par":[4,3,4,4,5,4,4,3,5]},{"name":"IN","par":[4,3,4,4,5,4,4,3,5]}]},{"name":"비승대체력단련장","aliases":["비승대CC","비승대골프장"],"region":"경기","city":"이천시","courses":[{"name":"비승대","par":[4,5,3,4,5,3,4,4,4]}]},{"name":"남여주GC","aliases":["남여주CC","남여주골프클럽","남여주컨트리클럽"],"region":"경기","city":"여주시","courses":[{"name":"가람","par":[4,4,5,4,3,4,3,4,5]},{"name":"마루","par":[4,4,5,4,4,3,5,3,4]},{"name":"북","par":[4,4,3,5,4,3,4,5,4]}]},{"name":"아리지CC","aliases":["아리지컨트리클럽"],"region":"경기","city":"여주시","courses":[{"name":"문","par":[4,3,4,5,4,3,5,4,4]},{"name":"스타","par":[4,5,4,4,3,4,4,3,5]},{"name":"썬","par":[5,4,3,4,4,3,4,4,5]}]},{"name":"360도CC","aliases":["360도컨트리클럽"],"region":"경기","city":"여주시","courses":[{"name":"OUT","par":[4,4,5,3,4,4,3,5,4]},{"name":"IN","par":[4,3,5,4,4,3,5,4,4]}]},{"name":"캐슬파인GC","aliases":["캐슬파인골프클럽","캐슬파인CC"],"region":"경기","city":"여주시","courses":[{"name":"레이크","par":[4,4,4,5,3,4,4,3,5]},{"name":"밸리","par":[4,4,4,3,5,5,4,3,4]}]},{"name":"블루헤런GC","aliases":["블루헤런골프클럽","블루헤런CC"],"region":"경기","city":"여주시","courses":[{"name":"동","par":[4,3,4,5,3,4,5,4,4]},{"name":"서","par":[5,3,4,4,4,4,3,4,5]}]},{"name":"세라지오CC","aliases":["세라지오컨트리클럽","세라지오GC"],"region":"경기","city":"여주시","courses":[{"name":"세라","par":[4,5,4,4,4,3,5,3,4]},{"name":"지오","par":[4,5,4,3,4,4,3,5,4]}]},{"name":"페럼클럽","aliases":["페럼CC","페럼골프클럽"],"region":"경기","city":"여주시","courses":[{"name":"OUT","par":[4,4,3,4,5,4,4,3,5]},{"name":"IN","par":[4,4,5,4,3,4,3,4,5]}]},{"name":"해슬리나인브릿지","aliases":["해슬리 나인브릿지","해슬리나인브릿지GC"],"region":"경기","city":"여주시","courses":[{"name":"OUT","par":[4,3,5,4,5,3,4,4,4]},{"name":"IN","par":[4,5,4,4,3,4,5,3,4]}]},{"name":"자유CC","aliases":["자유컨트리클럽"],"region":"경기","city":"여주시","courses":[{"name":"OUT","par":[4,4,3,4,5,4,3,5,4]},{"name":"IN","par":[4,5,4,3,4,5,3,4,4]}]},{"name":"이포CC","aliases":["이포컨트리클럽"],"region":"경기","city":"여주시","courses":[{"name":"OUT","par":[4,3,5,4,5,4,3,4,4]},{"name":"IN","par":[4,5,3,4,4,5,4,3,4]}]},{"name":"트리니티클럽","aliases":["트리니티CC","트리니티컨트리클럽"],"region":"경기","city":"여주시","courses":[{"name":"OUT","par":[4,4,3,4,5,4,5,4,3]},{"name":"IN","par":[4,5,4,3,5,3,4,4,4]}]},{"name":"금강CC","aliases":["여주 금강","금강컨트리클럽"],"region":"경기","city":"여주시","courses":[{"name":"동","par":[4,5,4,3,4,4,4,3,5]},{"name":"서","par":[5,4,4,3,4,5,4,3,4]},{"name":"남","par":[4,5,4,3,4,4,4,3,5]}],"chk":1},{"name":"신라CC","aliases":["여주신라CC","신라컨트리클럽"],"region":"경기","city":"여주시","courses":[{"name":"동","par":[4,4,5,3,4,4,3,5,4]},{"name":"서","par":[5,4,4,4,3,4,4,3,5]}],"part":1},{"name":"스카이밸리CC","aliases":["스카이밸리컨트리클럽"],"region":"경기","city":"여주시","courses":[{"name":"레이크","par":[4,4,3,4,4,5,3,4,5]},{"name":"마운틴","par":[4,4,4,5,3,4,5,3,4]},{"name":"스카이","par":[4,5,4,3,5,4,3,4,4]},{"name":"밸리","par":[4,5,3,4,4,4,3,5,4]}]},{"name":"여주CC","aliases":["여주컨트리클럽"],"region":"경기","city":"여주시","courses":[{"name":"에이스","par":[5,3,4,4,4,4,5,3,4]},{"name":"드림","par":[4,4,4,3,4,5,5,3,4]},{"name":"챌린지","par":[4,3,5,3,5,4,4,4,4]}]},{"name":"루트52CC","aliases":["루트52","루트52컨트리클럽"],"region":"경기","city":"여주시","courses":[{"name":"A","par":[4,4,4,5,3,4,3,5,4]},{"name":"B","par":[4,3,5,4,4,5,4,3,4]}]},{"name":"렉스필드CC","aliases":["렉스필드컨트리클럽"],"region":"경기","city":"여주시","courses":[{"name":"레이크","par":[4,5,3,4,4,5,3,4,4]},{"name":"마운틴","par":[4,3,4,5,4,4,3,4,5]},{"name":"밸리","par":[5,4,3,4,4,3,5,4,4]}]},{"name":"소피아그린CC","aliases":["소피아그린컨트리클럽"],"region":"경기","city":"여주시","courses":[{"name":"황학","par":[4,4,5,3,4,5,3,4,4]},{"name":"세종","par":[4,5,4,3,4,4,5,3,4]},{"name":"여강","par":[4,5,4,3,5,4,4,3,4]}]},{"name":"솔모로CC","aliases":["솔모로컨트리클럽"],"region":"경기","city":"여주시","courses":[{"name":"메이플","par":[5,4,3,4,5,4,3,4,4]},{"name":"파인","par":[5,4,3,4,5,4,4,3,4]},{"name":"체리","par":[4,4,4,3,4,4,5,4,3]},{"name":"퍼시몬","par":[3,4,4,4,3,5,4,4,5]}]},{"name":"여주썬밸리CC","aliases":["썬밸리CC 여주","여주 썬밸리"],"region":"경기","city":"여주시","courses":[{"name":"썬밸리","par":[5,4,3,4,5,5,3,4,4]}]},{"name":"빅토리아GC","aliases":["빅토리아골프클럽","빅토리아CC"],"region":"경기","city":"여주시","courses":[{"name":"빅토리아","par":[4,3,5,4,4,5,4,4,3]}]},{"name":"동여주체력단련장","aliases":["동여주CC","국군복지단 동여주골프장","동여주골프장"],"region":"경기","city":"여주시","courses":[]},{"name":"여주그랜드CC","aliases":["여주그랜드컨트리클럽"],"region":"경기","city":"여주시","courses":[{"name":"OUT","par":[5,4,4,4,3,5,3,4,4]},{"name":"IN","par":[4,4,4,5,4,3,4,3,5]}],"chk":1},{"name":"양평TPC","aliases":["양평TPC골프클럽","양평 TPC"],"region":"경기","city":"양평군","courses":[{"name":"루나","par":[4,4,4,3,5,4,3,5,4]},{"name":"스텔라","par":[4,5,4,5,3,4,4,3,4]},{"name":"솔라","par":[4,5,3,4,4,4,3,4,5]}]},{"name":"더스타휴골프앤리조트","aliases":["더스타휴","더스타휴CC","더 스타 팰리스 GC"],"region":"경기","city":"양평군","courses":[{"name":"OUT","par":[4,4,3,5,3,4,4,4,5]},{"name":"IN","par":[5,4,5,4,3,4,3,4,4]}]},{"name":"미리내골프클럽","aliases":["미리내GC"],"region":"경기","city":"양평군","courses":[]},{"name":"안성베네스트GC","aliases":["안성베네스트 골프클럽","안성 베네스트"],"region":"경기","city":"안성시","courses":[{"name":"서","par":[4,3,4,5,3,4,4,4,5]},{"name":"북","par":[5,3,4,4,3,4,4,5,4]},{"name":"남","par":[5,3,4,4,4,4,4,3,5]},{"name":"동","par":[4,3,4,5,5,4,3,4,4]}]},{"name":"골프존카운티 안성W","aliases":["골프존카운티안성W","안성W","존W골프 안성카운티"],"region":"경기","city":"안성시","courses":[{"name":"OUT","par":[4,4,5,4,4,3,4,3,5]},{"name":"IN","par":[4,5,3,4,4,4,4,3,5]}]},{"name":"골프존카운티 안성H","aliases":["골프존카운티안성H","안성H","골프클럽Q햄튼"],"region":"경기","city":"안성시","courses":[{"name":"힐","par":[4,4,4,3,4,5,3,5,4]},{"name":"레이크","par":[4,5,3,4,3,5,4,4,4]}]},{"name":"골프클럽Q","aliases":["골프클럽 Q","골프클럽Q 안성","골프존카운티 안성Q","골프존카운티안성Q"],"region":"경기","city":"안성시","courses":[{"name":"밸리","par":[5,4,4,4,3,4,3,4,5]},{"name":"팜파스","par":[4,5,4,3,5,4,3,4,4]}]},{"name":"마에스트로CC","aliases":["마에스트로 컨트리클럽"],"region":"경기","city":"안성시","courses":[{"name":"레이크","par":[4,4,3,5,4,5,3,4,4]},{"name":"밸리","par":[5,3,4,4,4,3,4,4,5]}]},{"name":"신안CC","aliases":["신안컨트리클럽","신안 컨트리클럽"],"region":"경기","city":"안성시","courses":[{"name":"애플","par":[4,4,5,4,3,4,4,3,5]},{"name":"오렌지","par":[4,5,4,3,4,4,4,5,3]}],"part":1},{"name":"포웰CC 안성","aliases":["포웰CC안성","포웰안성","포웰컨트리클럽 안성","루나힐스안성CC","루나힐스 안성","아덴힐CC"],"region":"경기","city":"안성시","courses":[{"name":"오크힐","par":[4,5,4,4,3,5,4,3,4]},{"name":"버치힐","par":[4,4,4,4,5,3,4,3,5]}],"chk":1},{"name":"에덴블루CC","aliases":["에덴블루 컨트리클럽"],"region":"경기","city":"안성시","courses":[{"name":"마운틴","par":[4,4,4,3,4,4,5,3,5]},{"name":"레이크","par":[4,3,4,4,5,3,4,5,4]},{"name":"밸리","par":[4,3,4,4,4,5,4,3,5]}]},{"name":"파인크리크CC","aliases":["파인크리크 컨트리클럽"],"region":"경기","city":"안성시","courses":[{"name":"파인","par":[4,5,3,4,5,3,5,3,4]},{"name":"크리크","par":[4,4,3,5,3,4,5,4,4]},{"name":"밸리","par":[4,5,3,4,5,4,3,4,4]}]},{"name":"안성CC","aliases":["안성컨트리클럽","안성 컨트리클럽"],"region":"경기","city":"안성시","courses":[{"name":"OUT","par":[4,4,3,4,5,5,3,4,4]},{"name":"IN","par":[4,4,3,5,4,3,5,4,4]}]},{"name":"윈체스트GC","aliases":["윈체스트 골프클럽","윈체스트CC"],"region":"경기","city":"안성시","courses":[{"name":"로맨틱","par":[4,5,3,4,4,5,3,4,4]},{"name":"클래식","par":[5,4,3,4,4,4,3,5,4]}]},{"name":"이글몬트CC","aliases":["이글몬트 컨트리클럽"],"region":"경기","city":"안성시","courses":[{"name":"이글","par":[4,4,4,5,3,4,3,5,4]},{"name":"몬트","par":[4,3,4,4,5,4,4,3,5]},{"name":"히든","par":[4,3,5,4,3,5,3,4,5]}]},{"name":"한림안성CC","aliases":["한림안성","골프존카운티 한림안성","레이크힐스안성GC","레이크힐스 안성"],"region":"경기","city":"안성시","courses":[{"name":"9홀","par":[4,4,5,3,4,5,4,4,3]}]},{"name":"서안성 파3 골프클럽","aliases":["서안성파3"],"region":"경기","city":"안성시","courses":[]},{"name":"기흥CC","aliases":["기흥컨트리클럽","기흥 컨트리클럽"],"region":"경기","city":"화성시","courses":[{"name":"동","par":[4,5,4,3,4,4,3,4,5]},{"name":"남","par":[4,4,3,4,4,4,5,3,5]},{"name":"서","par":[4,3,5,3,4,5,4,4,4]},{"name":"북","par":[4,4,3,4,5,5,3,4,4]}]},{"name":"리베라CC","aliases":["리베라 컨트리클럽","관악CC"],"region":"경기","city":"화성시","courses":[{"name":"파인힐","par":[5,4,4,3,4,3,4,4,5]},{"name":"레이크스","par":[4,3,4,5,4,4,3,5,4]}],"part":1},{"name":"화성상록GC","aliases":["화성상록CC","화성상록 골프클럽","상록골프장 화성"],"region":"경기","city":"화성시","courses":[{"name":"동","par":[4,4,3,5,4,3,4,5,4]},{"name":"남","par":[4,5,3,4,4,3,5,4,4]},{"name":"서","par":[4,5,3,4,4,3,5,4,4]}]},{"name":"발리오스CC","aliases":["발리오스 컨트리클럽"],"region":"경기","city":"화성시","courses":[{"name":"동","par":[4,5,4,3,4,5,4,3,4]},{"name":"남","par":[4,3,4,5,4,4,3,5,4]},{"name":"서","par":[4,4,4,3,4,5,4,5,3]}]},{"name":"화성GC","aliases":["화성골프클럽","화성 골프클럽"],"region":"경기","city":"화성시","courses":[{"name":"9홀","par":[5,3,4,4,4,4,4,3,4]}]},{"name":"링크나인GC","aliases":["링크나인 골프클럽"],"region":"경기","city":"화성시","courses":[{"name":"9홀","par":[4,3,4,4,5,4,4,5,3]}]},{"name":"라비돌리조트CC","aliases":["라비돌","라비돌CC","라비돌 리조트"],"region":"경기","city":"화성시","courses":[{"name":"9홀","par":[5,3,4,4,5,4,4,3,4]}]},{"name":"남수원CC","aliases":["남수원 컨트리클럽","남수원 골프장"],"region":"경기","city":"화성시","courses":[{"name":"OUT","par":[4,3,4,5,4,4,5,3,4]},{"name":"IN","par":[4,4,3,4,5,4,3,5,4]}]},{"name":"덕산대체력단련장","aliases":["덕산대 체력단련장","덕산체력단련장"],"region":"경기","city":"화성시","courses":[{"name":"9홀","par":[4,5,3,4,4,4,5,3,4]}]},{"name":"오산체력단련장","aliases":["오산 체력단련장"],"region":"경기","city":"평택시","courses":[{"name":"9홀","par":[4,5,4,4,3,4,3,4,5]}],"chk":1},{"name":"서평택CC","aliases":["서평택 컨트리클럽","서평택골프장"],"region":"경기","city":"평택시","courses":[]},{"name":"청북CC","aliases":["청북 컨트리클럽"],"region":"경기","city":"평택시","courses":[]},{"name":"평택체력단련장","aliases":["평택 체력단련장","해군 평택체력단련장"],"region":"경기","city":"평택시","courses":[{"name":"9홀","par":[4,5,4,3,4,4,3,5,4]}]},{"name":"제일CC","aliases":["제일컨트리클럽","제일 컨트리클럽"],"region":"경기","city":"안산시","courses":[{"name":"센터","par":[4,4,5,3,5,4,3,4,4]},{"name":"남","par":[4,3,5,4,4,4,3,5,4]},{"name":"동","par":[4,4,4,5,3,4,3,4,5]}]},{"name":"유니아일랜드CC","aliases":["유니아일랜드","아일랜드CC","아일랜드 컨트리클럽","아일랜드리조트"],"region":"경기","city":"안산시","courses":[{"name":"동","par":[4,4,5,3,4,4,3,5,4]},{"name":"서","par":[4,4,4,5,3,5,4,3,4]}],"part":1},{"name":"더헤븐CC","aliases":["더헤븐 컨트리클럽","더헤븐 리조트"],"region":"경기","city":"안산시","courses":[]},{"name":"강욱순골프아카데미","aliases":["강욱순 골프아카데미"],"region":"경기","city":"안산시","courses":[]},{"name":"솔트베이GC","aliases":["솔트베이 골프클럽","솔트베이CC"],"region":"경기","city":"시흥시","courses":[{"name":"OUT","par":[4,5,4,3,4,5,4,3,4]},{"name":"IN","par":[5,4,4,3,4,5,3,4,4]}]},{"name":"아세코밸리CC","aliases":["아세코밸리","아세코밸리 골프클럽"],"region":"경기","city":"시흥시","courses":[{"name":"9홀","par":[4,4,3,4,4,5,3,5,4]}],"chk":1},{"name":"수원체력단련장","aliases":["수원 체력단련장","공군 수원체력단련장"],"region":"경기","city":"수원시","courses":[{"name":"9홀","par":[4,5,4,4,4,3,5,3,4]}]},{"name":"안양CC","aliases":["안양컨트리클럽","안양 컨트리클럽","안양베네스트GC"],"region":"경기","city":"군포시","courses":[{"name":"OUT","par":[4,4,4,3,4,5,4,3,5]},{"name":"IN","par":[5,4,4,3,4,4,5,3,4]}]}];
+  var REGIONS=[["경기","서울·인천 포함"],["강원",""],["충북",""],["충남","대전·세종 포함"],["경북","대구 포함"],["경남","부산·울산 포함"],["전북",""],["전남","광주 포함"],["제주",""]];
+  var RKEY="golfround.recent.v1";
+  var STOPS=[
+    {id:"coffee",name:"커피",sub:"테이크아웃",stay:8,q:"카페"},
+    {id:"gimbap",name:"김밥",sub:"포장",stay:10,q:"김밥"},
+    {id:"store",name:"편의점",sub:"물·간식·장갑",stay:7,q:"편의점"},
+    {id:"gas",name:"주유",sub:"",stay:10,q:"주유소"},
+    {id:"meal",name:"식사",sub:"골프장 안이면 일찍 도착",stay:30,q:"맛집"}
+  ];
+  var DETOUR=3,LOAD=3,EXTRAS=[5,10,15,20,30];
+  var TRAFFIC=[[0,"거의 없음"],[10,"보통 +10%"],[20,"주말 아침 +20%"]];
+  var PKEY="golfround.profile.v1";
+  function getLevel(){try{var v=(JSON.parse(localStorage.getItem(PKEY)||"{}").level)||null;return {new:"g110",begin:"b100",mid:"m80",adv:"a70"}[v]||v;}catch(e){return null;}}
+  function setLevel(v){try{localStorage.setItem(PKEY,JSON.stringify({level:v}));}catch(e){}}
+  var LEVELS=[["g110","골린이","입문 ~ 110타"],["b100","백돌이·백순이","100타대"],["n90","초보","90대"],["m80","중급","80대"],["a70","상급","70대"]];
+  var PACKS={
+    g110:["골프화","장갑 2개","공 15개 이상(잃어버려도 괜찮게)","티 넉넉히·볼마커","갈아입을 옷·양말","모자·선크림","캐디피 현금","신분증·카드","물·간식","우산·우비(비 예보면)"],
+    b100:["골프화","장갑 2개","공 10개 이상","티 넉넉히·볼마커","갈아입을 옷","모자·선크림","캐디피 현금","카드","물"],
+    n90:["골프화","장갑 2개","공 8~10개","티·볼마커","거리측정기(있으면)","갈아입을 옷","모자·선크림","캐디피 현금","카드"],
+    m80:["골프화","장갑 여분","공 6~8개(같은 모델)","티·볼마커·그린 보수기","거리측정기(충전)","갈아입을 옷","모자·선크림","캐디피 현금"],
+    a70:["거리측정기(충전 확인)","같은 모델 공 6개","장갑 여분·그립 상태","볼마커·그린 보수기","코스 공략 메모","스트레칭 밴드","캐디피 현금","갈아입을 옷"]};
+  function PACK(){return PACKS[getLevel()||"b100"];}
+  var ARRIVAL=[
+    {after:0,title:"클럽하우스 앞에서 백 내리기",note:"직원이 받아요"},
+    {after:3,title:"주차",note:"안내 표지 따라"},
+    {after:8,title:"프론트 체크인",note:"예약자 이름 · 락커 키"},
+    {after:12,title:"락커에서 환복",note:"골프화로 갈아신기"},
+    {before:20,title:"스타트하우스로 이동",note:"코스 나가는 출구 쪽"},
+    {before:12,title:"캐디 미팅 · 카트 확인",note:"남는 시간엔 퍼팅 연습"}
+  ];
+
+  function today(){var d=new Date(),m=d.getMonth()+1,dd=d.getDate();return d.getFullYear()+"-"+(m<10?"0":"")+m+"-"+(dd<10?"0":"")+dd;}
+  function blank(){
+    return {tab:"plan",course:"",courseId:null,nines:null,date:today(),tee:"07:12",players:["나","","",""],
+      move:"self",pick:{},buffer:40,drive:50,traffic:0,first:false,pack:{},
+      stops:{coffee:{on:false,where:"course"},gimbap:{on:false,where:"home"},store:{on:false,where:"home"},gas:{on:false,where:"home"},meal:{on:false,where:"course"}},
+      bet:{on:false,game:"tadang",amt:{},bp:{tie3:true,tie4:true,triple:true,par3dbl:true,birdie:true},bpWhen:"next",bonus:{birdie:{mode:"stroke",v:1},putt:{mode:"stroke",v:3},shot:{mode:"stroke",v:5},hio:{mode:"stroke",v:10}},eg:{},pk:{},dr:{},joker:"bogey",drawMode:"app",vtie:"carry",stack:"cap4",hrank:2,skip:{first:"on",last:"on"},nearMode:"carry",order:null,vg:{},hz:{},near:{}},age19:false,
+      par:DEFAULT_PAR.slice(),scores:[0,1,2,3].map(function(){return Array(18).fill(null);}),hole:0,sample:false};
+  }
+  function sample(){
+    var s=blank();
+    s.course="장수CC";s.sample=true;s.players=["나","민수","지훈","현우"];s.move="drive";
+    s.pick={"1":{on:true,place:"래미안 정문",extra:10}};s.first=true;s.buffer=50;
+    s.stops.coffee.on=true;s.bet=Object.assign(s.bet,{on:true,game:"tadang",amt:{tadang:{unit:1000}}});s.age19=true;
+    var rows=[[5,4,3,6,5,4,4],[4,5,4,5,4,5,3],[6,4,4,7,5,4,3],[4,4,2,5,4,4,4]];
+    rows.forEach(function(r,i){r.forEach(function(v,h){s.scores[i][h]=v;});});
+    s.hole=7;return s;
+  }
+  function load(){
+    try{var t=localStorage.getItem(KEY);if(t){var o=JSON.parse(t),b=blank();
+      Object.keys(b).forEach(function(k){if(o[k]===undefined)o[k]=b[k];});
+      o.stops=Object.assign({},b.stops,o.stops||{});o.traffic=0;if(o.stops&&o.stops.meal&&o.stops.meal.where==="home")o.stops.meal.where="course";var ob=o.bet||{};o.bet=Object.assign({},b.bet,ob);o.bet.vg=o.bet.vg||{};if(ob.bp&&ob.bp.tie4===undefined)o.bet.bp=Object.assign({},ob.bp,{tie4:!!ob.bp.tie3});o.bet.hz=o.bet.hz||{};var sk0=o.bet.skip||{};o.bet.skip={first:sk0.first===true?"off":(sk0.first||"on"),last:sk0.last===true?"off":(sk0.last||"on")};if([2,"turn","manual"].indexOf(o.bet.hrank)<0)o.bet.hrank=2;o.bet.near=o.bet.near||{};if(!ob.bp){o.bet.bp={tie3:ob.tie!==false,tie4:ob.tie!==false,triple:true,par3dbl:true,birdie:ob.birdie!=="none"};}
+      if(!ob.bonus){o.bet.bonus=JSON.parse(JSON.stringify(b.bet.bonus));var ob2=ob.bbonus||(ob.birdie==="cash"||ob.birdie==="extra"?ob.birdie:null);if(ob2==="cash")o.bet.bonus.birdie={mode:"cash",v:((ob.amt||{}).tadang||{}).bonus||0};else if(ob2==="none")o.bet.bonus.birdie={mode:"none",v:1};}
+      o.bet.eg=o.bet.eg||{};o.bet.pk=o.bet.pk||{};o.bet.dr=o.bet.dr||{};if(o.bet.stack!=="cap2")o.bet.stack="cap4";
+      if(!ob.amt){o.bet.amt={};o.bet.amt[o.bet.game||"tadang"]={unit:o.bet.unit||0,seed:o.bet.seed||0};}return o;}}catch(e){}
+    return sample();
+  }
+  function save(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}
+  var S=load();
+  var $=function(id){return document.getElementById(id);};
+  function esc(s){return String(s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];});}
+  function act(){var a=[];S.players.forEach(function(n,i){if(i<2||String(n).trim())a.push(i);});return a;}
+  function nameOf(i){var n=String(S.players[i]||"").trim();return n||(i===0?"나":"동반자 "+i);}
+  function vp(n){return n>0?"+"+n:String(n);}
+  var toMin=function(h){var p=String(h||"07:00").split(":");return (+p[0])*60+(+p[1]);};
+  var fmt=function(m){m=((Math.round(m)%1440)+1440)%1440;var h=Math.floor(m/60),mm=m%60;return (h<10?"0":"")+h+":"+(mm<10?"0":"")+mm;};
+  var kakao=function(q){return "https://map.kakao.com/link/search/"+encodeURIComponent(q);};
+  var naver=function(q){return "https://map.naver.com/p/search/"+encodeURIComponent(q);};
+  function toast(msg){var t=document.querySelector(".toast");if(!t){t=document.createElement("div");t.className="toast";t.setAttribute("role","status");document.body.appendChild(t);}t.textContent=msg;t.hidden=false;clearTimeout(toast.t);toast.t=setTimeout(function(){t.hidden=true;},1800);}
+  function copy(txt,boxId,okMsg){
+    var fb=$(boxId);
+    var fail=function(){fb.value=txt;fb.hidden=false;fb.focus();fb.select();toast("자동 복사가 막혔어요. 아래 글을 길게 눌러 복사하세요.");};
+    try{navigator.clipboard.writeText(txt).then(function(){fb.hidden=true;toast(okMsg);},fail);}catch(e){fail();}
+  }
+
+  /* ---------- 가는 길 계산 ---------- */
+  function pickers(){ // 내가 태우는 사람들(이름이 있는 동반자만)
+    if(S.move!=="drive")return [];
+    return act().filter(function(i){return i>0&&S.pick[i]&&S.pick[i].on;}).map(function(i){return {i:i,place:S.pick[i].place||"",extra:S.pick[i].extra||10};});
+  }
+  function plan(){
+    var inMeal=S.stops.meal.on&&S.stops.meal.where==="inside",mealT=inMeal?STOPS.filter(function(d){return d.id==="meal";})[0].stay:0;
+    var tee=toMin(S.tee),arrive=tee-S.buffer-mealT,D=Math.round(S.drive*(1+S.traffic/100));
+    var on=STOPS.filter(function(d){return S.stops[d.id].on&&!(d.id==="meal"&&inMeal);});
+    var home=on.filter(function(d){return S.stops[d.id].where==="home";}),near=on.filter(function(d){return S.stops[d.id].where==="course";});
+    var stopTime=on.reduce(function(a,d){return a+d.stay+DETOUR;},0);
+    var pk=pickers(),pickTime=pk.reduce(function(a,x){return a+x.extra+LOAD;},0);
+    var depart=arrive-D-stopTime-pickTime;
+    var a=home.length?Math.max(3,Math.round(D*.12)):0,c=near.length?Math.max(3,Math.round(D*.12)):0,b=D-a-c;
+    var ev=[],t=depart;
+    ev.push({t:t,k:"start",title:S.move==="ride"?"태워 줄 차에 타기":"집에서 출발",note:"골프장까지 "+D+"분"+(S.traffic?" (막힘 여유 포함)":"")+(pk.length?" · 픽업 "+pk.length+"명 +"+pickTime+"분":"")});
+    pk.forEach(function(x){t+=x.extra;ev.push({t:t,k:"pick",x:x,title:nameOf(x.i)+" 픽업",note:(x.place?x.place+" · ":"")+"백 싣기 "+LOAD+"분"});t+=LOAD;});
+    t+=a;home.forEach(function(d){t+=DETOUR;ev.push({t:t,k:"stop",d:d,title:d.name+" 들르기",note:d.stay+"분 · 집 근처"});t+=d.stay;});
+    t+=b;near.forEach(function(d){t+=DETOUR;ev.push({t:t,k:"stop",d:d,title:d.name+" 들르기",note:d.stay+"분 · 골프장 근처"});t+=d.stay;});
+    t+=c;ev.push({t:t,k:"arrive",title:"골프장 도착",note:"티오프 "+(S.buffer+mealT)+"분 전"+(inMeal?" · 클럽하우스 식사 포함":"")});
+    if(inMeal)ev.push({t:arrive+15,k:"meal",title:"클럽하우스에서 식사",note:mealT+"분 · 골프장 안"});
+    if(["g110","b100"].indexOf(getLevel()||"b100")>=0)ARRIVAL.forEach(function(x){var at=x.after!=null?arrive+x.after:tee-x.before;if(at>arrive&&at<tee)ev.push({t:at,k:"sub",title:x.title,note:x.note});});
+    ev.push({t:tee,k:"tee",title:"티오프",note:S.course||"골프장"});
+    ev.sort(function(x,y){return x.t-y.t;});
+    return {depart:depart,tee:tee,arrive:arrive,D:D,ev:ev,prev:depart<0,pk:pk};
+  }
+
+  /* ---------- 정산 계산 ---------- */
+  function stats(i){var tot=0,par=0,thru=0,out=0,inn=0,on=0,inN=0;for(var h=0;h<18;h++){var v=S.scores[i][h];if(v!=null){tot+=v;par+=S.par[h];thru++;if(h<9){out+=v-S.par[h];on++;}else{inn+=v-S.par[h];inN++;}}}return {tot:tot,vs:tot-par,thru:thru,out:out,inn:inn,on:on,inN:inN};}
+  function stackMul(m,x,st){var v=m*x;return st==="cap2"?Math.min(v,2):(st==="cap4"?Math.min(v,4):v);}
+  /* 내기 게임: 규칙은 모임마다 달라서 흔한 방식을 기본값으로 둔다. 금액은 계산만 한다. */
+  var GAMES=[
+    {id:"tadang",name:"타당",sub:"스트로크",min:2,unit:"한 타당 금액 (원)",
+      desc:["홀마다 타수 차이로 계산해요.","타수 차이 × 금액을 진 사람이 이긴 사람에게 줘요.","배판: 3명 이상 동타, 트리플 이상, 파3 더블 이상, 버디가 나오면 다음 홀이 2배예요. 하나씩 끌 수 있어요.","버디·퍼트 이글·샷 이글·홀인원 보너스를 타당 몇 개 더(예: 1·3·5·10타) 또는 금액으로 걸 수 있어요."]},
+    {id:"vegas",name:"뽑기",sub:"한국식",min:4,max:4,
+      desc:["4명이 같은 돈을 걷어요(예: 10만 원씩, 모두 40만 원).","홀마다 뽑기 통에서 막대를 뽑아요(같은 색 2개씩 두 쌍 + 조커 1개). 같은 색 두 사람이 한 팀, 짝 없는 사람은 조커 뽑은 사람과 한 팀이에요.","두 사람 타수를 더해 적은 팀이 이겨요. 이긴 팀 두 사람이 걷은 돈의 10분의 1씩 가져가요(10만 원이면 1만 원씩, 18홀이면 36만 원).","조커 뽑은 사람 타수는 정한 규칙으로 쳐요: 무조건 보기 / 무조건 4타(파5 버디·파4 파·파3 보기) / 무조건 파.","같으면 상금이 다음 홀로 이월돼요. 남는 돈(10만 원이면 4만 원)은 파3 니어 상금이에요."]},
+    {id:"hussein",name:"후세인",sub:"1 대 3",min:4,max:4,unit:"한 홀 금액 (원)",
+      desc:["홀마다 한 사람이 후세인이 돼서 나머지 셋과 붙어요.","후세인 타수 × 3과 나머지 셋 타수 합을 비교해요.","홀마다 주고받기: 후세인이 이기면 셋에게서 금액씩 받고, 지면 셋에게 금액씩 줘요. 같으면 그대로.","판돈 걷기: 각자 같은 돈을 걷고, 홀 상금을 후세인이 이기면 혼자, 셋이 이기면 셋이 나눠 가져요. 비기면 이월.","후세인은 앞 홀 2등이 맡아요(바꿀 수 있어요). 앞 홀 동타면 그 전 홀에서 더 잘 친 사람이 앞 등수, 끝까지 같으면 타순이 빠른 사람이 앞 등수예요. 1번 홀은 직접 정해요."]},
+    {id:"jopok",name:"조폭",sub:"판돈 스킨스",min:3,unit:"홀 상금 (원)",
+      desc:["모두 같은 판돈을 내서 가운데 모아요.","홀마다 혼자 1등이면 홀 상금을 가져가요. 1등이 여럿이면 다음 홀로 이월(상금이 쌓여요).","돈 딴 사람이 더블 보기면 마지막에 딴 돈을, 트리플 보기 이상이면 딴 돈 전부를 판에 돌려놔요.","버디하면 가장 많이 딴 사람에게서 홀 상금만큼 뺏어 와요.","끝나고 남은 판돈은 똑같이 나눠요."]},
+    {id:"happy",name:"해피",sub:"4321",min:4,max:4,
+      desc:["4명이 판돈을 똑같이 내요(예: 5만 원씩, 모두 20만 원).","홀마다 등수대로 가져가요. 5만 원씩이면 1등 4천·2등 3천·3등 2천·4등 1천(홀마다 1만 원), 10만 원씩이면 두 배예요.","동타면 앞 홀에서 더 못 친 사람이 앞 등수를 가져가요(앞 홀도 같으면 그 전 홀로). 1번 홀처럼 끝까지 같으면 뽑기로 정한 타순이 빠른 사람이 앞 등수예요.","남는 돈은 파3 니어 상금이에요(5만 원씩이면 2만 원 ÷ 파3 4개 = 5천 원).","니어가 없으면 다음 파3로 이월하거나 공금(그늘집·밥값)으로 돌려요."]},
+    {id:"scratch",name:"스크래치",sub:"전체 타수",min:2,unit:"한 타당 금액 (원)",
+      desc:["18홀 전체 타수를 두 사람씩 비교해요.","전체 타수 차이 × 금액을 진 사람이 이긴 사람에게 줘요. 배판 없어요.","홀마다 지금까지의 누적으로 보여줘요."]}
+  ];
+  var AMT={tadang:[["unit","한 타당 금액 (원)","예: 1000",1000]],scratch:[["unit","한 타당 금액 (원)","예: 1000",1000]],vegas:[["seed","한 사람이 걷는 돈 (원)","예: 100000",10000]],
+    hussein:[["unit","한 홀 금액 (원)","예: 1000",1000]],jopok:[["seed","한 사람이 내는 판돈 (원)","예: 50000",10000],["unit","홀 상금 (원)","예: 10000",1000]],happy:[["seed","한 사람이 걷는 돈 (원)","예: 50000",10000]]};
+  function amtFields(gid){if(gid==="hussein"&&S.bet.hzMode==="pot")return [["seed","한 사람이 걷는 돈 (원)","예: 100000",10000],["unit","홀 상금 (원)","예: 20000",1000]];return AMT[gid]||[];}
+  function amt(k,gid){var a=(S.bet.amt||{})[gid||S.bet.game]||{};return Math.max(0,Math.floor(+a[k]||0));}
+  function happyUnit(){return Math.floor(amt("seed","happy")/50);}
+  function gameOf(id){for(var k=0;k<GAMES.length;k++)if(GAMES[k].id===id)return GAMES[k];return GAMES[0];}
+  function fullHole(h,a){var st={};for(var k=0;k<a.length;k++){var v=S.scores[a[k]][h];if(v==null)return null;st[a[k]]=v;}return st;}
+  function zero(a){var o={};a.forEach(function(i){o[i]=0;});return o;}
+  function pairwise(a,st,mul,d){for(var x=0;x<a.length;x++)for(var y=x+1;y<a.length;y++){var p=a[x],q=a[y],v=(st[q]-st[p])*mul;d[p]+=v;d[q]-=v;}}
+  function teeOrder(a){var o=(S.bet.order||[]).filter(function(i){return a.indexOf(i)>=0;});a.forEach(function(i){if(o.indexOf(i)<0)o.push(i);});return o;}
+  function vegasUnit(){return Math.floor(amt("seed","vegas")/10);}
+  function holeMode(h){var k=S.bet.skip||{},m=h===0?k.first:(h===17?k.last:"on");m=m||"on";if(m==="birdie"&&S.bet.game!=="tadang")m="off";return m;}
+  function offHole(h){return holeMode(h)==="off";}
+  function bOnly(h){return holeMode(h)==="birdie";}
+  function betHoles(){return 18-(offHole(0)?1:0)-(offHole(17)?1:0);}
+  function nearPrize(n,gid){gid=gid||S.bet.game;var sd=amt("seed",gid),spent=gid==="vegas"?18*2*vegasUnit():18*10*happyUnit(),p3=S.par.filter(function(x){return x===3;}).length;if(!p3)return 0;return Math.max(0,Math.floor((sd*n-spent)/p3));}
+  function sticksOf(h,a){var pk=(S.bet.pk||{})[h];if(!pk)return null;var by={A:[],B:[],J:[]};for(var z=0;z<a.length;z++){var c=pk[a[z]];if(!by[c])return null;by[c].push(a[z]);}
+    if(by.J.length>1)return null;if(by.J.length===0)return by.A.length===2&&by.B.length===2?[by.A,by.B]:null;
+    var pair=by.A.length===2?by.A:(by.B.length===2?by.B:null),lone=by.A.length===1?by.A:(by.B.length===1?by.B:null);return pair&&lone?[pair,[lone[0],by.J[0]]]:null;}
+  function jokerScore(par){var j=S.bet.joker||"bogey";return j==="four"?4:(j==="par"?par:par+1);}
+  var BK=[["birdie","버디"],["putt","퍼트 이글"],["shot","샷 이글"],["hio","홀인원"]];
+  function bonusKind(h,i,v,par){if(v===1)return "hio";if(v<=par-2)return S.bet.eg[h+"_"+i]==="shot"?"shot":"putt";if(v===par-1)return "birdie";return null;}
+  function bonusOf(k){var b=k&&(S.bet.bonus||{})[k];return b&&b.mode!=="none"?{st:b.mode==="stroke"?Math.max(0,+b.v||0):0,cash:b.mode==="cash"?Math.max(0,Math.floor(+b.v||0)):0}:{st:0,cash:0};}
+  function bkName(k){for(var z=0;z<BK.length;z++)if(BK[z][0]===k)return BK[z][1];return "";}
+  function hzRule(){return S.bet.hrank==="turn"?"타순대로 돌아가며":(S.bet.hrank==="manual"?"직접 고르기":"앞 홀 2등");}
+  function husseinOf(h,a){
+    if(S.bet.hz[h]!=null&&a.indexOf(+S.bet.hz[h])>=0)return {i:+S.bet.hz[h],auto:false};
+    var hm=S.bet.hrank;if(hm==="manual")return null;
+    if(hm==="turn"){var tt=teeOrder(a);return {i:tt[h%tt.length],auto:true};}
+    if(h===0)return null;var st=fullHole(h-1,a);if(!st)return null;
+    var to=teeOrder(a),cmp=function(x,y){if(st[x]!==st[y])return st[x]-st[y];for(var k=h-2;k>=0;k--){var vx=S.scores[x][k],vy=S.scores[y][k];if(vx!=null&&vy!=null&&vx!==vy)return vx-vy;}return to.indexOf(x)-to.indexOf(y);};
+    var ord=a.slice().sort(cmp),n=Math.min(2,a.length);return {i:ord[n-1],auto:true};
+  }
+  function calc(){
+    var a=act(),g=S.bet,G=gameOf(g.game);if(a.length<2||G.ready===false)return null;
+    if(G.max&&a.length!==G.max)return {bad:G.name+"는 "+G.max+"명이 쳐야 해요.",act:a};
+    if(G.min&&a.length<G.min)return {bad:G.name+"는 "+G.min+"명 이상이어야 해요.",act:a};
+    if(G.id==="vegas"&&g.drawMode==="off")return {bad:"뽑기는 오프라인으로 해요. 앱은 스코어만 적고 정산하지 않아요.",act:a};
+    var unit=G.id==="happy"?happyUnit():amt("unit"),tot=zero(a),per={},played=0,skipped=[],need=[],doubled=[],extra={},offH=[];
+    var carry=1,win=zero(a),last=zero(a),seed=amt("seed"),pot=seed*a.length,np=nearPrize(a.length),bank=0,fund=0,nearNeed=[],dq=0;
+    for(var h=0;h<18;h++){
+      if(offHole(h)){offH.push(h+1);per[h]={off:true};continue;}
+      var st=fullHole(h,a);
+      if(!st){if(a.some(function(i){return S.scores[i][h]!=null;}))skipped.push(h+1);continue;}
+      var d=zero(a),tag="",par=S.par[h];
+      if(G.id==="tadang"&&bOnly(h)){var bk2={},tg2=[];a.forEach(function(i){bk2[i]=bonusKind(h,i,st[i],par);});
+        for(var x2=0;x2<a.length;x2++)for(var y2=x2+1;y2<a.length;y2++){var p2=a[x2],q2=a[y2],B1=bonusOf(bk2[p2]),B2=bonusOf(bk2[q2]),v2=(B1.st-B2.st)*unit+B1.cash-B2.cash;d[p2]+=v2;d[q2]-=v2;}
+        a.forEach(function(i){if(!bk2[i])return;var B=bonusOf(bk2[i]);tg2.push(nameOf(i)+" "+bkName(bk2[i])+(B.st?" +"+B.st+"타":"")+(B.cash?" +"+money(B.cash):""));});
+        carry=1;tag="버디피만 홀"+(tg2.length?" · "+tg2.join(" · "):" · 버디 없음");
+      }else if(G.id==="tadang"){
+        var bpo=g.bp||{},thisH=g.bpWhen==="this";
+        var bset=a.filter(function(i){return st[i]<=par-1;}),tg=[],bk={};a.forEach(function(i){bk[i]=bonusKind(h,i,st[i],par);});
+        var cnt={},trig=[];a.forEach(function(i){cnt[st[i]]=(cnt[st[i]]||0)+1;});
+        if(bpo.tie3&&a.length>=3&&Object.keys(cnt).some(function(k){return cnt[k]===3;}))trig.push("3명 동타");
+        var all4=bpo.tie4&&a.length>=4&&Object.keys(cnt).length===1;if(all4&&!thisH)trig.push("4명 동타");
+        if(bpo.triple&&a.some(function(i){return st[i]>=par+3;}))trig.push("트리플");
+        if(bpo.par3dbl&&par===3&&a.some(function(i){return st[i]>=par+2;}))trig.push("파3 더블");
+        if(bpo.birdie&&bset.length)trig.push("버디 이상");
+        var capN=g.stack==="cap2"?2:4,mt=thisH&&trig.length?(capN===4&&trig.length>=2?4:2):1,m=thisH?Math.min(carry*mt,capN):carry,fromPrev=carry>1;carry=1;
+        for(var x=0;x<a.length;x++)for(var y=x+1;y<a.length;y++){var p=a[x],q=a[y],BP=bonusOf(bk[p]),BQ=bonusOf(bk[q]),df=st[q]-st[p]+BP.st-BQ.st;
+          var v=df*m*unit+BP.cash-BQ.cash;d[p]+=v;d[q]-=v;}
+        if(m>1){var why=thisH?[].concat(fromPrev?["앞 홀 4명 동타"]:[],mt>1?trig:[]):[];tg.push("배판 ×"+m+(why.length?"("+why.join("·")+")":""));doubled.push((h+1)+"번 ×"+m);}
+        a.forEach(function(i){if(!bk[i])return;var B=bonusOf(bk[i]);tg.push(nameOf(i)+" "+bkName(bk[i])+(B.st?" +"+B.st+"타":"")+(B.cash?" +"+money(B.cash):""));});
+        if(!thisH&&trig.length){carry=stackMul(m,2,g.stack);tg.push("다음 홀 ×"+carry+"("+trig.join("·")+")");}
+        if(thisH&&all4){carry=2;tg.push("다음 홀 ×2(4명 동타)");}
+        tag=tg.join(" · ");
+      }else if(G.id==="scratch"){
+        pairwise(a,st,unit,d);
+      }else if(G.id==="vegas"){
+        var tm=sticksOf(h,a);if(!tm){need.push(h+1);per[h]={need:"뽑기 결과를 넣어 주세요"};continue;}
+        var pkh=g.pk[h],sc2=function(i){return pkh[i]==="J"?jokerScore(par):st[i];},sa=sc2(tm[0][0])+sc2(tm[0][1]),sb=sc2(tm[1][0])+sc2(tm[1][1]),vu=vegasUnit(),ev3=[];
+        var vt=g.vtie||"carry",mul=vt==="carry"?carry:(vt==="next"&&dq>0?2:1);if(vt==="next"&&dq>0&&sa!==sb)dq--;
+        if(sa!==sb){var W=sa<sb?tm[0]:tm[1],prz=vu*mul;W.forEach(function(i){d[i]+=prz;});ev3.push(W.map(nameOf).join("·")+" 승"+(mul>1?" (×"+mul+")":""));if(vt==="carry")carry=1;}
+        else if(vt==="carry"){carry++;ev3.push("동점 → 다음 홀 ×"+carry);}
+        else if(vt==="next"){dq++;ev3.push("동점 → 다음에 이기는 "+dq+"홀까지 2배");}
+        else ev3.push("동점 · 상금 없음");
+        if(par===3){bank+=np;var nw2=g.near[h];
+          if(nw2==null){nearNeed.push(h+1);ev3.push("니어 고르기 전");}
+          else if(+nw2>=0&&a.indexOf(+nw2)>=0){d[+nw2]+=bank;ev3.push("니어 "+nameOf(+nw2)+" "+money(bank));bank=0;}
+          else if(g.nearMode==="fund"){fund+=bank;ev3.push("니어 없음 → 공금 "+money(bank));bank=0;}
+          else ev3.push("니어 없음 → 다음 파3 상금 "+money(bank+np)+"(이월)");}
+        a.forEach(function(i){win[i]+=d[i];});
+        tag=tm[0].map(function(i){return nameOf(i)+(pkh[i]==="J"?"(조커 "+jokerScore(par)+")":"");}).join("·")+" "+sa+" : "+sb+" "+tm[1].map(function(i){return nameOf(i)+(pkh[i]==="J"?"(조커 "+jokerScore(par)+")":"");}).join("·")+" · "+ev3.join(" · ");
+      }else if(G.id==="hussein"){
+        var hz=husseinOf(h,a);if(!hz){need.push(h+1);per[h]={need:"후세인을 정해 주세요"};continue;}
+        var others=a.filter(function(i){return i!==hz.i;}),h3=st[hz.i]*3,so=others.reduce(function(x,i){return x+st[i];},0);
+        tag="후세인 "+nameOf(hz.i)+" "+st[hz.i]+"×3="+h3+" : "+so;
+        if(g.hzMode==="pot"){
+          if(h3!==so){var prz2=Math.min(unit*carry,pot);
+            if(h3<so){d[hz.i]+=prz2;pot-=prz2;tag+=" · 후세인 혼자 "+money(prz2);}
+            else{var each2=Math.floor(prz2/others.length);others.forEach(function(i){d[i]+=each2;});pot-=each2*others.length;tag+=" · 세 명 "+money(each2)+"씩";}
+            if(carry>1)tag+=" (×"+carry+")";carry=1;}
+          else{carry++;tag+=" · 비김 → 다음 홀 ×"+carry;}
+          a.forEach(function(i){win[i]+=d[i];});
+        }else{
+        if(h3<so){d[hz.i]+=unit*others.length;others.forEach(function(i){d[i]-=unit;});}
+        else if(h3>so){d[hz.i]-=unit*others.length;others.forEach(function(i){d[i]+=unit;});}
+        }
+      }else if(G.id==="happy"){
+        var hcmp=function(x,y){if(st[x]!==st[y])return st[x]-st[y];for(var k=h-1;k>=0;k--){var vx=S.scores[x][k],vy=S.scores[y][k];if(vx!=null&&vy!=null&&vx!==vy)return vy-vx;}var to=teeOrder(a);return to.indexOf(x)-to.indexOf(y);};
+        var ordr=a.slice().sort(hcmp),PTS=[4,3,2,1],pos=0,ev2=[];
+        while(pos<ordr.length){var e=pos;while(e+1<ordr.length&&hcmp(ordr[e+1],ordr[pos])===0)e++;var sum=0;for(var q=pos;q<=e;q++)sum+=PTS[q];var each=Math.round(sum*unit/(e-pos+1));for(q=pos;q<=e;q++){d[ordr[q]]+=each;}pos=e+1;}
+        if(par===3){bank+=np;var nw=g.near[h];
+          if(nw==null){nearNeed.push(h+1);ev2.push("니어 고르기 전");}
+          else if(+nw>=0&&a.indexOf(+nw)>=0){d[+nw]+=bank;ev2.push("니어 "+nameOf(+nw)+" "+money(bank));bank=0;}
+          else if(g.nearMode==="fund"){fund+=bank;ev2.push("니어 없음 → 공금 "+money(bank));bank=0;}
+          else ev2.push("니어 없음 → 다음 파3 상금 "+money(bank+np)+"(이월)");}
+        a.forEach(function(i){win[i]+=d[i];});tag=ev2.join(" · ");
+      }else if(G.id==="jopok"){
+        var ev=[];
+        a.forEach(function(i){if(win[i]<=0)return;var over=st[i]-par;
+          if(over>=3||st[i]>=par*2){pot+=win[i];d[i]-=win[i];ev.push(nameOf(i)+" 다 토해냄");win[i]=0;last[i]=0;}
+          else if(over===2){var back=Math.min(last[i],win[i]);if(back>0){pot+=back;d[i]-=back;win[i]-=back;ev.push(nameOf(i)+" 마지막 딴 돈 반납");}last[i]=0;}});
+        var best=Math.min.apply(null,a.map(function(i){return st[i];})),top=a.filter(function(i){return st[i]===best;});
+        if(top.length===1){var prize=Math.min(unit*carry,pot);win[top[0]]+=prize;d[top[0]]+=prize;pot-=prize;last[top[0]]=prize;ev.unshift(nameOf(top[0])+" 상금"+(carry>1?"(×"+carry+")":""));carry=1;}
+        else{carry++;ev.unshift("동타 이월 → 다음 홀 ×"+carry);}
+        a.forEach(function(i){if(st[i]>par-1)return;var tg=null;a.forEach(function(j){if(j!==i&&win[j]>0&&(tg==null||win[j]>win[tg]))tg=j;});
+          if(tg!=null){var amt=Math.min(unit,win[tg]);win[tg]-=amt;d[tg]-=amt;win[i]+=amt;d[i]+=amt;ev.push(nameOf(i)+" 버디 → "+nameOf(tg)+"에게서 뺏음");}});
+        tag=ev.join(" · ");
+      }
+      played++;
+      var keepWin=G.id==="jopok"||G.id==="happy"||G.id==="vegas"||(G.id==="hussein"&&g.hzMode==="pot");
+      if(!keepWin)a.forEach(function(i){tot[i]+=d[i];});
+      var cum={};a.forEach(function(i){cum[i]=keepWin?win[i]:tot[i];});
+      per[h]={d:d,cum:cum,tag:tag,pot:(G.id==="jopok"||(G.id==="hussein"&&g.hzMode==="pot"))?pot:null};
+    }
+    if(G.id==="jopok"||(G.id==="hussein"&&g.hzMode==="pot")){var share=Math.floor(pot/a.length);a.forEach(function(i){tot[i]=win[i]+share-seed;});extra={pot:pot,share:share,rest:pot-share*a.length,seed:seed};}
+    if(G.id==="happy"||G.id==="vegas"){var paid=0;a.forEach(function(i){tot[i]=win[i]-seed;paid+=win[i];});extra={seed:seed,left:seed*a.length-paid,fund:fund,bank:bank,np:np,nearNeed:nearNeed};}
+    return {tot:tot,unit:unit,played:played,skipped:skipped,need:need,doubled:doubled,act:a,per:per,game:G,extra:extra,offH:offH};
+  }
+  function won(v){return (v>0?"+":(v<0?"−":""))+Math.abs(v).toLocaleString("ko-KR")+"원";}
+  function money(v){return Math.abs(v).toLocaleString("ko-KR")+"원";}
+  function betReady(){var G=gameOf(S.bet.game);return S.bet.on&&G.ready!==false&&S.age19&&((G.id==="vegas"&&S.bet.drawMode==="off")||(amtFields(G.id)||[]).every(function(f){return amt(f[0])>0;}))&&(G.id!=="happy"||happyUnit()>0);}
+  function ruleText(){var t=ruleText0();if(!S.bet.on)return t;var L=[[0,"첫 홀"],[17,"마지막 홀"]].map(function(x){var m=holeMode(x[0]);return m==="off"?x[1]+" 내기 안 함":(m==="birdie"?x[1]+" 버디피만":null);}).filter(Boolean);return t+(L.length?" · "+L.join(" · "):"");}
+  function ruleText0(){
+    if(!S.bet.on)return "내기 안 함";
+    var g=S.bet,G=gameOf(g.game),u=amt("unit")>0?money(amt("unit")):"금액 미정",sd=amt("seed")>0?money(amt("seed")):"미정";
+    if(G.ready===false)return G.name+" (규칙 받는 중)";
+    if(G.id==="tadang"){var bpo=g.bp||{},on=[["tie3","3명 동타"],["tie4","4명 동타"],["triple","트리플"],["par3dbl","파3 더블"],["birdie","버디 이상"]].filter(function(x){return bpo[x[0]];}).map(function(x){return x[1];});
+      return "타당 "+u+" · 배판 "+(on.length?on.join("·"):"없음")+(function(){var L=BK.map(function(x){var b=(g.bonus||{})[x[0]];if(!b||b.mode==="none")return null;return x[1]+" "+(b.mode==="stroke"?(+b.v||0)+"타":money(+b.v||0));}).filter(Boolean);return L.length?" · "+L.join("·"):"";})()+(on.length?" · "+(g.bpWhen==="this"?"당홀":"다음 홀")+" 배판 "+(g.stack==="cap2"?"2배까지":"4배까지"):"");}
+    if(G.id==="scratch")return "스크래치 한 타 "+u;
+    if(G.id==="vegas"&&g.drawMode==="off")return "뽑기(한국식) · 오프라인 진행";
+    if(G.id==="vegas")return "뽑기(한국식) 1인 "+sd+" · 비기면 "+({carry:"이월 적립",next:"다음 홀 2배",none:"배판 없음"}[g.vtie||"carry"])+" · 조커 "+({bogey:"무조건 보기",four:"무조건 4타",par:"무조건 파"}[g.joker||"bogey"])+" · 니어 없으면 "+(g.nearMode==="fund"?"공금":"이월");
+    if(G.id==="hussein")return g.hzMode==="pot"?"후세인(판돈) 1인 "+sd+" · 홀 상금 "+u+" · "+hzRule():"후세인 홀당 "+u+" · "+hzRule();
+    if(G.id==="happy")return "해피(4321) 1인 "+sd+" · 니어 없으면 "+(g.nearMode==="fund"?"공금":"이월");
+    if(G.id==="jopok")return "조폭 판돈 1인 "+sd+" · 홀 상금 "+u;
+    return G.name;
+  }
+
+  /* ---------- 그리기: 다음 라운드 ---------- */
+  var MOVES=[["self","각자 가요","따로 출발"],["drive","내가 태워요","픽업"],["ride","얻어 타요","누가 태워 줌"]];
+  var GOPT={bpWhen:[["this","당홀"],["next","다음 홀"]],stack:[["cap2","2배까지"],["cap4","4배까지"]],hrank:[[2,"앞 홀 2등"],["turn","타순대로 돌아가며"],["manual","직접 고르기"]],nearMode:[["carry","다음 파3로 이월"],["fund","공금으로"]],hzMode:[["direct","홀마다 주고받기"],["pot","판돈 걷기"]],joker:[["bogey","무조건 보기"],["four","무조건 4타"],["par","무조건 파"]],drawMode:[["app","휴대폰으로 뽑기"],["manual","뽑기통 · 결과만 입력"],["off","오프라인"]],vtie:[["carry","이월 적립"],["next","비긴 만큼 다음 홀 2배"],["none","배판 없음"]]};
+  function norm(x){return String(x||"").replace(/\s+/g,"").toLowerCase();}
+  function clubById(id){var c=id==null?null:COURSES[id];return c&&c.name===S.course?c:null;}
+  function recent(){try{var a=JSON.parse(localStorage.getItem(RKEY)||"[]");return Array.isArray(a)?a:[];}catch(e){return [];}}
+  function pushRecent(name){try{var a=recent().filter(function(n){return n!==name;});a.unshift(name);localStorage.setItem(RKEY,JSON.stringify(a.slice(0,5)));}catch(e){}}
+  var pickRegion=null,pickCity=null;
+  function cityKey(c){var t=String(c||"").split(" ")[0];return t.length>2?t.replace(/[시군]$/,""):t.replace(/시$/,"");}
+  function clubBtn(c,i){var n=c.courses&&c.courses.length?c.courses.length*9+"홀"+(c.part?" · 일부만":"")+(c.chk?" · 파 확인 필요":""):"파 직접 입력";return '<button type="button" data-club="'+i+'">'+esc(c.name)+'<span>'+esc(c.city||"")+" · "+n+'</span></button>';}
+  function renderSearch(){
+    var q=norm($("cq").value),box=$("cResults");
+    if(!q){box.innerHTML="";return;}
+    var hits=[];COURSES.forEach(function(c,i){var hay=norm(c.name+" "+(c.aliases||[]).join(" ")+" "+(c.city||""));if(hay.indexOf(q)>=0)hits.push(i);});
+    box.innerHTML=hits.length?hits.slice(0,8).map(function(i){return clubBtn(COURSES[i],i);}).join(""):'<p class="note">"'+esc($("cq").value)+'" 골프장을 아직 못 찾았어요. 아래에 이름을 직접 적어도 돼요.</p>';
+  }
+  function renderPicker(){
+    var c=S.courseId!=null?clubById(S.courseId):null;
+    var label=S.course?esc(S.course):"골프장 고르기";
+    var sub=c&&S.nines?esc(c.courses.length===1?"9홀 두 바퀴":c.courses[S.nines[0]].name+" → "+c.courses[S.nines[1]].name):(c&&c.courses.length?esc(c.courses[0].name)+" + 후반 직접":(S.course?"직접 입력":"검색 · 지역"));
+    $("courseBtn").innerHTML=label+'<span>'+sub+' ▾</span>';
+    var open=!$("picker").hidden;$("courseBtn").setAttribute("aria-expanded",String(open));
+    var nb=$("nineBox");
+    if(c&&c.courses&&c.courses.length>2&&S.nines){
+      nb.innerHTML='<span class="note">전반</span><div class="quick">'+c.courses.map(function(x,k){return '<button type="button" class="chip" data-nine="0:'+k+'" aria-pressed="'+(S.nines[0]===k)+'">'+esc(x.name)+'</button>';}).join("")+'</div><span class="note">후반</span><div class="quick">'+c.courses.map(function(x,k){return '<button type="button" class="chip" data-nine="1:'+k+'" aria-pressed="'+(S.nines[1]===k)+'">'+esc(x.name)+'</button>';}).join("")+'</div>';
+    }else nb.innerHTML="";
+    if(c&&!(c.courses&&c.courses.length))nb.innerHTML+='<p class="note">이 골프장은 파를 직접 넣어요. 스코어 화면에서 홀마다 파를 눌러 맞춰 주세요.</p>';
+    else{
+      if(c&&c.part)nb.innerHTML+='<p class="note">'+(S.nines?'이 골프장은 일부 코스 파만 있어요. 없는 코스는 스코어 화면에서 맞춰 주세요.':'전반 '+esc(c.courses[0].name)+' 코스 파만 있어요. 후반은 스코어 화면에서 맞춰 주세요.')+'</p>';
+      if(c&&c.chk)nb.innerHTML+='<p class="note">이 골프장 파는 아직 확인 전이에요. 스코어 화면에서 홀 파를 눌러 고칠 수 있어요.</p>';
+    }
+    if(!open)return;
+    var rc=recent();
+    $("recentBox").innerHTML=rc.length?'<span class="ql">최근 간 곳</span><div class="quick">'+rc.map(function(n){return '<button type="button" class="chip" data-recent="'+esc(n)+'">'+esc(n)+'</button>';}).join("")+'</div>':"";
+    var cnt={};COURSES.forEach(function(x){cnt[x.region]=(cnt[x.region]||0)+1;});
+    $("regions").innerHTML=REGIONS.map(function(r){var n=cnt[r[0]]||0;return '<button type="button" data-region="'+r[0]+'" aria-pressed="'+(pickRegion===r[0])+'"'+(n?"":" disabled")+'>'+r[0]+'<span>'+(n?n+"곳":"준비 중")+'</span></button>';}).join("");
+    var list=[];if(pickRegion)COURSES.forEach(function(x,i){if(x.region===pickRegion)list.push(i);});
+    var cb=$("cityBox");if(pickRegion&&list.length>30){var cc={};list.forEach(function(i){var k=cityKey(COURSES[i].city);cc[k]=(cc[k]||0)+1;});var ks=Object.keys(cc).sort(function(x,y){return x.localeCompare(y,"ko");});
+      if(pickCity&&!cc[pickCity])pickCity=null;
+      cb.innerHTML='<span class="ql" style="width:100%">시·군</span>'+ks.map(function(k){return '<button type="button" class="chip" data-city="'+esc(k)+'" aria-pressed="'+(pickCity===k)+'">'+esc(k)+' '+cc[k]+'</button>';}).join("");
+      if(pickCity)list=list.filter(function(i){return cityKey(COURSES[i].city)===pickCity;});else list=[];
+      if(!pickCity)cb.innerHTML+='<p class="note" style="width:100%">시·군을 고르면 골프장이 나와요.</p>';}
+    else{cb.innerHTML="";pickCity=null;}
+    list.sort(function(a,b){return (COURSES[a].city+COURSES[a].name).localeCompare(COURSES[b].city+COURSES[b].name,"ko");});
+    $("regionList").innerHTML=list.map(function(i){return clubBtn(COURSES[i],i);}).join("");
+  }
+  function parEditable(){var c=clubById(S.courseId);return !c||!(c.courses&&c.courses.length)||!!c.part||!!c.chk;}
+  function reveal(id){try{var el=$(id);if(el&&el.firstChild)setTimeout(function(){el.scrollIntoView({behavior:"smooth",block:"start"});},30);}catch(e){}}
+  function chooseClub(i){
+    var c=COURSES[i];S.course=c.name;S.courseId=i;
+    if(c.part&&c.courses&&c.courses.length===1){S.nines=null;S.par=c.courses[0].par.concat(DEFAULT_PAR.slice(9));}
+    else if(c.courses&&c.courses.length>=2){S.nines=[0,1];S.par=c.courses[0].par.concat(c.courses[1].par);}
+    else if(c.courses&&c.courses.length===1){S.nines=[0,0];S.par=c.courses[0].par.concat(c.courses[0].par);}
+    else{S.nines=null;S.par=DEFAULT_PAR.slice();}
+    pushRecent(c.name);$("picker").hidden=true;$("cq").value="";$("cResults").innerHTML="";changed();reveal("courseBtn");
+  }
+  function renderPlan(){
+    function keep(id,v){if(document.activeElement!==$(id))$(id).value=v;}
+    keep("course",S.courseId==null?(S.course||""):"");keep("date",S.date||"");keep("tee",S.tee||"");renderPicker();
+    var nm=$("names");
+    if(!nm.children.length)nm.innerHTML=[0,1,2,3].map(function(i){return '<input type="text" id="pn'+i+'" data-pn="'+i+'" aria-label="'+(i+1)+'번째 사람" placeholder="'+(i===0?"나":(i===1?"동반자 이름":"비우면 빠짐"))+'">';}).join("");
+    [0,1,2,3].forEach(function(i){keep("pn"+i,S.players[i]||"");});
+    $("move").innerHTML=MOVES.map(function(m){return '<button type="button" data-move="'+m[0]+'" aria-pressed="'+(S.move===m[0])+'">'+m[1]+'<span>'+m[2]+'</span></button>';}).join("");
+    var pw=$("pickWho");pw.hidden=S.move!=="drive";
+    if(S.move==="drive"){
+      var others=act().filter(function(i){return i>0;});
+      pw.innerHTML='<span class="ql">누구를 태워요?</span>'+(others.length?others.map(function(i){var on=S.pick[i]&&S.pick[i].on;return '<label><input type="checkbox" data-pick="'+i+'"'+(on?" checked":"")+'>'+esc(nameOf(i))+'</label>';}).join(""):'<p class="note">같이 치는 사람 이름을 먼저 넣어 주세요.</p>')+'<p class="note">만날 곳과 시간은 "가는 길"에서 정해요.</p>';
+    }
+    var G=gameOf(S.bet.game);
+    $("games").innerHTML='<button type="button" data-game="off" aria-pressed="'+(!S.bet.on)+'">안 해요<span>스코어만</span></button>'+GAMES.map(function(x){return '<button type="button" data-game="'+x.id+'" aria-pressed="'+(S.bet.on&&S.bet.game===x.id)+'">'+x.name+'<span>'+x.sub+'</span></button>';}).join("");
+    $("betBox").hidden=!S.bet.on;
+    if(G.ready===false){$("gdesc").innerHTML='<b>'+G.name+'</b><p class="note">이 게임 규칙을 받는 중이에요. 규칙이 정해지면 바로 넣을게요.</p>';}
+    else{var n=act().length,warn=(G.max&&n!==G.max)?'<p class="note" style="color:var(--over)">지금 '+n+'명이에요. '+G.name+'는 '+G.max+'명이 쳐야 해요.</p>':((G.min&&n<G.min)?'<p class="note" style="color:var(--over)">'+G.name+'는 '+G.min+'명 이상이어야 해요.</p>':'');
+      $("gdesc").innerHTML='<b>'+G.name+' <span class="note">'+G.sub+'</span></b><ol>'+G.desc.map(function(t){return '<li>'+esc(t)+'</li>';}).join("")+'</ol>'+warn+'<p class="note">모임마다 규칙이 다르면 알려 주세요. 돈은 계산만 해요.</p>';}
+    var ab=$("amtBox"),fl=amtFields(G.id)||[];
+    if(ab.getAttribute("data-g")!==G.id+(S.bet.hzMode||"")){ab.setAttribute("data-g",G.id+(S.bet.hzMode||""));ab.innerHTML=fl.map(function(f){return '<div class="q"><label class="ql" for="amt-'+f[0]+'">'+f[1]+'</label>'+(f[0]==="seed"?'<div class="quick" id="seedQ"></div>':'')+'<input type="number" id="amt-'+f[0]+'" data-amt="'+f[0]+'" inputmode="numeric" step="'+f[3]+'" min="0" placeholder="'+(f[0]==="seed"?"직접 적기":f[2])+'"></div>';}).join("")+((G.id==="happy"||G.id==="vegas")?'<p class="note" id="happyInfo"></p>':'');}
+    if($("seedQ"))$("seedQ").innerHTML=[10000,50000,100000].map(function(v){return '<button type="button" class="chip" data-amtq="seed:'+v+'" aria-pressed="'+(amt("seed")===v)+'">'+(v/10000)+'만 원</button>';}).join("");
+    fl.forEach(function(f){keep("amt-"+f[0],amt(f[0])||"");});
+    $("nearOpts").hidden=G.id!=="happy"&&G.id!=="vegas";var vOff=S.bet.drawMode==="off";$("jkOpts").hidden=G.id!=="vegas"||vOff;$("vtOpts").hidden=G.id!=="vegas"||vOff;$("drawOpts").hidden=G.id!=="vegas";
+    if(G.id==="vegas"){var vu2=vegasUnit()||10000;$("drawNote").textContent={app:"홀마다 스코어 화면에 막대 5개가 떠요. 네 명이 차례로 하나씩 누르면 색과 팀이 공개돼요. 정산은 앱이 해요.",manual:"카트 뽑기통으로 뽑고, 스코어 화면에서 각자 뽑은 색만 눌러 넣어요. 정산은 앱이 해요.",off:"뽑기와 정산은 오프라인으로 해요. 앱은 스코어만 적어요."}[S.bet.drawMode||"app"];
+      $("vtNote").textContent={carry:"비길 때마다 다음 홀 상금이 쌓여요("+money(vu2*2)+" → "+money(vu2*3)+" → "+money(vu2*4)+"). 누가 이기면 다시 처음부터.",next:"비긴 횟수만큼 뒤에 승부가 난 판들 상금이 2배("+money(vu2*2)+")예요. 세 번 비기면 뒤 세 판이 2배.",none:"비기면 그 홀 상금은 없고 판돈에 남아요."}[S.bet.vtie||"carry"];}
+    if(G.id==="vegas"){var vu=vegasUnit(),p3v=S.par.filter(function(x){return x===3;}).length,npw=nearPrize(4,"vegas");
+      $("happyInfo").innerHTML=vu>0?('걷는 돈에 맞춰 자동으로 정해져요 · 홀마다 이긴 팀 각자 <b>'+money(vu)+'</b> · 파3 '+p3v+'개 니어 <b>'+money(npw)+'</b>씩'+(npw<=0?' (니어 상금이 안 남아요)':'')):'걷는 돈을 넣으면 홀 상금과 니어 상금이 자동으로 나와요.';
+      $("jkNote").textContent={bogey:"조커는 홀마다 보기로 쳐요(파3 4타, 파4 5타, 파5 6타).",four:"조커는 홀과 상관없이 4타예요. 파5에선 버디, 파4에선 파, 파3에선 보기가 돼요.",par:"조커는 홀마다 파로 쳐요."}[S.bet.joker||"bogey"];$("nearInfo").textContent="";}
+    if(G.id==="happy"){var hu=happyUnit(),p3n=S.par.filter(function(x){return x===3;}).length,npv=nearPrize(4);
+      $("happyInfo").innerHTML=hu>0?('걷는 돈에 맞춰 자동으로 정해져요 · 1등 <b>'+money(hu*4)+'</b> · 2등 <b>'+money(hu*3)+'</b> · 3등 <b>'+money(hu*2)+'</b> · 4등 <b>'+money(hu)+'</b> · 파3 '+p3n+'개 니어 <b>'+money(npv)+'</b>씩'+(npv<=0?' (니어 상금이 안 남아요)':'')):'걷는 돈을 넣으면 등수 금액과 니어 상금이 자동으로 나와요.';
+      $("nearInfo").textContent="";}
+    var sk=S.bet.skip||{};$("skipChips").innerHTML=[["first","첫 홀"],["last","마지막 홀"]].map(function(x){var cur=sk[x[0]]||"on";if(cur==="birdie"&&G.id!=="tadang")cur="off";return '<div class="skrow"><b>'+x[1]+'</b>'+[["on","내기"],["off","안 함"]].concat(G.id==="tadang"?[["birdie","버디피만"]]:[]).map(function(o){return '<button type="button" class="chip" data-skip="'+x[0]+':'+o[0]+'" aria-pressed="'+(cur===o[0])+'">'+o[1]+'</button>';}).join("")+'</div>';}).join("");$("skipNote").textContent=G.id==="tadang"?"기본은 모든 홀 내기해요. 안 함은 스코어만 적고, 버디피만은 그 홀에서 버디·이글·홀인원 보너스만 주고받아요.":"기본은 모든 홀 내기해요. 안 함을 고른 홀은 스코어만 적어요.";
+    $("tadOpts").hidden=G.id!=="tadang";
+    if(G.id==="tadang"){var bpo=S.bet.bp||{};
+      $("bpChips").innerHTML=[["tie3","3명 동타"],["tie4","4명 동타 시 다음 홀 배판"],["triple","트리플 이상"],["par3dbl","파3 더블 이상"],["birdie","버디 이상"]].map(function(x){return '<button type="button" class="chip" data-bp="'+x[0]+'" aria-pressed="'+(!!bpo[x[0]])+'">'+x[1]+'</button>';}).join("");
+      var bpAny=["tie3","tie4","triple","par3dbl","birdie"].some(function(k){return bpo[k];});$("bpWhenRow").hidden=!bpAny;var c4=S.bet.stack!=="cap2";$("bpWhenNote").textContent=S.bet.bpWhen==="this"?(c4?"조건이 나온 그 홀이 2배, 조건이 2개 이상 겹치면 4배예요.":"조건이 나온 그 홀이 2배예요. 겹쳐도 2배예요.")+(bpo.tie4?" 4명 동타는 당홀·다음 홀 설정과 상관없이 다음 홀이 배판이에요.":""):(c4?"조건이 나온 다음 홀이 2배, 배판 홀에서 또 나오면 그다음 홀은 4배예요.":"조건이 나온 다음 홀이 2배예요. 배판 홀에서 또 나와도 2배예요.");
+      BK.forEach(function(x){var k=x[0],b=(S.bet.bonus||{})[k]||{mode:"none",v:0};
+        $("bm-"+k).innerHTML=[["none","없음"],["stroke","타 더"],["cash","금액"]].map(function(o){return '<button type="button" class="chip" data-bm="'+k+':'+o[0]+'" aria-pressed="'+(b.mode===o[0])+'">'+o[1]+'</button>';}).join("");
+        $("bvw-"+k).hidden=b.mode==="none";$("bu-"+k).textContent=b.mode==="cash"?"원":"타 더";$("bv-"+k).step=b.mode==="cash"?"1000":"1";keep("bv-"+k,b.v||"");});}$("hzOpts").hidden=G.id!=="hussein";if(G.id==="hussein"){$("hrNote").textContent=S.bet.hrank==="turn"?"뽑기로 정한 타순대로 한 홀씩 돌아가며 후세인을 맡아요.":(S.bet.hrank==="manual"?"홀마다 스코어 화면에서 후세인을 직접 골라요.":"앞 홀 2등이 후세인이에요. 동타면 그 앞 홀에서 더 잘 친 사람, 끝까지 같으면 타순이 빠른 사람이에요. 1번 홀은 직접 골라요.");var sd3=amt("seed"),u3=amt("unit");$("hzNote").textContent=S.bet.hzMode==="pot"?("각자 같은 돈을 걷어 판을 만들어요. 후세인이 이기면 홀 상금을 혼자, 세 명이 이기면 셋이 나눠 가져요. 비기면 다음 홀로 이월. 끝나고 남은 판돈은 똑같이 나눠요."+(sd3&&u3?" · 판 "+money(sd3*4)+", 18홀이면 최대 "+money(u3*18)+(u3*18>sd3*4?" (판돈이 모자라요)":""):"")):"후세인이 이기면 세 명에게서 금액씩 받고, 지면 세 명에게 금액씩 줘요.";}
+    document.querySelectorAll(".quick[data-g]").forEach(function(box){var k=box.getAttribute("data-g");box.innerHTML=GOPT[k].map(function(o){return '<button type="button" class="chip" data-gk="'+k+'" data-gv="'+o[0]+'" aria-pressed="'+(String(S.bet[k])===String(o[0]))+'">'+o[1]+'</button>';}).join("");});
+    $("age19").checked=!!S.age19;
+    var p=plan(),pk=p.pk.map(function(x){return nameOf(x.i);});
+    var who=act().map(nameOf).join(", ");
+    var mv=S.move==="drive"?"내가 운전"+(pk.length?" · "+pk.join(", ")+" 픽업":""):(S.move==="ride"?"얻어 타요":"각자 가요");
+    $("recap").innerHTML=[["골프장",(S.course||"아직 안 정함")+(S.date?" · "+S.date.slice(5).replace("-","/"):"")+" · "+fmt(p.tee)],["사람",who],["이동",mv],["내기",ruleText()+(S.bet.on&&!S.age19?" (19세·동의 확인 전)":"")]].map(function(r){return '<li><span>'+r[0]+'</span><span>'+esc(r[1])+'</span></li>';}).join("");
+    $("goDepart").textContent=fmt(p.depart);
+    var maxThru=Math.max.apply(null,act().map(function(i){return stats(i).thru;}));
+    var r=betReady()?calc():null,me=r&&r.played?won(r.tot[0]):null;
+    $("goScore").textContent=maxThru?(maxThru+"홀"):"시작 전";
+    document.querySelector(".go .g2 span").textContent=maxThru?("나 "+vp(stats(0).vs)+(me?" · "+me:"")):"타수 적기";
+  }
+
+  /* ---------- 그리기: 가는 길 ---------- */
+  function renderGo(){
+    var p=plan();
+    $("depart").firstChild.nodeValue=fmt(p.depart);$("dayTag").textContent=p.prev?"전날":"";
+    $("goLbl").textContent=S.move==="ride"?"이 시간에 차에 타세요 (운전자 기준)":"이 시간에 출발하세요";
+    var so=p.ev.filter(function(e){return e.k==="stop";}).map(function(e){return e.d.name;});
+    $("goSum").innerHTML="<b>"+fmt(p.tee)+"</b> 티오프 · <b>"+fmt(p.arrive)+"</b> 도착"+(p.pk.length?" · 픽업 "+p.pk.length+"명":"")+(so.length?" · "+esc(so.join(", "))+" 들름":"");
+    $("navNaver").href=naver(S.course||"골프장");
+    $("first").checked=!!S.first;
+    $("timeline").innerHTML=p.ev.map(function(e){
+      var link="";
+      if(e.k==="stop"){var q=S.stops[e.d.id].where==="course"?(S.course+" 근처 "+e.d.q):e.d.q;link=' · <a href="'+kakao(q)+'" target="_blank" rel="noopener">'+e.d.name+' 찾기</a>';}
+      if(e.k==="pick"&&e.x.place)link=' · <a href="'+kakao(e.x.place)+'" target="_blank" rel="noopener">위치 보기</a>';
+      if(e.k==="arrive"&&S.course)link=' · <a href="'+kakao(S.course)+'" target="_blank" rel="noopener">위치 보기</a>';
+      return '<li class="'+e.k+'"><div class="t">'+fmt(e.t)+'</div><div class="dot"><i></i></div><div class="what"><b>'+esc(e.title)+'</b><span>'+esc(e.note)+'</span>'+link+'</div></li>';
+    }).join("");
+    var lv=getLevel();$("packCard").hidden=false;
+    $("packLevel").innerHTML='<span class="note" style="align-self:center">내 수준</span>'+LEVELS.map(function(l){return '<button type="button" class="chip" data-level="'+l[0]+'" aria-pressed="'+(lv===l[0])+'">'+l[1]+'</button>';}).join("");
+    $("packNote").textContent=lv?"수준에 맞춘 준비물이에요.":"수준을 고르면 준비물이 맞춰져요. 지금은 백돌이 기준이에요.";
+    $("pack").innerHTML=PACK().map(function(n,i){return '<li><label><input type="checkbox" data-pack="'+i+'"'+(S.pack[n]?" checked":"")+'><span>'+n+'</span></label></li>';}).join("");
+    var bufs=[40,50,60];if(bufs.indexOf(S.buffer)<0){S.buffer=S.buffer<45?40:(S.buffer<55?50:60);save();}
+    $("bufferChips").innerHTML=bufs.map(function(v){return '<button type="button" class="chip" data-buf="'+v+'" aria-pressed="'+(S.buffer===v)+'">'+v+'분 전</button>';}).join("");
+    $("driveOut").textContent=S.drive+"분";
+    $("trafKakao").href=kakao(S.course||"골프장");$("trafNaver").href=naver(S.course||"골프장");
+    $("pickBox").hidden=S.move!=="drive";
+    $("pickups").innerHTML=p.pk.length?p.pk.map(function(x){
+      return '<div class="pk"><b>'+esc(nameOf(x.i))+'</b><input type="text" data-place="'+x.i+'" id="place'+x.i+'" placeholder="만날 곳 (아파트 정문 등)" value="'+esc(x.place)+'"><span class="note">경로가 몇 분 늘어나나요 · 백 싣기 3분은 자동</span><div class="quick">'+EXTRAS.map(function(v){return '<button type="button" class="chip" data-ex="'+x.i+':'+v+'" aria-pressed="'+(x.extra===v)+'">+'+v+'분</button>';}).join("")+'</div></div>';
+    }).join("")+(p.pk.length>=3?'<p class="note">4명이 한 차면 골프백 4개가 트렁크에 다 안 들어갈 수 있어요.</p>':''):'<p class="note">"다음 라운드"에서 태울 사람을 고르세요.</p>';
+    $("stops").innerHTML=STOPS.map(function(d){var st=S.stops[d.id];return '<div class="item"><input type="checkbox" id="st-'+d.id+'" data-stop="'+d.id+'"'+(st.on?" checked":"")+'><label class="nm" for="st-'+d.id+'">'+d.name+'<span>'+(d.sub?d.sub+" · ":"")+d.stay+'분</span></label><select data-where="'+d.id+'" aria-label="'+d.name+' 위치"'+(st.on?"":" disabled")+'>'+(d.id==="meal"?[["inside","골프장 안"],["course","골프장 근처 맛집"]]:[["home","집 근처"],["course","골프장 근처"]]).map(function(o){return '<option value="'+o[0]+'"'+(st.where===o[0]?" selected":"")+'>'+o[1]+'</option>';}).join("")+'</select></div>';}).join("");
+  }
+  function goText(){
+    var p=plan(),so=p.ev.filter(function(e){return e.k==="stop";}).map(function(e){return e.d.name;});
+    var L=[(S.course||"골프장")+" "+fmt(p.tee)+" 티오프",fmt(p.depart)+" 출발"+(so.length?" ("+so.join(", ")+" 들름)":"")+" → "+fmt(p.arrive)+" 도착 예정"];
+    p.ev.filter(function(e){return e.k==="pick";}).forEach(function(e){L.push("· "+nameOf(e.x.i)+" "+fmt(e.t)+(e.x.place?" "+e.x.place:"")+" 픽업");});
+    if(p.pk.length)L.push("시간 맞춰 나와 계세요");
+    return L.join("\n");
+  }
+
+  /* ---------- 그리기: 스코어·정산 ---------- */
+  function term(d,par,v){if(v===1)return "홀인원";if(v>=par*2)return "양파";var t={"-3":"알바트로스","-2":"이글","-1":"버디","0":"파","1":"보기","2":"더블 보기","3":"트리플 보기"};return t[String(d)]||("+"+d);}
+  function renderScore(){
+    var h=S.hole,par=S.par[h];
+    $("holeNo").innerHTML=(h+1)+'<small>번 홀 · 파 '+par+'</small>';
+    $("prevH").disabled=h===0;$("nextH").disabled=h===17;
+    var pe=parEditable();$("parChips").hidden=!pe;$("parBox").hidden=!pe;
+    $("parChips").innerHTML='<span class="note" style="align-self:center">이 홀 파</span>'+(par>5?[3,4,5,par]:[3,4,5]).map(function(p){return '<button type="button" class="chip" data-par="'+p+'" aria-pressed="'+(p===par)+'">'+p+'</button>';}).join("");
+    $("players").innerHTML=act().map(function(i){
+      var v=S.scores[i][h],sub=v==null?'<span>아직 안 넣음</span>':'<span class="'+(v<par?"u":(v>par?"o":""))+'">'+term(v-par,par,v)+'</span>';
+      var vv=v==null?null:v-par;return '<div class="pl pl2"><div class="who2">'+esc(nameOf(i))+sub+'</div><div class="cur'+(vv==null?'':(vv<0?' u':(vv>0?' o':' e')))+'">'+(v==null?'–':vp(vv))+'</div><div class="dots" style="grid-template-columns:repeat('+(Math.min(par,8)-Math.max(1-par,-3)+1)+',minmax(0,1fr))">'+(function(){var r=[];for(var x=Math.max(1-par,-3);x<=Math.min(par,8);x++)r.push(x);return r;})().map(function(dd){var on=vv===dd,bad=par+dd<1;return '<button type="button" class="dot'+(dd<0?' du':(dd>0?' do':' de'))+(on?' on':'')+'" data-sv="'+i+':'+dd+'" aria-pressed="'+on+'" aria-label="'+esc(nameOf(i))+' '+(dd>0?'+'+dd:dd)+'"'+(bad?' disabled':'')+'>'+(dd>0?'+'+dd:dd)+'</button>';}).join("")+'</div></div>';
+    }).join("");
+    $("allPar").innerHTML=act().every(function(i){return S.scores[i][h]!=null;})?"":'<button type="button" class="chip" data-act="fillPar">빈칸 모두 파로 채우기</button>';
+    var hs=$("holeSettle"),G=gameOf(S.bet.game);
+    if(!S.bet.on){hs.innerHTML="";}
+    else if(G.ready===false){hs.innerHTML='<p class="note">'+G.name+' 규칙을 받는 중이에요.</p>';}
+    else if(!betReady()){hs.innerHTML='<p class="note">"다음 라운드"에서 금액'+(G.id==="jopok"?"·판돈":"")+'과 19세·동의를 넣으면 홀마다 '+G.name+' 결과가 여기 떠요.</p>';}
+    else{var rr=calc();
+      if(rr.bad){hs.innerHTML='<p class="note">'+esc(rr.bad)+'</p>';}
+      else{var ctl="",a4=rr.act;
+        if(G.id==="vegas"){var pkh2=(S.bet.pk||{})[h]||{},tm2=sticksOf(h,a4),CL=[["A","빨강","#C8442F"],["B","파랑","#2F6FC8"],["J","조커","#222"]],CC={A:["빨강","#C8442F"],B:["파랑","#2F6FC8"],J:["조커","#222"]};
+          var teamTxt='<p class="note">'+(tm2?'<b>팀: '+tm2.map(function(t){return t.map(function(i){return esc(nameOf(i))+(pkh2[i]==="J"?"(조커)":"");}).join("·");}).join(" vs ")+'</b>':'')+'</p>';
+          if(S.bet.drawMode==="manual"){
+            ctl='<div class="gctl"><span class="ql">'+(h+1)+'번 홀 뽑기 · 뽑기통 결과 넣기</span>'+a4.map(function(i){return '<div class="quick"><span class="note" style="align-self:center;min-width:44px">'+esc(nameOf(i))+'</span>'+CL.map(function(c){var on=pkh2[i]===c[0];return '<button type="button" class="chip" data-pk="'+h+':'+i+':'+c[0]+'" aria-pressed="'+on+'"'+(on?' style="background:'+c[2]+';border-color:'+c[2]+'"':'')+'>'+c[1]+'</button>';}).join("")+'</div>';}).join("")+(tm2?teamTxt:'<p class="note">같은 색 두 쌍이거나, 한 쌍 + 한 명 + 조커가 되게 눌러 주세요.</p>')+'</div>';
+          }else{
+            var dr=(S.bet.dr||{})[h]||{picks:{}},pk2=dr.picks||{},who={};Object.keys(pk2).forEach(function(pi){who[pk2[pi]]=+pi;});
+            var revealed=!!tm2,turn=null;if(!revealed)for(var z=0;z<a4.length;z++)if(pk2[a4[z]]==null){turn=a4[z];break;}
+            var deck=dr.deck||[];
+            ctl='<div class="gctl"><span class="ql">'+(h+1)+'번 홀 뽑기</span><p class="note">'+(revealed?'결과가 나왔어요.':esc(nameOf(turn))+' 차례 · 막대 하나를 누르세요')+'</p><div class="sticks">'+[0,1,2,3,4].map(function(k){var w=who[k],col=revealed&&deck[k]?CC[deck[k]]:null;
+              if(revealed&&!deck.length){col=null;}
+              return '<button type="button" class="stick'+(w!=null?' taken':'')+(col?' open':'')+'" data-stick="'+h+':'+k+'"'+(col?' style="--c:'+col[1]+'"':'')+(revealed||w!=null?' disabled':'')+' aria-label="막대 '+(k+1)+(w!=null?' · '+esc(nameOf(w)):'')+'"><i>'+(col?col[0]:'?')+'</i><span>'+(w!=null?esc(nameOf(w)):'')+'</span></button>';}).join("")+'</div>'+(revealed?teamTxt:'')+'<div class="quick"><button type="button" class="chip" data-act="redraw">다시 뽑기</button></div></div>';
+          }}
+        if(G.id==="tadang"){var egs=a4.filter(function(i){var v=S.scores[i][h];return v!=null&&v!==1&&v<=S.par[h]-2;});
+          if(egs.length)ctl='<div class="gctl"><span class="ql">이글 종류</span>'+egs.map(function(i){var t=S.bet.eg[h+"_"+i]==="shot"?"shot":"putt";return '<div class="quick"><span class="note" style="align-self:center;min-width:44px">'+esc(nameOf(i))+'</span><button type="button" class="chip" data-eg="'+h+'_'+i+':putt" aria-pressed="'+(t==="putt")+'">퍼트 이글</button><button type="button" class="chip" data-eg="'+h+'_'+i+':shot" aria-pressed="'+(t==="shot")+'">샷 이글</button></div>';}).join("")+'</div>';}
+        if(G.id==="hussein"){var hz=husseinOf(h,a4);ctl='<div class="gctl"><span class="ql">'+(h+1)+'번 홀 후세인'+(hz&&hz.auto?' · '+hzRule():'')+'</span><div class="quick">'+a4.map(function(i){return '<button type="button" class="chip" data-hz="'+h+':'+i+'" aria-pressed="'+(hz&&hz.i===i)+'">'+esc(nameOf(i))+'</button>';}).join("")+'</div>'+(hz?'':'<p class="note">'+(S.bet.hrank==="manual"?'이 홀 후세인을 골라 주세요.':(h===0?'1번 홀은 직접 정해요.':'앞 홀 스코어가 다 들어가면 자동으로 정해져요. 직접 골라도 돼요.'))+'</p>')+'</div>';}
+        if((G.id==="happy"||G.id==="hussein")&&h===0){var to=teeOrder(a4),setd=S.bet.order&&S.bet.order.length>=a4.length,dr=S.bet.orderDraft||[];
+          ctl+='<div class="gctl"><span class="ql">1번 홀 타순 (뽑기)</span>'+(dr.length?'<p class="note">'+dr.length+'번까지 정함 · 다음 사람을 누르세요</p>':'<p class="note">'+(setd?to.map(function(i,k){return (k+1)+" "+esc(nameOf(i));}).join(" · "):"아직 안 정했어요. 뽑기로 정하거나 칠 순서대로 이름을 누르세요.")+'</p>')+'<div class="quick">'+a4.map(function(i){var k=dr.indexOf(i);return '<button type="button" class="chip" data-ord="'+i+'" aria-pressed="'+(k>=0)+'"'+(k>=0?' disabled':'')+'>'+(k>=0?(k+1)+" ":"")+esc(nameOf(i))+'</button>';}).join("")+'<button type="button" class="chip" data-act="drawOrder">뽑기</button></div><p class="note">동타가 끝까지 같으면 타순이 빠른 사람이 앞 등수예요.</p></div>';}
+        if((G.id==="happy"||G.id==="vegas")&&S.par[h]===3){var nw=S.bet.near[h];ctl+='<div class="gctl"><span class="ql">'+(h+1)+'번 홀 파3 니어</span><div class="quick">'+a4.map(function(i){return '<button type="button" class="chip" data-near="'+h+':'+i+'" aria-pressed="'+(nw!=null&&+nw===i)+'">'+esc(nameOf(i))+'</button>';}).join("")+'<button type="button" class="chip" data-near="'+h+':-1" aria-pressed="'+(nw!=null&&+nw===-1)+'">니어 없음</button></div></div>';}
+        var ph=rr.per[h];
+        if(ph&&ph.off){hs.innerHTML=(h===0&&(G.id==="happy"||G.id==="hussein")?ctl:'')+'<p class="note">'+(h+1)+'번 홀은 내기 안 해요. 스코어만 적어요.</p>';}
+        else if(!ph||ph.need){hs.innerHTML=ctl+'<p class="note">'+(ph&&ph.need?ph.need+". ":"")+'모두 넣으면 '+(h+1)+'번 홀 '+G.name+' 결과가 바로 떠요.</p>';}
+        else{var ordH=rr.act.slice().sort(function(x,y){return ph.d[y]-ph.d[x];}),potG=G.id==="jopok"||G.id==="happy"||G.id==="vegas"||(G.id==="hussein"&&S.bet.hzMode==="pot"),cl=potG?"딴 돈":"누적";
+          hs.innerHTML=ctl+'<div class="hs"><div class="hs-top"><b>'+(h+1)+'번 홀 '+G.name+'</b><span>'+esc(ph.tag||"")+'</span></div><ul class="settle">'+ordH.map(function(i){var v=ph.d[i],c=ph.cum[i];return '<li><span class="nm">'+esc(nameOf(i))+'<small>'+cl+' '+(potG?money(c):won(c))+'</small></span><span class="amt '+(v>0?"plus":(v<0?"minus":""))+'">'+won(v)+'</span></li>';}).join("")+'</ul>'+(ph.pot!=null?'<p class="note">남은 판돈 '+money(ph.pot)+'</p>':'')+'</div>';}}}
+    var a=act(),html='<thead><tr><th class="nm">홀</th>';
+    for(var k=0;k<18;k++){html+='<th class="'+(k===h?"cur":"")+'">'+(k+1)+'</th>';if(k===8)html+='<th class="sub">OUT</th>';}
+    html+='<th class="sub">IN</th><th class="sub">합계</th></tr></thead><tbody><tr class="par"><td class="nm">파</td>';
+    var o=0,n=0;for(k=0;k<18;k++){if(k<9)o+=S.par[k];else n+=S.par[k];html+='<td>'+S.par[k]+'</td>';if(k===8)html+='<td class="sub">'+o+'</td>';}
+    html+='<td class="sub">'+n+'</td><td class="sub">'+(o+n)+'</td></tr>';
+    a.forEach(function(i){var s=stats(i);html+='<tr><td class="nm">'+esc(nameOf(i))+'</td>';
+      for(var k2=0;k2<18;k2++){var v=S.scores[i][k2],cell='<span class="mk">·</span>';
+        if(v!=null){var d=v-S.par[k2],cl=d<=-2?"e":(d===-1?"b":(d===1?"bo":(d>=2?"db":"")));cell='<span class="mk '+cl+'">'+d+'</span>';}
+        html+='<td class="'+(k2===h?"cur":"")+'"><button type="button" class="cell" data-h="'+k2+'" aria-label="'+(k2+1)+'번 홀로">'+cell+'</button></td>';
+        if(k2===8)html+='<td class="sub">'+(s.on?vp(s.out):"")+'</td>';}
+      html+='<td class="sub">'+(s.inN?vp(s.inn):"")+'</td><td class="sub">'+(s.thru?vp(s.vs):"")+'</td></tr>';});
+    $("sc").innerHTML=html+'</tbody>';
+    $("ruleLine").textContent=ruleText();
+    var out=$("settle");
+    if(!S.bet.on)out.innerHTML='<p class="note">내기를 안 하는 라운드예요. 스코어만 공유돼요.</p>';
+    else if(G.ready===false)out.innerHTML='<p class="note">'+G.name+' 규칙을 받는 중이에요.</p>';
+    else if(!S.age19)out.innerHTML='<p class="note">"다음 라운드"에서 19세·규칙 동의를 체크하면 정산이 나와요.</p>';
+    else if(!betReady())out.innerHTML='<p class="note">"다음 라운드"에서 금액'+(G.id==="jopok"?"과 판돈":"")+'을 넣으면 정산이 나와요.</p>';
+    else{var r=calc();
+      if(r.bad)out.innerHTML='<p class="note">'+esc(r.bad)+'</p>';
+      else if(!r.played)out.innerHTML='<p class="note">모두의 타수가 들어간 홀부터 정산해요.</p>';
+      else{var ord=r.act.slice().sort(function(x,y){return r.tot[y]-r.tot[x];});
+        var ex=(G.id==="happy"||G.id==="vegas")?' 판돈 1인 '+money(r.extra.seed)+'을 뺀 결과예요. 판돈 중 '+money(r.extra.left)+'이 남아요'+(r.offH&&r.offH.length&&r.extra.left>0?' (빠진 홀 몫 포함 · 나눠 갖거나 캐디팁 등 알아서 써요)':'')+(r.extra.fund?' (공금 '+money(r.extra.fund)+' 포함)':'')+(r.extra.bank?' · 아직 안 준 니어 상금 '+money(r.extra.bank):'')+(r.extra.nearNeed.length?' · 니어 안 고른 '+r.extra.nearNeed.join(", ")+'번 홀':'')+'.':(G.id==="jopok"||(G.id==="hussein"&&S.bet.hzMode==="pot"))?' 판돈 1인 '+money(r.extra.seed)+'을 빼고, 남은 판돈 '+money(r.extra.pot)+'을 '+r.act.length+'명이 '+money(r.extra.share)+'씩 나눈 결과예요'+(r.extra.rest?' (나머지 '+money(r.extra.rest)+'은 따로)':'')+'.':'';
+        out.innerHTML='<ul class="settle">'+ord.map(function(i){var v=r.tot[i];return '<li><span class="nm">'+esc(nameOf(i))+'</span><span class="amt '+(v>0?"plus":(v<0?"minus":""))+'">'+won(v)+'</span></li>';}).join("")+'</ul><p class="note">'+r.played+'홀 정산'+(r.offH&&r.offH.length?' · 내기 안 한 '+r.offH.join(", ")+'번 홀 제외':'')+(r.skipped.length?' · 타수 빠진 '+r.skipped.join(", ")+'번 제외':'')+(r.need.length?' · '+(G.id==="vegas"?"뽑기":"후세인")+' 안 정한 '+r.need.join(", ")+'번 제외':'')+(r.doubled.length?' · 배판 '+r.doubled.join(", "):'')+'.'+ex+'</p>';}}
+    $("parset").innerHTML=S.par.map(function(p,k){return '<button type="button" data-ph="'+k+'" aria-label="'+(k+1)+'번 홀 파 '+p+'"><span>'+(k+1)+'</span>'+p+'</button>';}).join("");
+    $("parTotal").textContent="합계 파 "+S.par.reduce(function(x,y){return x+y;},0)+(S.course?" · "+S.course:"");
+  }
+  function scoreText(){
+    var a=act(),list=a.map(function(i){return {i:i,s:stats(i)};}).sort(function(x,y){return x.s.vs-y.s.vs;});
+    var L=["[스코어] "+(S.course||"골프장")+" "+(S.date||"")],mx=0;
+    list.forEach(function(x){mx=Math.max(mx,x.s.thru);L.push(nameOf(x.i)+" "+(x.s.thru?vp(x.s.vs)+" ("+x.s.tot+"타)":"기록 없음"));});
+    if(mx<18)L.splice(1,0,mx+"홀까지");
+    var r=betReady()?calc():null;
+    if(r&&!r.bad&&r.played){L.push("");L.push("[정산] "+ruleText());r.act.slice().sort(function(x,y){return r.tot[y]-r.tot[x];}).forEach(function(i){L.push(nameOf(i)+" "+won(r.tot[i]));});if(r.doubled.length)L.push("배판: "+r.doubled.join(", "));}
+    L.push("— 슬기로운 라운드(시험판)");return L.join("\n");
+  }
+
+  /* ---------- 탭 ---------- */
+  function showTab(t){
+    S.tab=t;save();
+    ["plan","go","score"].forEach(function(x){$("view-"+x).hidden=x!==t;$("tab-"+x).setAttribute("aria-selected",String(x===t));});
+    try{history.replaceState(null,"","#"+t);}catch(e){}
+    window.scrollTo(0,0);
+  }
+  function renderLevel(){var lv=getLevel();$("levelAsk").hidden=!!lv;if(!lv)$("levelChips").innerHTML=LEVELS.map(function(l){return '<button type="button" class="chip" data-level="'+l[0]+'">'+l[1]+' <span class="note">'+l[2]+'</span></button>';}).join("");}
+  function render(){renderLevel();$("sampleBar").hidden=!S.sample;renderPlan();renderGo();renderScore();}
+  function changed(){S.sample=false;save();render();}
+
+  document.addEventListener("click",function(e){
+    var b=e.target.closest("button");if(!b)return;var d=b.dataset;
+    if(d.tab){showTab(d.tab);return;}
+    if(d.level){setLevel(d.level);render();toast("준비물을 "+LEVELS.filter(function(l){return l[0]===d.level;})[0][1]+" 기준으로 맞췄어요");return;}
+    if(d.club!=null){chooseClub(+d.club);return;}
+    if(d.region){pickRegion=pickRegion===d.region?null:d.region;pickCity=null;renderPicker();if(pickRegion)reveal($("cityBox").children.length?"cityBox":"regionList");return;}
+    if(d.city){pickCity=pickCity===d.city?null:d.city;renderPicker();if(pickCity)reveal("regionList");return;}
+    if(d.recent){var ri=-1;COURSES.forEach(function(c,i){if(c.name===d.recent)ri=i;});if(ri>=0)chooseClub(ri);else{S.course=d.recent;S.courseId=null;S.nines=null;$("picker").hidden=true;changed();}return;}
+    if(d.nine){var np=d.nine.split(":"),cc=clubById(S.courseId);if(cc){S.nines[+np[0]]=+np[1];S.par=cc.courses[S.nines[0]].par.concat(cc.courses[S.nines[1]].par);changed();}return;}
+    if(d.act==="togglePicker"){$("picker").hidden=!$("picker").hidden;renderPicker();return;}
+    if(d.move){S.move=d.move;changed();return;}
+    if(d.game){if(d.game==="off")S.bet.on=false;else{S.bet.on=true;S.bet.game=d.game;}changed();return;}
+    if(d.skip){var sp=d.skip.split(":");S.bet.skip=Object.assign({first:"on",last:"on"},S.bet.skip);S.bet.skip[sp[0]]=sp[1];changed();return;}
+    if(d.gk){S.bet[d.gk]=d.gk==="hrank"&&!isNaN(+d.gv)?+d.gv:d.gv;changed();return;}
+    if(d.bm){var bm=d.bm.split(":");S.bet.bonus=JSON.parse(JSON.stringify(S.bet.bonus||{}));var cur=S.bet.bonus[bm[0]]||{v:0};var MUL={birdie:1,putt:3,shot:5,hio:10},bb0=S.bet.bonus.birdie||{},base=bb0.mode==="cash"&&+bb0.v>0?+bb0.v:10000,dv=[MUL[bm[0]],bm[0]==="birdie"?10000:base*MUL[bm[0]]];
+      if(bm[1]!==cur.mode)cur={mode:bm[1],v:bm[1]==="cash"?dv[1]:(bm[1]==="stroke"?dv[0]:cur.v)};S.bet.bonus[bm[0]]=cur;
+      if(bm[0]==="birdie"&&bm[1]!=="none"){["putt","shot","hio"].forEach(function(k){S.bet.bonus[k]={mode:bm[1],v:bm[1]==="cash"?(+cur.v||10000)*MUL[k]:MUL[k]};});}
+      changed();return;}
+    if(d.eg){var ep=d.eg.split(":");S.bet.eg[ep[0]]=ep[1];changed();return;}
+    if(d.bp){S.bet.bp=Object.assign({},S.bet.bp||{});S.bet.bp[d.bp]=!S.bet.bp[d.bp];changed();return;}
+    if(d.vg){var vp2=d.vg.split(":");S.bet.vg[vp2[0]]=+vp2[1];changed();return;}
+    if(d.ord!=null){var a5=act(),dr=(S.bet.orderDraft||[]).slice();if(dr.indexOf(+d.ord)<0)dr.push(+d.ord);if(dr.length>=a5.length-1){a5.forEach(function(i){if(dr.indexOf(i)<0)dr.push(i);});S.bet.order=dr;S.bet.orderDraft=null;toast("타순: "+dr.map(nameOf).join(" → "));}else S.bet.orderDraft=dr;changed();return;}
+    if(d.stick){var sp=d.stick.split(":"),hh=+sp[0],k=+sp[1],a6=act();S.bet.dr=Object.assign({},S.bet.dr||{});var dd=S.bet.dr[hh]?JSON.parse(JSON.stringify(S.bet.dr[hh])):null;
+      if(!dd){var dk=["A","A","B","B","J"];for(var z4=dk.length-1;z4>0;z4--){var r4=Math.floor(Math.random()*(z4+1)),t4=dk[z4];dk[z4]=dk[r4];dk[r4]=t4;}dd={deck:dk,picks:{}};}
+      var taken=Object.keys(dd.picks).map(function(x){return dd.picks[x];});if(taken.indexOf(k)>=0)return;
+      var tn=null;for(var z5=0;z5<a6.length;z5++)if(dd.picks[a6[z5]]==null){tn=a6[z5];break;}if(tn==null)return;
+      dd.picks[tn]=k;S.bet.dr[hh]=dd;
+      if(Object.keys(dd.picks).length>=a6.length){var m5={};a6.forEach(function(i){m5[i]=dd.deck[dd.picks[i]];});S.bet.pk=Object.assign({},S.bet.pk||{});S.bet.pk[hh]=m5;changed();var tm5=sticksOf(hh,a6);if(tm5)toast("팀: "+tm5.map(function(t){return t.map(function(i){return nameOf(i)+(m5[i]==="J"?"(조커)":"");}).join("·");}).join(" vs "));return;}
+      changed();return;}
+    if(d.pk){var pp=d.pk.split(":");S.bet.pk=Object.assign({},S.bet.pk||{});S.bet.pk[pp[0]]=Object.assign({},S.bet.pk[pp[0]]||{});S.bet.pk[pp[0]][pp[1]]=pp[2];changed();return;}
+    if(d.amtq){var aq=d.amtq.split(":"),gq=S.bet.game;S.bet.amt[gq]=Object.assign({},S.bet.amt[gq]||{});S.bet.amt[gq][aq[0]]=+aq[1];changed();return;}
+    if(d.near){var nr=d.near.split(":");S.bet.near[nr[0]]=+nr[1];changed();return;}
+    if(d.hz){var hp=d.hz.split(":");S.bet.hz[hp[0]]=+hp[1];changed();return;}
+    if(d.buf){S.buffer=+d.buf;changed();return;}
+    if(d.tr!=null){S.traffic=+d.tr;changed();return;}
+    if(d.ex){var pr=d.ex.split(":");S.pick[pr[0]]=Object.assign({on:true},S.pick[pr[0]]||{},{extra:+pr[1]});changed();return;}
+    if(d.sv){var sv=d.sv.split(":"),si=+sv[0],sd=+sv[1],hs=S.hole,nv3=S.par[hs]+sd;S.scores[si][hs]=S.scores[si][hs]===nv3?null:nv3;changed();return;}
+    if(d.p!=null){var i=+d.p,h=S.hole,cur=S.scores[i][h],nv=cur==null?S.par[h]+(+d.d>0?0:-1):cur+(+d.d);S.scores[i][h]=Math.max(1,Math.min(15,nv));changed();return;}
+    if(d.par){S.par[S.hole]=+d.par;changed();return;}
+    if(d.ph!=null){var ph=+d.ph;S.par[ph]=S.par[ph]>=5?3:S.par[ph]+1;changed();return;}
+    if(d.h!=null){S.hole=+d.h;save();renderScore();return;}
+    switch(d.act){
+      case "prev":if(S.hole>0){S.hole--;save();renderScore();}return;
+      case "next":if(S.hole<17){S.hole++;save();renderScore();}return;
+      case "drawOrder":var o2=act().slice();for(var z=o2.length-1;z>0;z--){var r2=Math.floor(Math.random()*(z+1)),t2=o2[z];o2[z]=o2[r2];o2[r2]=t2;}S.bet.order=o2;S.bet.orderDraft=null;changed();toast("타순: "+o2.map(nameOf).join(" → "));return;
+      case "redraw":S.bet.dr=Object.assign({},S.bet.dr||{});delete S.bet.dr[S.hole];S.bet.pk=Object.assign({},S.bet.pk||{});delete S.bet.pk[S.hole];changed();return;
+      case "drawSticks":var stk=["A","A","B","B","J"];for(var z2=stk.length-1;z2>0;z2--){var r3=Math.floor(Math.random()*(z2+1)),t3=stk[z2];stk[z2]=stk[r3];stk[r3]=t3;}S.bet.pk=Object.assign({},S.bet.pk||{});var m3={};act().forEach(function(i,k){m3[i]=stk[k];});S.bet.pk[S.hole]=m3;changed();return;
+      case "fillPar":act().forEach(function(i){if(S.scores[i][S.hole]==null)S.scores[i][S.hole]=S.par[S.hole];});changed();return;
+      case "driveMinus":S.drive=Math.max(5,S.drive-5);changed();return;
+      case "drivePlus":S.drive=Math.min(300,S.drive+5);changed();return;
+      case "copyGo":copy(goText(),"goCopy","문구를 복사했어요. 단톡방에 붙여넣으세요.");return;
+      case "copyScore":copy(scoreText(),"scoreCopy","결과를 복사했어요. 단톡방에 붙여넣으세요.");return;
+      case "askNew":$("resetArea").innerHTML='<div class="confirm"><span>지금 라운드 기록이 지워져요.</span><button class="btn btn-plain" type="button" data-act="new">지우고 새로 시작</button><button class="btn btn-plain" type="button" data-act="cancelNew">취소</button></div>';return;
+      case "cancelNew":$("resetArea").innerHTML='<button class="btn btn-plain" type="button" data-act="askNew">새 라운드 시작</button>';return;
+      case "new":
+        var keep=S.sample?null:{players:S.players.slice(),bet:Object.assign({},S.bet),stops:JSON.parse(JSON.stringify(S.stops)),drive:S.drive,first:false};
+        S=blank();if(keep){S.players=keep.players;S.bet=keep.bet;S.bet.vg={};S.bet.hz={};S.bet.near={};S.bet.order=null;S.bet.eg={};S.bet.pk={};S.bet.dr={};S.stops=keep.stops;S.drive=keep.drive;}
+        $("resetArea").innerHTML='<button class="btn btn-plain" type="button" data-act="askNew">새 라운드 시작</button>';
+        save();render();showTab("plan");toast("새 라운드를 시작해요. 공치러 어디 가세요?");return;
+    }
+  });
+  document.addEventListener("input",function(e){
+    var t=e.target,d=t.dataset||{};
+    if(t.id==="course"){S.course=t.value;S.courseId=null;S.nines=null;changed();return;}
+    if(t.id==="cq"){renderSearch();return;}
+    if(t.id==="date"){S.date=t.value;changed();return;}
+    if(t.id==="tee"){if(t.value){S.tee=t.value;changed();}return;}
+    if(d.pn!=null){S.players[+d.pn]=t.value;changed();return;}
+    if(d.bv){S.bet.bonus=JSON.parse(JSON.stringify(S.bet.bonus||{}));var nv2=Math.max(0,Math.floor(+t.value||0)),ob3=S.bet.bonus[d.bv]||{};
+      if(d.bv==="birdie"&&ob3.mode==="cash"){var M2={putt:3,shot:5,hio:10},old=+ob3.v||0;Object.keys(M2).forEach(function(k){var r=S.bet.bonus[k];if(r&&r.mode==="cash"&&(+r.v===old*M2[k]||!(+r.v)))r.v=nv2*M2[k];});}
+      S.bet.bonus[d.bv]=Object.assign({mode:"stroke"},ob3,{v:nv2});changed();return;}
+    if(d.amt){var gid=S.bet.game;S.bet.amt[gid]=Object.assign({},S.bet.amt[gid]||{});S.bet.amt[gid][d.amt]=Math.max(0,Math.floor(+t.value||0));changed();return;}
+    if(d.place!=null){S.pick[d.place]=Object.assign({on:true,extra:10},S.pick[d.place]||{},{place:t.value});S.sample=false;save();renderPlan();return;}
+  });
+  document.addEventListener("change",function(e){
+    var t=e.target,d=t.dataset||{};
+    if(t.id==="age19"){S.age19=t.checked;changed();return;}
+    if(t.id==="first"){S.first=t.checked;if(S.first&&S.buffer<50)S.buffer=50;changed();return;}
+    if(d.pick!=null){S.pick[d.pick]=Object.assign({extra:10,place:""},S.pick[d.pick]||{},{on:t.checked});changed();return;}
+    if(d.stop){S.stops[d.stop].on=t.checked;changed();return;}
+    if(d.where){S.stops[d.where].where=t.value;changed();return;}
+    if(d.pack!=null){S.pack[PACK()[+d.pack]]=t.checked;save();return;}
+  });
+
+  render();
+  var h0=(location.hash||"").slice(1);showTab(["plan","go","score"].indexOf(h0)>=0?h0:"plan");
+})();
+</script>
+</body></html>
