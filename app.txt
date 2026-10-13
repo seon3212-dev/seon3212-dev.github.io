@@ -297,6 +297,7 @@ details.card[open] summary::after{content:"－"}
 .gx-list{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:6px;font-size:14px}
 .gx-exec{background:var(--flag);color:var(--flag-ink);border-radius:var(--r);padding:16px;font-size:17px;font-weight:700;line-height:1.45;margin:0}
 .gx-exec small{display:block;font-size:12px;font-weight:600;opacity:.8;margin-bottom:4px}
+.gx-caddie{margin:0;background:var(--bg);border-radius:4px 14px 14px 14px;padding:12px 14px;font-size:15px;font-weight:500;line-height:1.6}
 .gx-fun{display:grid;grid-template-columns:auto 1fr;gap:6px 12px;font-size:14px;margin:0}
 .gx-fun dt{color:var(--muted);font-size:12.5px;padding-top:2px}
 .gx-fun dd{margin:0}
@@ -510,7 +511,7 @@ details.card[open] summary::after{content:"－"}
 /* ---------- 골프 유형 검사 (GRAS ERFA) — 문항과 채점은 검사 서버에만 있다 ---------- */
 (function(){
   var GRAS_API = "https://script.google.com/macros/s/AKfycbz4aGblc6lrfqolwbt6x9imyHetDBVgHcPnb5SeZJsmbqnmnkEciMFo1xt3NoIPcwDJ/exec";               /* 배포한 Apps Script 웹 앱 주소(…/exec) */
-  var APP_VERSION = "round-v70";
+  var APP_VERSION = "round-v71";
   var LKEY = "gras_app_v1";
 
   function $(id){return document.getElementById(id);}
@@ -621,8 +622,7 @@ details.card[open] summary::after{content:"－"}
       '<section class="card"><h2>이럴 때 조심</h2>'+list(p.risk_scenes)+'</section>'+
       '<section class="card"><h2>이렇게 해 보세요</h2>'+list(p.common_improvements)+'<div class="gx-practice">'+practice+'</div></section>'+
       '<section class="card"><h2>라운드 끝나고 체크해 보세요</h2>'+list(p.checkpoints)+'</section>'+
-      '<section class="card"><h2>캐디가 본 나</h2><dl class="gx-fun">'+
-        (fun.caddie_view?'<dt>캐디 한마디</dt><dd>'+esc(fun.caddie_view)+'</dd>':'')+
+      '<section class="card"><h2>캐디가 본 나</h2>'+(fun.caddie_view?'<p class="gx-caddie">'+esc(fun.caddie_view)+'</p>':'')+'<dl class="gx-fun">'+
         (fun.danger_button?'<dt>나를 흔드는 것</dt><dd>'+esc(fun.danger_button)+'</dd>':'')+
         (fun.forbidden_word?'<dt>하면 안 되는 말</dt><dd>“'+esc(fun.forbidden_word)+'”</dd>':'')+
         (fun.combo?'<dt>조심할 동반자</dt><dd>'+esc(fun.combo)+'</dd>':'')+
