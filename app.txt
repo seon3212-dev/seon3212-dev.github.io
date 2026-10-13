@@ -276,7 +276,9 @@ details.card[open] summary::after{content:"－"}
 .gx-ends{display:flex;justify-content:space-between;font-size:11.5px;color:var(--muted)}
 .gx-hero{background:var(--board);color:var(--board-ink);border-radius:var(--r);padding:18px 16px;display:flex;flex-direction:column;gap:8px}
 .gx-hero small{color:var(--board-muted);font-size:12px;letter-spacing:.04em}
+.gx-codeline{display:flex;align-items:baseline;gap:4px 12px;flex-wrap:wrap}
 .gx-code{font:700 44px/1 var(--font-display);letter-spacing:.06em;color:var(--flag)}
+.gx-formal{font-size:13.5px;font-weight:600;color:var(--board-muted)}
 .gx-hero h2{margin:0;font-size:20px;line-height:1.35;color:var(--board-ink);text-wrap:balance}
 .gx-hero p{margin:0;font-size:14px;color:var(--board-muted)}
 .gx-axes{display:flex;flex-direction:column;gap:14px}
@@ -508,7 +510,7 @@ details.card[open] summary::after{content:"－"}
 /* ---------- 골프 유형 검사 (GRAS ERFA) — 문항과 채점은 검사 서버에만 있다 ---------- */
 (function(){
   var GRAS_API = "https://script.google.com/macros/s/AKfycbz4aGblc6lrfqolwbt6x9imyHetDBVgHcPnb5SeZJsmbqnmnkEciMFo1xt3NoIPcwDJ/exec";               /* 배포한 Apps Script 웹 앱 주소(…/exec) */
-  var APP_VERSION = "round-v69";
+  var APP_VERSION = "round-v70";
   var LKEY = "gras_app_v1";
 
   function $(id){return document.getElementById(id);}
@@ -608,11 +610,11 @@ details.card[open] summary::after{content:"－"}
         '<div class="ends"><span><i><b>'+esc(a.left.code)+'</b> '+esc(a.left.name)+'</i>'+(a.left.easy?'<small>'+esc(a.left.easy)+'</small>':'')+'</span><span class="r"><i>'+esc(a.right.name)+' <b>'+esc(a.right.code)+'</b></i>'+(a.right.easy?'<small>'+esc(a.right.easy)+'</small>':'')+'</span></div></div>';
     }).join("");
     var chem=[["fantasy","환상의 케미"],["surprise","의외의 케미"],["chaos","환장의 케미"],["twin","쌍둥이"]].filter(function(k){return ch[k[0]];}).map(function(k){
-      return '<div><small>'+k[1]+'</small><b>'+esc(ch[k[0]].code)+'</b><span>'+esc(ch[k[0]].name)+'</span>'+(ch[k[0]].easy?'<small>'+esc(ch[k[0]].easy)+'</small>':'')+'</div>';
+      return '<div><small>'+k[1]+'</small><b>'+esc(ch[k[0]].code)+'</b><span>'+esc(ch[k[0]].friendly||ch[k[0]].name)+'</span>'+(ch[k[0]].friendly?'<small>'+esc(ch[k[0]].name)+'</small>':'')+''+(ch[k[0]].easy?'<small>'+esc(ch[k[0]].easy)+'</small>':'')+'</div>';
     }).join("");
     var practice=(p.practice||[]).map(function(x){return '<div><b>'+esc(x.title)+'</b><span>'+esc(x.text)+'</span></div>';}).join("");
     $("gxResult").innerHTML=
-      '<div class="gx-hero"><small>'+(r.nick?esc(r.nick)+'님의 ':'')+'골프 스타일</small><div class="gx-code">'+esc(r.code_display)+'</div><h2>'+esc(r.type_name)+'</h2>'+(r.easy_name?'<div class="gx-easy">'+esc(r.easy_name)+'</div>':'')+'<p>'+esc(p.character_line)+'</p></div>'+
+      '<div class="gx-hero"><small>'+(r.nick?esc(r.nick)+'님의 ':'')+'골프 스타일</small><div class="gx-codeline"><span class="gx-code">'+esc(r.code_display)+'</span>'+(r.friendly_name?'<span class="gx-formal">'+esc(r.type_name)+'</span>':'')+'</div><h2>'+esc(r.friendly_name||r.type_name)+'</h2>'+(r.easy_name?'<div class="gx-easy">'+esc(r.easy_name)+'</div>':'')+'<p>'+esc(p.character_line)+'</p></div>'+
       '<section class="card"><h2>나는 어느 쪽?</h2><div class="gx-axes">'+axes+'</div><p class="gx-fine">점이 가운데에 가까우면 양쪽을 다 가진 편이에요.</p></section>'+
       '<p class="gx-exec"><small>다음 라운드에 이것만 기억하세요</small>'+esc(p.execution_line)+'</p>'+
       '<section class="card"><h2>내가 잘하는 것</h2>'+list(p.strengths)+'</section>'+
@@ -633,10 +635,10 @@ details.card[open] summary::after{content:"－"}
   }
   function shareText(r){
     var ch=(r.profile||{}).chemistry||{},L=[];
-    L.push("[골프 유형 검사] 나는 "+r.code_display+" "+r.type_name+(r.easy_name?" ("+r.easy_name+")":""));
+    L.push("[골프 유형 검사] 나는 "+r.code_display+" "+(r.friendly_name||r.type_name)+(r.easy_name?" ("+r.easy_name+")":""));
     if((r.profile||{}).execution_line)L.push("내 한 문장: "+r.profile.execution_line);
-    if(ch.fantasy)L.push("환상의 케미: "+ch.fantasy.code+" "+ch.fantasy.name);
-    if(ch.chaos)L.push("환장의 케미: "+ch.chaos.code+" "+ch.chaos.name);
+    if(ch.fantasy)L.push("환상의 케미: "+ch.fantasy.code+" "+(ch.fantasy.friendly||ch.fantasy.name));
+    if(ch.chaos)L.push("환장의 케미: "+ch.chaos.code+" "+(ch.chaos.friendly||ch.chaos.name));
     L.push(((r.profile||{}).share_card||{}).cta||"너 골프 유형 뭐 나왔어?");
     return L.join("\n");
   }
