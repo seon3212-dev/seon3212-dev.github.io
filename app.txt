@@ -336,6 +336,50 @@ body{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
 .bnav button{appearance:none;border:0;background:transparent;color:var(--muted);font:500 11.5px var(--font-body);display:flex;flex-direction:column;align-items:center;gap:2px;min-height:48px;justify-content:center;cursor:pointer}
 .bnav button[aria-current="page"]{color:var(--ink);font-weight:700}
 .bnav svg{width:22px;height:22px}
+/* ---- 신체 검사 (GPAS) ---- */
+.gp-switch{display:inline-flex;background:var(--chip);border-radius:999px;padding:4px;gap:4px;align-self:flex-start}
+.gp-switch button{appearance:none;border:0;background:transparent;color:var(--ink);font:600 13.5px var(--font-body);padding:7px 14px;border-radius:999px;cursor:pointer}
+.gp-switch button[aria-current="true"]{background:var(--surface);box-shadow:0 1px 2px rgba(0,0,0,.12)}
+.gp-root{display:flex;flex-direction:column;gap:12px}
+.gp-row{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.gp-nav{display:flex;flex-wrap:wrap;gap:8px;justify-content:flex-end}
+.gp-nav .btn{align-self:auto;min-height:44px}
+.gp-pause{align-self:center !important;font-size:13px}
+.gp-tt{display:flex;flex-direction:column;gap:2px}
+.gp-tt small{color:var(--fairway);font-weight:700;font-size:12.5px}
+.gp-tt h2{margin:0}
+.gp-how{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:4px;font-size:14.5px}
+.gp-pics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
+@media (max-width:560px){.gp-pics{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.gp-pics.dual{grid-template-columns:repeat(2,minmax(0,1fr))}
+@media (max-width:560px){.gp-pics.dual{grid-template-columns:minmax(0,1fr)}}
+.gp-pics figure{margin:0;display:flex;flex-direction:column;gap:3px;min-width:0}
+.gp-pics svg{width:100%;height:auto;display:block;background:var(--bg);border:1px solid var(--line);border-radius:10px}
+.gp-pics figcaption{font-size:12.5px;line-height:1.35}
+.gp-g{font:700 16px var(--font-display);color:var(--fairway);margin-right:2px}
+.gp-side{display:flex;flex-direction:column;gap:6px;padding-top:6px;border-top:1px dashed var(--line)}
+.gp-gc{min-width:46px;font-weight:700}
+.gp-pain[aria-pressed="true"]{background:var(--over);border-color:var(--over);color:#fff}
+.gp-num{width:90px;min-height:40px;border:1.5px solid var(--line);border-radius:10px;padding:0 10px;font:600 16px var(--font-body);background:var(--surface);color:var(--ink)}
+.gp-timer{display:flex;flex-wrap:wrap;align-items:center;gap:10px;background:var(--chip);border-radius:12px;padding:10px 12px}
+.gp-timer b{font:700 28px var(--font-display);font-variant-numeric:tabular-nums;min-width:56px}
+.gp-checks{display:flex;flex-direction:column;gap:4px;max-height:320px;overflow:auto;border:1px solid var(--line);border-radius:12px;padding:8px}
+.gp-hero{font-size:20px;line-height:1.35}
+.gp-fine{font-size:12.5px;color:var(--board-muted)}
+.gp-warn{border-color:var(--over)}
+.gp-warn b{color:var(--over)}
+.gp-regs{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:12px}
+.gp-regs>li{display:flex;flex-direction:column;gap:4px;padding-bottom:12px;border-bottom:1px solid var(--line)}
+.gp-regs>li:last-child{border-bottom:0;padding-bottom:0}
+.gp-regs p{margin:0;font-size:14px}
+.gp-reg-h{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.gp-pill{font-size:12px;font-weight:700;padding:2px 10px;border-radius:999px;white-space:nowrap}
+.gp-pri{background:var(--over);color:#fff}
+.gp-watch{background:var(--flag);color:var(--flag-ink)}
+.gp-good{background:var(--fairway);color:#fff}
+.gp-hold,.gp-none{background:var(--chip);color:var(--muted)}
+.gp-facts{margin:0;padding-left:18px;font-size:13px;color:var(--muted)}
+.gp-copyfb{width:100%;min-height:120px;border:1px solid var(--line);border-radius:10px;padding:8px;font:13px var(--font-body);background:var(--surface);color:var(--ink)}
 </style>
 
 <div class="wrap">
@@ -519,7 +563,7 @@ body{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
   <!-- ===================== 골프 유형 검사 ===================== -->
   <section id="view-type" class="wrap" hidden aria-labelledby="gxTitle">
     <div class="gx-head">
-      <button type="button" class="btn btn-plain gx-back" data-tab="plan">← 다음 라운드</button>
+      <div class="gp-switch" role="group" aria-label="진단 고르기"><button type="button" data-tab="type" aria-current="true">운영 GRAS</button><button type="button" data-tab="gpas">신체 GPAS</button></div>
       <h1 id="gxTitle">골프 유형 검사</h1>
       <p>20문제 · 3분이면 끝나요</p>
     </div>
@@ -549,7 +593,17 @@ body{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
   </section>
 
 
-  <p class="note">슬기로운골프생활 시험판입니다. 가입이나 서버 저장 없이 이 기기 브라우저에만 남습니다. 골프 유형 검사 응답만 검사 서버에 저장됩니다. 정산은 계산만 해 주고, 돈은 주고받지 않습니다.</p>
+  <!-- ===================== 신체 검사 (GPAS) ===================== -->
+  <section id="view-gpas" class="wrap" hidden aria-labelledby="gpTitle">
+    <div class="gx-head">
+      <div class="gp-switch" role="group" aria-label="진단 고르기"><button type="button" data-tab="type">운영 GRAS</button><button type="button" data-tab="gpas" aria-current="true">신체 GPAS</button></div>
+      <h1 id="gpTitle">신체 검사</h1>
+      <p>검사 20개 · 질문 7개 · 20~25분</p>
+    </div>
+    <div id="gpRoot" class="gp-root"></div>
+  </section>
+
+  <p class="note">슬기로운골프생활 시험판입니다. 가입이나 서버 저장 없이 이 기기 브라우저에만 남습니다. 골프 유형 검사 응답만 검사 서버에 저장됩니다. 신체 검사 기록은 이 기기에만 남습니다. 정산은 계산만 해 주고, 돈은 주고받지 않습니다.</p>
 </div>
 <nav class="bnav" aria-label="앱 메뉴">
   <button type="button" data-tab="home" id="nav-home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 11l8-7 8 7v9h-5v-6H9v6H4z"></path></svg>홈</button>
@@ -562,7 +616,7 @@ body{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
 /* ---------- 골프 유형 검사 (GRAS ERFA) — 문항과 채점은 검사 서버에만 있다 ---------- */
 (function(){
   var GRAS_API = "https://script.google.com/macros/s/AKfycbz4aGblc6lrfqolwbt6x9imyHetDBVgHcPnb5SeZJsmbqnmnkEciMFo1xt3NoIPcwDJ/exec";               /* 배포한 Apps Script 웹 앱 주소(…/exec) */
-  var APP_VERSION = "round-v72";
+  var APP_VERSION = "round-v73";
   var LKEY = "gras_app_v1";
 
   function $(id){return document.getElementById(id);}
@@ -1242,11 +1296,12 @@ body{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
   /* ---------- 탭 ---------- */
   function showTab(t){
     S.tab=t;save();
-    ["home","plan","go","score","type"].forEach(function(x){$("view-"+x).hidden=x!==t;var tb=$("tab-"+x);if(tb)tb.setAttribute("aria-selected",String(x===t));});
+    ["home","plan","go","score","type","gpas"].forEach(function(x){$("view-"+x).hidden=x!==t;var tb=$("tab-"+x);if(tb)tb.setAttribute("aria-selected",String(x===t));});
     var inRound=t==="plan"||t==="go"||t==="score";$("segRound").hidden=!inRound;$("sampleBar").hidden=!(inRound&&S.sample);
-    [["nav-home",t==="home"],["nav-round",inRound],["nav-diag",t==="type"]].forEach(function(n){var el=$(n[0]);if(n[1])el.setAttribute("aria-current","page");else el.removeAttribute("aria-current");});
+    [["nav-home",t==="home"],["nav-round",inRound],["nav-diag",t==="type"||t==="gpas"]].forEach(function(n){var el=$(n[0]);if(n[1])el.setAttribute("aria-current","page");else el.removeAttribute("aria-current");});
     if(t==="home")renderHome();
     if(t==="type"&&window.GRAS_OPEN)window.GRAS_OPEN();
+    if(t==="gpas"&&window.GPAS_OPEN)window.GPAS_OPEN();
     try{history.replaceState(null,"","#"+t);}catch(e){}
     window.scrollTo(0,0);
   }
@@ -1268,7 +1323,9 @@ body{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
     var g={};try{g=(JSON.parse(localStorage.getItem("gras_app_v1")||"{}")||{}).last||{};}catch(e){g={};}
     var gr=g.code_display?'<button type="button" data-tab="type"><span class="nm">운영 GRAS</span><b>'+hEsc(g.code_display)+'</b><span class="fr">'+hEsc(g.friendly_name||g.type_name||"")+'</span></button>'
       :'<button type="button" data-tab="type"><span class="nm">운영 GRAS</span><b style="font:700 13px var(--font-body)">검사하기</b><span class="fr">골프 유형 검사 · 3분</span></button>';
-    $("hmQuad").innerHTML=gr+["신체 GPAS","클럽 GCAS","스윙 GSAS"].map(function(nm){return '<div class="off"><span class="nm">'+nm+'</span><b>공개 예정</b></div>';}).join("");
+    var gpI=window.GPAS_HOME?window.GPAS_HOME():{text:"검사하기",sub:"신체 검사 · 20분"};
+    var gp='<button type="button" data-tab="gpas"><span class="nm">신체 GPAS</span><b style="font:700 13px var(--font-body)">'+hEsc(gpI.text)+'</b><span class="fr">'+hEsc(gpI.sub)+'</span></button>';
+    $("hmQuad").innerHTML=gr+gp+["클럽 GCAS","스윙 GSAS"].map(function(nm){return '<div class="off"><span class="nm">'+nm+'</span><b>공개 예정</b></div>';}).join("");
   }
   function changed(){S.sample=false;save();render();}
 
@@ -1367,6 +1424,519 @@ body{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
 
   render();
   var h0=(location.hash||"").slice(1);showTab(["home","plan","go","score","type"].indexOf(h0)>=0?h0:"home");
+})();
+</script>
+<script>
+/* ---------- 신체 검사 (GPAS) — 무료 자가 검사. 채점은 이 앱 안에서, 기록은 이 기기에만 ---------- */
+(function(){
+  var KEY="gpas_app_v1";
+  function $(id){return document.getElementById(id);}
+  function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];});}
+  function load(){try{return JSON.parse(localStorage.getItem(KEY)||"{}")||{};}catch(e){return {};}}
+  function save(){try{localStorage.setItem(KEY,JSON.stringify(P));}catch(e){}}
+  function toast(msg){var t=document.querySelector(".toast");if(!t){t=document.createElement("div");t.className="toast";t.setAttribute("role","status");document.body.appendChild(t);}t.textContent=msg;t.hidden=false;clearTimeout(toast.t);toast.t=setTimeout(function(){t.hidden=true;},1800);}
+
+  /* ---- 그림 (A~D 비교) ---- */
+  var NS="http://www.w3.org/2000/svg";
+  var INK="var(--ink)",ACC="var(--fairway)",REF="var(--over)",LINE="var(--line)",PANEL="var(--surface)";
+  function el(t,a){var e=document.createElementNS(NS,t);for(var k in a)e.setAttribute(k,a[k]);return e;}
+  function mk(label){return el("svg",{viewBox:"0 0 160 160",role:"img","aria-label":label});}
+  function L(s,a,b,c,w,dash){var o={x1:a[0],y1:a[1],x2:b[0],y2:b[1],stroke:c,"stroke-width":w,"stroke-linecap":"round",fill:"none"};if(dash)o["stroke-dasharray"]=dash;s.appendChild(el("line",o));}
+  function C(s,p,r,c,fill,w){s.appendChild(el("circle",{cx:p[0],cy:p[1],r:r,stroke:c,"stroke-width":w||3,fill:fill||"none"}));}
+  function T(s,x,y,t,c,anchor,size){var e=el("text",{x:x,y:y,fill:c,"font-size":size||"10","font-family":"IBM Plex Sans KR, sans-serif","text-anchor":anchor||"middle"});e.textContent=t;s.appendChild(e);}
+  function PATH(s,d,c,w,fill,dash){var o={d:d,stroke:c,"stroke-width":w,fill:fill||"none","stroke-linecap":"round","stroke-linejoin":"round"};if(dash)o["stroke-dasharray"]=dash;s.appendChild(el("path",o));}
+  function rad(d){return d*Math.PI/180;}
+  function pol(p,len,ang){return [p[0]+Math.sin(rad(ang))*len,p[1]-Math.cos(rad(ang))*len];} // 0=위, 시계방향
+  function floor(s,y){L(s,[10,y],[150,y],LINE,3);}
+  function head(s,p,r){C(s,p,r||9,INK,PANEL,3);}
+  function bar(s,val,max,mark,unit){ // 숫자 검사용 막대
+    var x0=18,w=124,y=146;L(s,[x0,y],[x0+w,y],LINE,7);
+    L(s,[x0,y],[x0+w*Math.min(val,max)/max,y],ACC,7);
+    if(mark!=null){var mx=x0+w*mark/max;L(s,[mx,y-7],[mx,y+5],REF,1.5,"2 2");}
+    var lx=Math.max(x0+10,Math.min(x0+w-10,x0+w*Math.min(val,max)/max));T(s,lx,y+10,val+unit,ACC,"middle","9");
+  }
+
+  /* ---- 그림 함수 ---- */
+  function ankle(d){return function(s){
+    floor(s,145);L(s,[132,14],[132,145],LINE,4);
+    var toe=[132-d*3.2,143],ank=[toe[0]-16,140],knee=[129,100];
+    var hip=[(ank[0]+knee[0])/2-24,90];
+    L(s,hip,[hip[0]-26,118],INK,5);L(s,[hip[0]-26,118],[hip[0]-48,140],INK,5);L(s,[hip[0]-48,140],[hip[0]-36,141],INK,4);
+    L(s,hip,knee,INK,5);L(s,ank,knee,ACC,6);L(s,ank,toe,INK,5);
+    var sh=[hip[0]+6,50];L(s,hip,sh,INK,5);head(s,[hip[0]+8,37]);L(s,[sh[0],sh[1]+4],[127,64],INK,4);
+    L(s,[toe[0],151],[132,151],REF,1.5,"3 3");T(s,Math.min(118,(toe[0]+132)/2),159,"발끝~벽 "+d+"cm",REF,"middle","9");
+  };}
+  function hipIR(phi,shift){return function(s){
+    L(s,[30,96],[130,96],LINE,4);L(s,[36,96],[36,150],LINE,3);L(s,[124,96],[124,150],LINE,3);
+    var tx=80+shift;s.appendChild(el("rect",{x:tx-18,y:40,width:36,height:46,rx:10,stroke:INK,"stroke-width":3,fill:PANEL}));head(s,[tx,26],11);
+    var kL=[62,96],kR=[98,96];L(s,[tx-9,86],kL,INK,5);L(s,[tx+9,86],kR,INK,5);C(s,kL,5,INK,PANEL);C(s,kR,5,INK,PANEL);
+    L(s,kL,[kL[0],150],REF,1.5,"4 4");L(s,kL,pol(kL,50,180+45),REF,1.5,"4 4");T(s,kL[0]-40,kL[1]+44,"45°",REF);
+    var f=pol(kL,46,180+phi);L(s,kL,f,ACC,6);L(s,f,[f[0]-9,f[1]+2],ACC,5);
+    L(s,kR,[kR[0],kR[1]+46],INK,5);L(s,[kR[0],kR[1]+46],[kR[0]+9,kR[1]+48],INK,5);T(s,kL[0]-6,kL[1]-8,phi+"°",ACC,"end");
+  };}
+  // 위에서 본 모습: 어깨선·골반 회전 (move: 'sh' 또는 'pel')
+  function top(sh,pel,move,refs,opt){opt=opt||{};return function(s){
+    var c=[80+(opt.sway||0),84];
+    refs.forEach(function(a){var p1=pol([80,84],64,90-a),p2=pol([80,84],64,270-a);L(s,p1,p2,REF,1.8,"5 4");});
+    if(opt.label)T(s,140,26,opt.label,REF,"end");
+    if(opt.feet){var fl=[52,86],fr=[108,86];[fl,fr].forEach(function(f,i){var lifted=opt.footUp&&i===1;s.appendChild(el("ellipse",{cx:f[0],cy:f[1],rx:6,ry:11,stroke:INK,"stroke-width":2.5,fill:lifted?"none":PANEL,"stroke-dasharray":lifted?"3 3":""}));});}
+    if(opt.knees){C(s,[c[0]-11,c[1]-40],6,INK,PANEL);C(s,[c[0]+11,c[1]-40],6,INK,PANEL);}
+    s.appendChild(el("ellipse",{cx:c[0],cy:c[1]+6,rx:26,ry:11,stroke:move==="pel"?ACC:INK,"stroke-width":move==="pel"?4:3,fill:PANEL,transform:"rotate("+(-pel)+" "+c[0]+" "+(c[1]+6)+")"}));
+    var a=pol(c,58,90-sh),b=pol(c,58,270-sh);L(s,b,a,move==="sh"?ACC:INK,move==="sh"?6:5);
+    head(s,c);
+    var v=Math.abs(move==="sh"?sh:pel);T(s,c[0]+40,c[1]+(v>25?-4:16),v+"°",ACC,"start");
+    if(opt.sway){L(s,[80,138],[c[0]+4,138],REF,1.5);PATH(s,"M"+c[0]+" 134 L"+(c[0]+4)+" 138 L"+c[0]+" 142",REF,1.5);T(s,80,154,"몸이 옆으로 밀림",REF,"middle","9");}
+  };}
+  function tilt(ant,post,chest){return function(s){
+    floor(s,145);var hip=[60,92],knee=[72,116],ank=[66,140];
+    L(s,ank,[86,142],INK,5);L(s,ank,knee,INK,5);L(s,knee,hip,INK,5);
+    var sh=pol(hip,44,52);L(s,hip,sh,INK,5);head(s,pol(hip,57,52));L(s,sh,[sh[0]+4,sh[1]+44],INK,4);
+    if(chest){var sh2=pol(hip,44,64);L(s,hip,sh2,REF,2,"4 3");T(s,sh2[0]+6,sh2[1]+16,"가슴도 움직임",REF,"start","9");}
+    function pv(a,c,w,d){var p=pol(hip,13,a),q=pol(hip,13,a+180);L(s,q,p,c,w,d);}
+    pv(155,INK,6);pv(155-ant,ACC,3,"4 3");pv(155+post,ACC,3,"4 3");
+    T(s,hip[0]-28,hip[1]-14,"앞 "+ant+"°",ACC,"middle","9");T(s,hip[0]-28,hip[1]+30,"뒤 "+post+"°",ACC,"middle","9");
+  };}
+  // 앞에서 본 회전: 몸통 폭이 줄고 가슴뼈·버클 표시가 옆으로 감. 오른쪽 위 작은 원 = 위에서 본 각도
+  function front(sh,pel,move,opt){opt=opt||{};return function(s){
+    floor(s,146);var sw=opt.sway||0,cx=74+sw;
+    var cs=Math.cos(rad(sh)),cp=Math.cos(rad(pel));
+    var sL=[cx-28*Math.max(cs,.18),46],sR=[cx+28*Math.max(cs,.18),46],bL=[74-20*Math.max(cp,.3),88],bR=[74+20*Math.max(cp,.3),88];
+    var chestC=move==="pel"?INK:ACC,beltC=move==="sh"?INK:ACC;
+    if(opt.footUp){L(s,[62,90],[54,142],INK,5);L(s,[86,90],[96,136],INK,5);L(s,[96,136],[102,132],INK,4);T(s,104,128,"발 들림",REF,"start","9");}
+    else{L(s,[64,90],[54,142],INK,5);L(s,[84,90],[94,142],INK,5);}
+    PATH(s,"M"+sL[0]+" "+sL[1]+" L"+sR[0]+" "+sR[1]+" L"+bR[0]+" "+bR[1]+" L"+bL[0]+" "+bL[1]+" Z",chestC,move==="pel"?3:4,PANEL);
+    L(s,bL,bR,beltC,7);
+    var st=cx+22*Math.sin(rad(sh));L(s,[st,52],[st,78],chestC,3);
+    var bk=74+16*Math.sin(rad(pel));s.appendChild(el("rect",{x:bk-4,y:85,width:8,height:6,rx:1,fill:beltC}));
+    head(s,[cx+6*Math.sin(rad(sh)),32]);
+    if(opt.arms===true){L(s,sL,[cx+4,100],INK,4);L(s,sR,[cx+4,100],INK,4);}
+    if(sw){L(s,[74,14],[74,146],REF,1.5,"4 4");T(s,72,152+4,"",REF);T(s,20,156,"머리가 옆으로 밀림",REF,"start","9");}
+    if(opt.noDial)return;
+    // 각도 다이얼
+    var d=[134,28],r=21;C(s,d,r,LINE,PANEL,2);
+    (opt.refs||[]).forEach(function(a){var q=pol(d,r,90-a);L(s,d,q,REF,1.5,"2 2");});
+    L(s,pol(d,r,270),pol(d,r,90),LINE,1.5);
+    var v=move==="pel"?pel:sh;L(s,pol(d,r,270-v),pol(d,r,90-v),ACC,3);
+    if(move==="both"){L(s,pol(d,r-4,270-pel),pol(d,r-4,90-pel),INK,2);}
+    T(s,d[0],d[1]+r+11,v+"°",ACC,"middle","10");
+  };}
+  // 두 방향을 한 칸에: 왼쪽·오른쪽 그림
+  function dual(f1,l1,f2,l2){return function(s){
+    s.setAttribute("viewBox","0 0 320 160");
+    var g1=el("g",{});f1(g1);s.appendChild(g1);
+    var g2=el("g",{transform:"translate(160,0)"});f2(g2);s.appendChild(g2);
+    L(s,[160,8],[160,152],LINE,2);
+    [[l1,6],[l2,166]].forEach(function(x){s.appendChild(el("rect",{x:x[1],y:6,width:x[0].length*11+10,height:16,rx:8,fill:PANEL,stroke:LINE,"stroke-width":1}));T(s,x[1]+6,18,x[0],INK,"start","10");});
+  };}
+  function neckFront(a){return function(s){
+    L(s,[24,104],[136,104],INK,7);L(s,[80,88],[80,104],INK,5);
+    var c=[80,70];C(s,c,17,ACC,PANEL,4);
+    var nx=c[0]+15*Math.sin(rad(a));L(s,[nx,64],[nx,76],ACC,3);
+    var chin=[c[0]+13*Math.sin(rad(a)),c[1]+15];C(s,chin,3,ACC,ACC,2);
+    L(s,chin,[118,100],REF,1.5,"3 3");T(s,124,96,"어깨",REF,"start","9");
+  };}
+  function golf(sh,pel,sway,footUp){return dual(top(sh,pel,"sh",[90],{feet:true,sway:sway,footUp:footUp,label:"90°"}),"위에서",front(sh,pel,"both",{sway:sway,footUp:footUp,noDial:true}),"앞에서");}
+  function pelD(sh,pel){return dual(top(sh,pel,"pel",[0],{feet:true}),"위에서",front(sh,pel,"pel",{noDial:true}),"앞에서");}
+  function thD(sh,pel){return dual(top(sh,pel,"sh",[45,-45],{feet:true,label:"45°"}),"위에서",front(sh,pel,"sh",{noDial:true}),"앞에서");}
+  function neckD(a){return dual(neck(a),"위에서",neckFront(a),"앞에서");}
+  function wallArm(ang,arch){return function(s){
+    floor(s,145);L(s,[36,10],[36,145],LINE,4);
+    var hip=[44,100],shd=[44,58];L(s,[44,100],[44,140],INK,5);L(s,[44,140],[60,142],INK,5);
+    if(arch){PATH(s,"M44 100 Q58 80 44 58",INK,5);L(s,[38,80],[52,80],REF,1.5,"2 2");T(s,62,84,"허리 뜸",REF,"start","9");}else L(s,hip,shd,INK,5);
+    head(s,[46,46]);var h=pol(shd,46,ang);L(s,shd,h,ACC,6);
+    if(ang<=-5)T(s,h[0]+14,h[1]+6,"팔 전체가 벽에",ACC,"start","9");else if(ang<=0)T(s,h[0]+14,h[1]+6,"손등만 닿음",ACC,"start","9");else{L(s,[36,h[1]],[h[0],h[1]],REF,1.5,"2 2");}
+  };}
+  function ninety(a){return function(s){
+    var hip=[64,112],shd=[64,58];L(s,[64,112],[64,148],INK,5);L(s,hip,shd,INK,5);head(s,[64,44]);
+    var elb=[86,60];L(s,shd,elb,INK,4);C(s,elb,4,INK,PANEL);
+    L(s,elb,[elb[0],14],REF,1.5,"4 4");L(s,elb,[146,elb[1]],REF,1.5,"4 4");
+    var hand=[elb[0]+Math.cos(rad(a))*44,elb[1]-Math.sin(rad(a))*44];L(s,elb,hand,ACC,6);C(s,hand,4,ACC,PANEL);
+    T(s,elb[0]+16,elb[1]+18,a+"°",ACC,"start");T(s,elb[0]+4,12,"수직",REF,"start","9");
+  };}
+  function prone(a){return function(s){
+    floor(s,122);var sh=[60,116];L(s,[140,118],[100,117],INK,5);L(s,[100,117],sh,INK,6);C(s,[46,112],9,INK,PANEL,3);
+    var hand=[sh[0]-Math.cos(rad(a))*44,sh[1]-Math.sin(rad(a))*44-2];L(s,sh,hand,ACC,6);C(s,hand,3,ACC,PANEL);
+    if(a>0){L(s,[hand[0],hand[1]],[hand[0],121],REF,1.5,"2 2");}T(s,a>0?hand[0]+6:20,a>0?hand[1]-8:100,a>0?"바닥에서 "+a+"°":"팔이 안 들림",ACC,"start","9");
+  };}
+  function squat(shin,th,tor,arm,heel){return function(s){
+    floor(s,145);var ank=[78,heel?134:140],toe=[96,143];
+    var knee=pol(ank,32,shin),hip=[knee[0]-Math.cos(rad(th))*32,knee[1]+Math.sin(rad(th))*32];
+    var shd=pol(hip,40,tor),hand=pol(shd,40,arm);
+    L(s,ank,toe,INK,5);if(heel)T(s,ank[0]-4,ank[1]+12,"뒤꿈치 들림",REF,"end","9");
+    L(s,ank,knee,INK,5);L(s,knee,hip,ACC,6);L(s,hip,shd,ACC,6);head(s,pol(hip,53,tor));L(s,shd,hand,INK,4);
+    s.appendChild(el("rect",{x:hand[0]-6,y:hand[1]-3,width:12,height:6,rx:3,fill:INK}));
+    L(s,[toe[0]-6,146],[toe[0]-6,10],REF,1.5,"4 4");T(s,toe[0]-2,14,"발 위",REF,"start","9");
+  };}
+  function toe(a,hand,flat){return function(s){
+    var hip=[54,80],ank=[70,140],tt=[88,142];floor(s,145);
+    L(s,hip,ank,INK,5);L(s,ank,tt,INK,5);var sh=pol(hip,40,a);L(s,hip,sh,ACC,6);
+    L(s,sh,hand,INK,4);head(s,pol(hip,52,a));
+    if(flat)L(s,[hand[0]-2,hand[1]],[hand[0]+12,hand[1]],INK,4);else C(s,hand,3,INK,INK,2);
+    L(s,[hand[0]+16,hand[1]],[hand[0]+28,hand[1]],REF,1.5,"3 3");
+  };}
+  function balance(sec){return function(s){
+    floor(s,140);head(s,[80,20]);L(s,[80,30],[80,78],INK,5);
+    L(s,[74,80],[74,138],INK,5);L(s,[86,80],[100,98],INK,5);L(s,[100,98],[92,118],INK,5);
+    L(s,[70,38],[60,58],INK,4);L(s,[60,58],[72,76],INK,4);L(s,[90,38],[100,58],INK,4);L(s,[100,58],[88,76],INK,4);
+    bar(s,sec,30,30,"초");
+  };}
+  function oneChair(n,wob){return function(s){
+    L(s,[30,100],[70,100],LINE,4);L(s,[34,100],[34,140],LINE,3);L(s,[66,100],[66,140],LINE,3);floor(s,140);
+    head(s,[86,22]);L(s,[86,32],[84,74],INK,5);var knee=wob?[80,104]:[86,104];L(s,[84,76],knee,ACC,6);L(s,knee,[88,136],ACC,6);L(s,[88,136],[102,138],INK,5);
+    L(s,[84,78],[104,92],INK,5);L(s,[104,92],[118,90],INK,5);L(s,[80,40],[100,52],INK,4);L(s,[92,40],[110,50],INK,4);
+    if(wob){PATH(s,"M70 98 q-4 4 0 8 q4 4 0 8",REF,1.5);T(s,66,92,"흔들림",REF,"end","9");}
+    for(var i=0;i<3;i++)C(s,[62+i*18,152],5,ACC,i<n?ACC:PANEL,2);
+  };}
+  function bridge(hy){return function(s){
+    floor(s,134);head(s,[22,125],8);var sh=[36,130],hip=[84,hy],knee=[106,96],foot=[116,132];
+    L(s,sh,hip,ACC,6);L(s,hip,knee,INK,5);L(s,knee,foot,INK,5);
+    var dx=knee[0]-hip[0],dy=knee[1]-hip[1],l=Math.hypot(dx,dy),ext=[hip[0]+dx/l*64,hip[1]+dy/l*64];L(s,hip,ext,INK,4);
+    L(s,[30,90],[96,90],REF,1.5,"4 4");T(s,30,86,"골반 높이 기준",REF,"start","9");T(s,104,150,"10초 유지",INK,"middle","9");
+  };}
+  function neck(a){return function(s){
+    L(s,[24,96],[136,96],INK,7);var c=[80,92];L(s,c,pol(c,62,90),REF,1.5,"4 4");T(s,140,86,"어깨",REF,"end","9");
+    C(s,c,15,ACC,PANEL,4);var n=pol(c,24,a);L(s,c,n,ACC,4);C(s,n,3,ACC,ACC,2);T(s,c[0]-6,c[1]-24,a+"°",ACC,"middle");
+  };}
+  function forearm(a){return function(s){
+    s.appendChild(el("rect",{x:46,y:30,width:68,height:116,rx:16,stroke:LINE,"stroke-width":3,fill:"none"}));
+    var f=[80,104];L(s,[f[0],40],[f[0],150],REF,1.5,"4 4");L(s,[20,f[1]],[140,f[1]],REF,1.5,"4 4");
+    var e=pol(f,52,a);L(s,f,e,ACC,6);C(s,f,9,INK,PANEL,3);T(s,f[0]+8,f[1]-46,a+"°",ACC,"start");
+  };}
+  function hinge(a){return function(s){
+    var shd=[24,92],wr=[86,92];head(s,[16,70],8);L(s,shd,wr,INK,6);C(s,wr,7,INK,PANEL,3);
+    L(s,wr,[150,92],REF,1.5,"4 4");L(s,wr,[86,20],REF,1.5,"4 4");
+    var e=[wr[0]+Math.cos(rad(a))*56,wr[1]-Math.sin(rad(a))*56];L(s,wr,e,ACC,6);T(s,wr[0]+10,wr[1]+18,a+"°",ACC,"start");
+  };}
+  function prayer(a){return function(s){
+    var w=[80,74];L(s,[80,48],w,ACC,7);L(s,[20,w[1]],[140,w[1]],REF,1.5,"4 4");
+    var el1=[80-Math.cos(rad(a))*48,74+Math.sin(rad(a))*48],el2=[80+Math.cos(rad(a))*48,74+Math.sin(rad(a))*48];
+    L(s,w,el1,INK,6);L(s,w,el2,INK,6);C(s,el1,4,INK,PANEL);C(s,el2,4,INK,PANEL);
+    T(s,80,132,a===0?"팔뚝 수평":"팔뚝이 "+a+"° 위",ACC,"middle");
+  };}
+  function sitStand(n){return function(s){
+    L(s,[26,100],[66,100],LINE,4);L(s,[30,100],[30,138],LINE,3);L(s,[62,100],[62,138],LINE,3);floor(s,138);
+    var ank=[88,136],knee=[98,110],hip=[72,98],sh=[86,60];L(s,ank,[104,138],INK,5);L(s,ank,knee,INK,5);L(s,knee,hip,INK,5);L(s,hip,sh,INK,5);head(s,[90,47]);
+    L(s,[78,68],[96,80],INK,4);L(s,[94,66],[78,80],INK,4);
+    bar(s,n,18,15,"회");
+  };}
+
+
+
+  /* ---- 영역과 검사 ---- */
+  var REG=[
+    {id:"ankle",n:"발목",txt:"발목이 덜 접혀요. 어드레스에서 무릎을 굽히거나 다운스윙에서 버티는 데 영향을 주는지 확인해 볼 만해요."},
+    {id:"hip",n:"고관절·골반",txt:"고관절·골반이 덜 돌아가거나 따로 놀지 못해요. 백스윙에서 몸이 옆으로 밀리거나(스웨이) 다운스윙에서 일어서는(얼리 익스텐션) 동작과 연결되는지 확인해 볼 만해요."},
+    {id:"trunk",n:"몸통 회전",txt:"가슴이 덜 돌아가거나 골반과 따로 돌지 못해요. 백스윙이 팔로만 커지거나 자세가 무너지는 것과 연결되는지 확인해 볼 만해요."},
+    {id:"shoulder",n:"어깨",txt:"어깨가 덜 올라가거나 덜 돌아가요. 백스윙 탑에서 자세가 무너지거나 팔꿈치가 들리는 것과 연결되는지 확인해 볼 만해요."},
+    {id:"chain",n:"전신 연결",txt:"발목·고관절·어깨를 한꺼번에 쓰는 동작이 어려워요. 어드레스 자세를 끝까지 지키는 것과 연결되는지 확인해 볼 만해요."},
+    {id:"balance",n:"균형·하체",txt:"한 다리로 버티는 힘이나 균형이 부족해요. 체중 이동과 피니시가 흔들리는지 확인해 볼 만해요."},
+    {id:"arm",n:"목·팔·손목",txt:"목·팔뚝·손목 움직임이 제한돼요. 백스윙 때 고개가 따라 돌거나 코킹·릴리스가 어색한지 확인해 볼 만해요."},
+    {id:"endure",n:"지속능력",txt:"후반으로 갈수록 몸이 버티기 힘들어요. 후반 9홀에 스윙이 무너지는 것과 연결되는지 확인해 볼 만해요."}
+  ];
+  function regName(id){for(var i=0;i<REG.length;i++)if(REG[i].id===id)return REG[i].n;return id;}
+  var G4=["A","B","C","D"],PTS={A:4,B:3,C:2,D:1};
+  /* kind: grade(그림 보고 고르기) / cm / sec / reps */
+  var TESTS=[
+    {id:"ankle",n:"발목 벽 닿기",r:"ankle",part:1,side:true,kind:"cm",unit:"cm",how:["벽을 보고 서서 한 발을 앞에 둬요.","뒤꿈치를 바닥에 붙인 채 무릎을 벽에 닿게 해요.","무릎이 닿는 가장 먼 곳에서 발끝과 벽 사이를 재요. 양쪽 다 해요."],pics:[ankle(12),ankle(8),ankle(5),ankle(2)],caps:["10cm 이상","7~9.9cm","4~6.9cm","4cm 미만"]},
+    {id:"pelvisSep",n:"골반 분리 회전",r:"hip",part:1,side:true,kind:"grade",dual:true,how:["어드레스 자세를 잡고 클럽을 가슴에 대요.","가슴은 정면 그대로 두고 골반만 왼쪽, 오른쪽으로 돌려요.","도는 방향마다 단계를 골라요."],pics:[pelD(0,40),pelD(10,30),pelD(20,20),pelD(4,5)],caps:["골반만 크게 돌아요","가슴이 조금 따라와요","가슴이 같이 돌아요","골반만 따로 못 돌려요"]},
+    {id:"tilt",n:"골반 틸트",r:"hip",part:1,side:false,kind:"grade",how:["어드레스 자세를 잡아요.","가슴은 그대로 두고 골반만 앞으로, 뒤로 기울여요."],pics:[tilt(20,20,false),tilt(20,10,false),tilt(15,3,true),tilt(4,4,false)],caps:["앞뒤 모두 매끄럽게","한쪽이 조금 어색해요","한쪽이 거의 안 돼요","앞뒤 모두 어려워요"]},
+    {id:"chestSep",n:"흉곽 분리 회전",r:"trunk",part:1,side:true,kind:"grade",dual:true,how:["어드레스 자세에서 클럽을 가슴에 대요.","벨트선은 정면 그대로 두고 가슴만 왼쪽, 오른쪽으로 돌려요."],pics:[thD(50,0),thD(45,10),thD(30,24),thD(15,15)],caps:["가슴만 45도 이상","가슴 약 45도","벨트가 크게 따라와요","한 덩어리로만 돌아요"]},
+    {id:"golfRot",n:"골프 자세 통합 회전",r:"trunk",part:1,side:false,kind:"grade",dual:true,how:["어드레스 자세에서 클럽을 가슴에 대요.","백스윙 쪽으로 천천히 끝까지 돌렸다 돌아오기를 5번 해요.","어깨가 90도(등이 타깃)까지 가는지, 몸이 밀리지 않는지 봐요."],pics:[golf(88,45,0,false),golf(76,40,0,false),golf(58,35,10,false),golf(42,30,6,true)],caps:["등이 타깃을 향해요","거의 다 돌아요","덜 돌고 몸이 밀려요","균형을 잃어요"]},
+    {id:"wallArm",n:"벽 팔 올리기",r:"shoulder",part:1,side:false,kind:"grade",how:["벽에 등과 허리를 붙이고 서요.","허리를 붙인 채 두 팔을 머리 위로 올려 벽에 대요."],pics:[wallArm(-10,false),wallArm(-2,false),wallArm(18,false),wallArm(28,true)],caps:["팔 전체가 벽에 닿아요","손등만 닿아요","손이 벽에서 떠요","허리를 꺾어야 올라가요"]},
+    {id:"ninety",n:"90/90 어깨 회전",r:"shoulder",part:1,side:true,kind:"grade",how:["팔꿈치를 어깨 높이로 들고 90도로 굽혀요.","몸통은 그대로 두고 팔뚝만 뒤로 돌려요. 양팔 다 해요."],pics:[ninety(105),ninety(90),ninety(68),ninety(40)],caps:["수직을 넘어 뒤로","팔뚝이 수직","수직에 못 미쳐요","크게 부족해요"]},
+    {id:"squat",n:"오버헤드 딥 스쿼트",r:"chain",part:1,side:false,kind:"grade",how:["발을 어깨너비로 벌리고 클럽을 머리 위로 들어요.","뒤꿈치를 붙인 채 끝까지 앉아요. 클럽이 발 위에 있어야 해요."],pics:[squat(34,18,34,4,false),squat(34,0,38,10,false),squat(30,0,58,42,false),squat(14,-35,42,48,true)],caps:["끝까지 앉아도 다 지켜요","하나가 무너져요","둘 이상 무너져요","깊이 못 내려가요"]},
+    {id:"toe",n:"허리 숙여 발끝 닿기",r:"chain",part:1,side:false,kind:"grade",how:["발을 모으고 무릎을 편 채 서요.","천천히 허리를 숙여 손이 어디까지 닿는지 봐요. 반동은 주지 마세요."],pics:[toe(140,[80,143],true),toe(120,[87,139],false),toe(100,[69,122],false),toe(75,[64,108],false)],caps:["손바닥이 바닥에","손끝이 발끝에","발목·정강이까지","무릎 근처까지"]},
+    {id:"balance",n:"한발 서기",r:"balance",part:1,side:true,kind:"sec",unit:"초",timer:"up",how:["손을 허리에 두고 눈을 뜬 채 한 발로 서요.","발이 닿거나 크게 움직이면 끝이에요. 최대 30초, 양쪽 다 해요.","아래 타이머를 쓰면 편해요."],pics:[balance(30),balance(24),balance(14),balance(6)],caps:["30초","20~29초","10~19초","10초 미만"]},
+    {id:"neck",n:"목 회전",r:"arm",part:1,side:true,kind:"grade",dual:true,how:["어깨를 고정하고 똑바로 서요.","고개만 왼쪽, 오른쪽으로 끝까지 돌려요."],pics:[neckD(80),neckD(65),neckD(45),neckD(25)],caps:["턱이 어깨에 거의 닿아요","어깨 중간까지","절반 정도","크게 제한돼요"]},
+    {id:"forearm",n:"팔뚝 돌리기",r:"arm",part:1,side:true,kind:"grade",how:["팔꿈치를 옆구리에 붙이고 클럽을 세워 쥐어요.","팔꿈치는 그대로, 클럽을 옆으로 눕혀요. 안쪽·바깥쪽, 양손 다 해요."],pics:[forearm(100),forearm(90),forearm(65),forearm(35)],caps:["클럽이 수평을 넘어요","수평까지","45~90도 사이","45도 미만"]},
+    {id:"hinge",n:"손목 코킹",r:"arm",part:1,side:true,kind:"grade",how:["팔을 앞으로 뻗고 클럽을 쥐어요.","팔은 그대로, 엄지 쪽으로 클럽을 들어 올려요. 양손 다 해요."],pics:[hinge(85),hinge(60),hinge(45),hinge(28)],caps:["클럽과 팔이 거의 직각","약 60도","약 45도","30도 이하"]},
+    {id:"wrist",n:"손목 굽히기·펴기",r:"arm",part:1,side:false,kind:"grade",how:["가슴 앞에서 손바닥을 맞대요.","손바닥을 붙인 채 팔뚝을 수평까지 내려요. 손등을 맞대고도 해 봐요."],pics:[prayer(0),prayer(15),prayer(30),prayer(48)],caps:["팔뚝 수평까지 붙어요","조금 떨어져요","크게 떨어져요","거의 안 굽혀져요"]},
+    {id:"hipIR",n:"앉은 고관절 회전",r:"hip",part:2,side:true,kind:"grade",how:["의자에 앉아 무릎을 90도로 둬요.","무릎은 그대로 두고 발만 바깥으로 보내요. 양쪽 다 해요."],pics:[hipIR(42,0),hipIR(30,0),hipIR(15,-5),hipIR(4,0)],caps:["정강이 45도 가까이","약 30도","약 15도","거의 안 움직여요"]},
+    {id:"thorax",n:"앉은 흉추 회전",r:"trunk",part:2,side:true,kind:"grade",how:["바닥에 클럽 두 개로 45도 선을 만들어요.","의자에 앉아 무릎을 붙이고 클럽을 가슴에 대요.","골반은 그대로, 상체만 돌려서 1초 멈춰요. 양쪽 다 해요."],pics:[top(55,0,"sh",[45,-45],{knees:true,label:"45°"}),top(45,0,"sh",[45,-45],{knees:true,label:"45°"}),top(30,0,"sh",[45,-45],{knees:true,label:"45°"}),top(15,10,"sh",[45,-45],{knees:true,label:"45°"})],caps:["45도 선을 넘어요","45도 선에 닿아요","선에 못 미쳐요","거의 안 돌아요"]},
+    {id:"prone",n:"엎드려 팔 들기",r:"shoulder",part:2,side:true,kind:"grade",how:["엎드려서 이마를 바닥에 대요.","팔을 머리 위로 뻗은 뒤 바닥에서 들어 3초 버텨요. 허리는 들지 마세요."],pics:[prone(24),prone(14),prone(5),prone(0)],caps:["팔이 들리고 3초 유지","조금 들리지만 힘들어요","거의 안 들려요","못 들어요"]},
+    {id:"oneChair",n:"한발 의자 일어나기",r:"balance",part:2,side:true,kind:"grade",how:["의자에 앉아 한 발을 들어요.","손을 쓰지 않고 한 다리로 일어서요. 최대 3번, 양쪽 다 해요."],pics:[oneChair(3,false),oneChair(3,true),oneChair(2,true),oneChair(0,false)],caps:["3번 깔끔하게","3번, 흔들려요","1~2번","0번"]},
+    {id:"bridge",n:"브리지 + 다리 펴기",r:"balance",part:2,side:true,kind:"grade",how:["누워서 무릎을 세우고 엉덩이를 들어요.","한 다리를 쭉 펴고 10초 버텨요. 골반이 처지는지 봐요. 양쪽 다 해요."],pics:[bridge(90),bridge(98),bridge(110),bridge(124)],caps:["골반 수평 그대로","살짝 처져요","크게 처지거나 못 버텨요","엉덩이 들기 어려워요"]},
+    {id:"sitStand",n:"30초 의자 일어나기",r:"endure",part:2,side:false,kind:"reps",unit:"회",timer:"down",how:["팔을 가슴에 교차하고 의자에 앉아요.","30초 동안 완전히 일어섰다 앉기를 반복해요.","타이머를 켜고 몇 번 했는지 적어요."],pics:[sitStand(16),sitStand(13),sitStand(10),sitStand(7)],caps:["15회 이상","12~14회","9~11회","8회 이하"]}
+  ];
+  function test(id){for(var i=0;i<TESTS.length;i++)if(TESTS[i].id===id)return TESTS[i];return null;}
+  var END=[
+    ["ankle","후반 9홀쯤 되면 발목·종아리가 뻣뻣하거나 아파지나요?"],
+    ["hip","후반에 엉덩이·골반이 덜 돌아가거나 불편해지나요?"],
+    ["trunk","후반에 허리·등이 뻣뻣해져서 몸통이 덜 돌아가나요?"],
+    ["shoulder","연습을 1시간 넘게 하면 어깨가 무겁거나 아파지나요?"],
+    ["arm","라운드나 연습 뒤에 팔꿈치·손목이 아픈 날이 있나요?"],
+    ["balance","후반에 다리가 풀려서 어드레스나 피니시가 흔들리나요?"],
+    ["endure","후반에 몸 전체가 무겁고 스윙 스피드가 떨어진다고 느끼나요?"]
+  ];
+  var SCALE=["전혀 아니다","아니다","보통","그렇다","매우 그렇다"];
+  var SAFE=[
+    "최근 다쳤거나 수술을 받았나요? (의료진이 운동을 막은 건 아니에요)",
+    "가만히 있어도 강한 통증이 계속되거나 최근 빠르게 심해지고 있나요?",
+    "팔·다리 저림, 감각 변화, 갑자기 힘이 빠지는 일이 있나요?",
+    "가벼운 움직임에도 가슴 통증, 이상한 숨참, 심한 어지럼이나 실신 느낌이 있나요?",
+    "지금 통증이나 불안정 때문에 혼자 서거나 돌기가 위험하다고 느끼나요?"
+  ];
+
+  /* ---- 상태 ---- */
+  var P=load();
+  if(!P.cur)P.cur=null;  /* 진행 중 검사 */
+  function fresh(){return {step:"intro",hand:null,adult:false,safe:[],injury:"",restricted:[],i:0,ans:{},end:{},endSkip:false};}
+  var ORDER=TESTS.filter(function(t){return t.part===1;}).concat(TESTS.filter(function(t){return t.part===2;}));
+  var P1N=TESTS.filter(function(t){return t.part===1;}).length;
+
+  /* ---- 채점 ---- */
+  function gradeOf(t,v){
+    if(v==="pain")return "pain";if(v==null||v==="")return null;
+    if(t.kind==="grade")return v;
+    var x=+v;if(isNaN(x))return null;
+    if(t.kind==="cm")return x>=10?"A":x>=7?"B":x>=4?"C":"D";
+    if(t.kind==="sec")return x>=30?"A":x>=20?"B":x>=10?"C":"D";
+    if(t.kind==="reps")return x>=15?"A":x>=12?"B":x>=9?"C":"D";
+    return null;
+  }
+  function sides(t){return t.side?["L","R"]:["V"];}
+  function sideName(k,c){if(k==="V")return "";var lead=c.hand==="L"?"R":"L";return (k==="L"?"왼쪽":"오른쪽")+(k===lead?"(앞쪽)":"(뒤쪽)");}
+  function judge(c){
+    var res={regions:{},asym:[],pain:[],excluded:[],facts:{}},lead=c.hand==="L"?"R":"L";
+    REG.forEach(function(r){res.regions[r.id]={done:0,ev:0,tev:0,score:0,small:false,pain:false,excl:false};res.facts[r.id]=[];});
+    TESTS.forEach(function(t){
+      var R=res.regions[t.r];
+      if(c.restricted.indexOf(t.id)>=0){res.excluded.push(t.n);R.excl=true;return;}
+      var a=c.ans[t.id]||{},g={},ok=true,anyPain=false;
+      sides(t).forEach(function(k){g[k]=gradeOf(t,a[k]);if(g[k]==="pain")anyPain=true;else if(!g[k])ok=false;});
+      if(anyPain){res.pain.push(t.n);R.pain=true;}
+      var valid=sides(t).filter(function(k){return g[k]&&g[k]!=="pain";});
+      if(!valid.length)return;
+      R.done++;
+      var worst=valid.reduce(function(m,k){return PTS[g[k]]<PTS[m]?g[k]:m;},"A");
+      var fact=t.n+": "+valid.map(function(k){return (k==="V"?"":(k==="L"?"왼쪽 ":"오른쪽 "))+g[k]+(t.kind!=="grade"?" ("+a[k]+t.unit+")":"");}).join(", ");
+      if(worst==="C"||worst==="D"){R.ev++;R.tev++;R.score+=worst==="D"?2:1;res.facts[t.r].push(fact);}
+      if(t.side&&valid.length===2){
+        var big=false,small=false,weak=null;
+        if(t.kind==="grade"){var d=PTS[g.L]-PTS[g.R];if(Math.abs(d)>=2)big=true;else if(Math.abs(d)===1)small=true;weak=d<0?"L":d>0?"R":null;}
+        else if(t.kind==="cm"){var dc=(+a.L)-(+a.R);if(Math.abs(dc)>=3)big=true;else if(Math.abs(dc)>=1.5)small=true;weak=dc<0?"L":dc>0?"R":null;}
+        else if(t.kind==="sec"){var mx=Math.max(+a.L,+a.R),mn=Math.min(+a.L,+a.R),ratio=mx>0?mn/mx:1;if(ratio<=0.70)big=true;else if(ratio<=0.85)small=true;weak=(+a.L)<(+a.R)?"L":(+a.R)<(+a.L)?"R":null;}
+        if((big||small)&&weak){
+          res.asym.push({t:t,weak:weak,big:big,isLead:weak===lead});
+          if(big){R.ev++;R.score+=1;if(res.facts[t.r].indexOf(fact)<0)res.facts[t.r].push(fact+" · 좌우 차이 큼");}
+          else R.small=true;
+          if(t.id==="hipIR"&&weak===lead)R.score+=1; /* 앞발 고관절이 약하면 더 무겁게 */
+        }
+      }
+      if(t.id==="golfRot"&&(worst==="C"||worst==="D")){["hip","trunk"].forEach(function(id){if(id!==t.r&&res.regions[id].tev>0){res.regions[id].ev++;res.regions[id].score+=0.5;}});}
+    });
+    var endOK=!c.endSkip&&END.every(function(e){return c.end[e[0]]!=null;});
+    if(endOK)END.forEach(function(e){var v=c.end[e[0]];if(v!=="na"&&+v>=3){var R=res.regions[e[0]];R.ev++;R.score+=0.5;res.facts[e[0]].push("지속성 질문: "+SCALE[+v]);}});
+    res.endOK=endOK;
+    var pri=[];
+    REG.forEach(function(r){var R=res.regions[r.id],st;
+      if(!R.done){st=(R.pain||R.excl)?"hold":"none";}
+      else if(R.ev>=2&&R.tev>=1){st="pri";pri.push(r.id);}
+      else if(R.ev>=1||R.small)st="watch";
+      else st="good";
+      R.st=st;});
+    pri.sort(function(a,b){return res.regions[b].score-res.regions[a].score;});
+    res.pri=pri;
+    return res;
+  }
+
+  /* ---- 화면 ---- */
+  var root=null;
+  function cur(){return P.cur;}
+  function render(){
+    root=$("gpRoot");if(!root)return;
+    var c=cur();
+    if(!c){renderHome();return;}
+    ({intro:renderIntro,safety:renderSafety,stop:renderStop,injury:renderInjury,test:renderTest,break1:renderBreak,endure:renderEndure,result:renderResult})[c.step]();
+    window.scrollTo(0,0);
+  }
+  function renderHome(){
+    var last=P.last;
+    var h='<div class="card"><h2>신체 검사란</h2><p class="note">집에서 20~25분 동안 몸을 직접 재 보고, 골프에 쓰는 몸 가운데 <b>먼저 확인할 곳</b>을 찾아 줘요. 병을 진단하는 검사는 아니에요.</p>'+
+      '<ul class="gx-list"><li>1부: 서서 하는 검사 14개</li><li>2부: 앉거나 누워서 하는 검사 6개</li><li>마지막: 질문 7개</li></ul>'+
+      '<p class="note">준비물: 휴대폰, 벽, 의자, 줄자, 골프클럽 2개 (매트가 있으면 좋아요)</p>'+
+      '<button type="button" class="btn btn-flag" data-gp="new">검사 시작</button></div>';
+    if(last)h='<div class="card"><h2>지난 결과</h2><p class="note">'+esc(last.date)+' · '+esc(last.summary)+'</p><button type="button" class="btn btn-plain" data-gp="showLast">결과 다시 보기</button></div>'+h;
+    root.innerHTML=h;
+  }
+  function renderIntro(){
+    var c=cur();
+    root.innerHTML='<div class="card"><h2>시작하기 전에</h2>'+
+      '<p class="note">이 검사는 의료 진단이 아니에요. 검사 중에 아프거나 저리면 바로 멈추고 "아파서 멈춤"을 눌러 주세요.</p>'+
+      '<label class="agree"><input type="checkbox" id="gpAdult"'+(c.adult?" checked":"")+'><span>만 19세 이상이에요</span></label>'+
+      '<div class="gx-field"><span class="ql">어느 쪽으로 치세요?</span><div class="gp-row">'+
+      [["R","오른손 골퍼"],["L","왼손 골퍼"]].map(function(x){return '<button type="button" class="chip" data-gp="hand" data-v="'+x[0]+'" aria-pressed="'+(c.hand===x[0])+'">'+x[1]+'</button>';}).join("")+'</div>'+
+      '<span class="note">좌우 차이를 볼 때 앞쪽 다리·뒤쪽 다리를 나누는 데 써요.</span></div>'+
+      '<p class="gx-msg" id="gpMsg" role="status"></p>'+
+      '<div class="gp-nav"><button type="button" class="btn btn-plain" data-gp="quit">그만두기</button><button type="button" class="btn btn-flag" data-gp="toSafety">다음</button></div></div>';
+  }
+  function renderSafety(){
+    var c=cur();
+    root.innerHTML='<div class="card"><h2>안전 확인</h2><p class="note">점수에 들어가지 않아요. 혼자 검사해도 괜찮은지만 봐요.</p><ol class="gx-qs">'+
+      SAFE.map(function(q,i){return '<li class="gx-q"><span>'+esc(q)+'</span><div class="gp-row">'+["아니오","예"].map(function(o,k){return '<button type="button" class="chip" data-gp="safe" data-i="'+i+'" data-v="'+k+'" aria-pressed="'+(c.safe[i]===k)+'">'+o+'</button>';}).join("")+'</div></li>';}).join("")+
+      '</ol><p class="gx-msg" id="gpMsg" role="status"></p><div class="gp-nav"><button type="button" class="btn btn-plain" data-gp="back">이전</button><button type="button" class="btn btn-flag" data-gp="safeNext">다음</button></div></div>';
+  }
+  function renderStop(){
+    root.innerHTML='<div class="card"><h2>오늘은 검사를 쉬어 주세요</h2><p>답해 주신 내용 가운데 혼자 몸을 재기엔 위험할 수 있는 신호가 있어요. 혼자 반복해서 재지 말고 의사나 물리치료사에게 먼저 확인받으세요.</p><p class="note">이 안내는 병을 진단하는 게 아니에요. 몸 상태가 괜찮아지면 언제든 다시 해 보세요.</p><div class="gp-nav"><button type="button" class="btn btn-plain" data-gp="back">답 다시 보기</button><button type="button" class="btn btn-flag" data-gp="quit">끝내기</button></div></div>';
+  }
+  function renderInjury(){
+    var c=cur();
+    root.innerHTML='<div class="card"><h2>다친 곳·수술한 곳</h2><p class="note">검사는 그대로 해요. 대신 하기 어렵거나 의사가 하지 말라고 한 검사를 골라 주시면 그 검사만 빼고 판정해요.</p>'+
+      '<div class="gx-field"><label class="ql" for="gpInj">어디를 다쳤거나 수술했나요?</label><input id="gpInj" type="text" maxlength="60" autocomplete="off" placeholder="예: 왼쪽 무릎 수술 (작년)" value="'+esc(c.injury)+'"></div>'+
+      '<span class="ql">뺄 검사 고르기</span><div class="gp-checks">'+ORDER.map(function(t){return '<label class="agree"><input type="checkbox" data-gpx="'+t.id+'"'+(c.restricted.indexOf(t.id)>=0?" checked":"")+'><span>'+esc(t.n)+' <small class="note">'+regName(t.r)+'</small></span></label>';}).join("")+'</div>'+
+      '<div class="gp-nav"><button type="button" class="btn btn-plain" data-gp="back">이전</button><button type="button" class="btn btn-flag" data-gp="injNext">검사 시작</button></div></div>';
+  }
+  function picsHtml(t){
+    var h='<div class="gp-pics'+(t.dual?" dual":"")+'" id="gpPics"></div>';return h;
+  }
+  function drawPics(t){
+    var box=$("gpPics");if(!box)return;box.innerHTML="";
+    G4.forEach(function(g,i){var f=document.createElement("figure");var s=mk(t.n+" "+g+" "+t.caps[i]);t.pics[i](s);f.appendChild(s);
+      var cap=document.createElement("figcaption");cap.innerHTML='<b class="gp-g">'+g+'</b> '+esc(t.caps[i]);f.appendChild(cap);box.appendChild(f);});
+  }
+  function inputHtml(t,c){
+    var a=c.ans[t.id]||{};
+    return sides(t).map(function(k){
+      var lab=k==="V"?"내 결과":(k==="L"?"왼쪽":"오른쪽");
+      var body;
+      if(t.kind==="grade"){body=G4.map(function(g){return '<button type="button" class="chip gp-gc" data-gp="g" data-k="'+k+'" data-v="'+g+'" aria-pressed="'+(a[k]===g)+'">'+g+'</button>';}).join("");}
+      else{var v=a[k]&&a[k]!=="pain"?a[k]:"";body='<input type="number" inputmode="decimal" min="0" step="'+(t.kind==="cm"?"0.5":"1")+'" class="gp-num" id="gpN'+k+'" data-gpn="'+k+'" value="'+esc(v)+'" aria-label="'+lab+' '+t.unit+'"><span class="note">'+t.unit+'</span>';}
+      return '<div class="gp-side"><span class="ql">'+lab+'</span><div class="gp-row">'+body+'<button type="button" class="chip gp-pain" data-gp="g" data-k="'+k+'" data-v="pain" aria-pressed="'+(a[k]==="pain")+'">아파서 멈춤</button></div></div>';
+    }).join("");
+  }
+  var TM={on:false,t0:0,id:null,val:0};
+  function timerHtml(t){
+    if(!t.timer)return "";
+    var lbl=t.timer==="up"?"스톱워치 (최대 30초)":"30초 타이머";
+    return '<div class="gp-timer"><span class="ql">'+lbl+'</span><b id="gpTime">'+(t.timer==="up"?"0.0":"30")+'</b><button type="button" class="btn btn-plain" data-gp="timer" id="gpTimerBtn">시작</button>'+(t.timer==="up"?'<div class="gp-row" id="gpTimerPut" hidden><button type="button" class="chip" data-gp="put" data-k="L">왼쪽에 넣기</button><button type="button" class="chip" data-gp="put" data-k="R">오른쪽에 넣기</button></div>':'')+'</div>';
+  }
+  function stopTimer(){if(TM.id){clearInterval(TM.id);TM.id=null;}TM.on=false;}
+  function renderTest(){
+    stopTimer();
+    var c=cur();
+    while(c.i<ORDER.length&&c.restricted.indexOf(ORDER[c.i].id)>=0)c.i++;
+    if(c.i>=ORDER.length){c.step="endure";save();render();return;}
+    var t=ORDER[c.i],part=t.part,idx=part===1?c.i+1:c.i-P1N+1,tot=part===1?P1N:ORDER.length-P1N;
+    root.innerHTML='<div class="gx-progress"><span>'+part+'부 · '+idx+' / '+tot+'</span><div class="gx-bar"><i style="width:'+Math.round(c.i/ORDER.length*100)+'%"></i></div></div>'+
+      '<div class="card"><div class="gp-tt"><small>'+esc(regName(t.r))+'</small><h2>'+esc(t.n)+'</h2></div>'+
+      '<ol class="gp-how">'+t.how.map(function(x){return '<li>'+esc(x)+'</li>';}).join("")+'</ol>'+
+      picsHtml(t)+'<p class="note">'+(t.kind==="grade"?"그림과 내 모습을 비교해서 가장 비슷한 단계를 골라 주세요.":"잰 값을 적으면 단계는 자동으로 정해져요.")+'</p>'+
+      timerHtml(t)+inputHtml(t,c)+
+      '<p class="gx-msg" id="gpMsg" role="status"></p>'+
+      '<div class="gp-nav"><button type="button" class="btn btn-plain" data-gp="prev">이전</button><button type="button" class="btn btn-plain" data-gp="skip">건너뛰기</button><button type="button" class="btn btn-flag" data-gp="next">다음</button></div>'+
+      '<button type="button" class="btn btn-plain gp-pause" data-gp="pause">여기까지 저장하고 나가기</button></div>';
+    drawPics(t);
+  }
+  function renderBreak(){
+    root.innerHTML='<div class="card"><h2>1부 끝</h2><p>서서 하는 검사를 다 했어요. 여기까지 저장됐어요.</p><p class="note">2부는 앉거나 누워서 하는 검사 6개예요. 의자와 매트를 준비해 주세요. 지금 이어서 해도 되고, 나중에 진단 탭에서 이어 할 수도 있어요.</p>'+
+      '<div class="gp-nav"><button type="button" class="btn btn-plain" data-gp="pauseQuit">나중에 하기</button><button type="button" class="btn btn-flag" data-gp="part2">2부 시작</button></div></div>';
+  }
+  function renderEndure(){
+    var c=cur();
+    root.innerHTML='<div class="card"><h2>마지막 질문 7개</h2><p class="note">라운드 후반이나 연습을 오래 했을 때를 떠올려 주세요. 라운드나 연습을 안 해서 모르겠으면 "해당 없음"을 눌러 주세요. 7개를 다 답해야 지속성까지 판정해요.</p><ol class="gx-qs">'+
+      END.map(function(e){var v=c.end[e[0]];return '<li class="gx-q"><span>'+esc(e[1])+'</span><div class="gx-scale">'+SCALE.map(function(s,k){return '<button type="button" class="chip" data-gp="end" data-r="'+e[0]+'" data-v="'+k+'" aria-pressed="'+(String(v)===String(k))+'" aria-label="'+s+'">'+(k+1)+'</button>';}).join("")+'</div><div class="gx-ends"><span>전혀 아니다</span><span>매우 그렇다</span></div><button type="button" class="chip mini" data-gp="end" data-r="'+e[0]+'" data-v="na" aria-pressed="'+(v==="na")+'">해당 없음</button></li>';}).join("")+
+      '</ol><p class="gx-msg" id="gpMsg" role="status"></p><div class="gp-nav"><button type="button" class="btn btn-plain" data-gp="prev">이전</button><button type="button" class="btn btn-plain" data-gp="endSkip">질문 건너뛰고 결과</button><button type="button" class="btn btn-flag" data-gp="finish">결과 보기</button></div></div>';
+  }
+  var ST={pri:["우선 확인","gp-pri"],watch:["확인 가치 있음","gp-watch"],good:["양호","gp-good"],hold:["판정 보류","gp-hold"],none:["아직 안 함","gp-none"]};
+  function swingNote(a,c){
+    var lead=a.isLead;
+    if(a.t.id==="hipIR")return lead?"앞쪽 고관절이 덜 돌아요. 다운스윙에서 몸이 일어서거나(얼리 익스텐션) 앞으로 밀리는(슬라이드) 것과 연결되는지 확인해 볼 만해요.":"뒤쪽 고관절이 덜 돌아요. 백스윙에서 몸이 옆으로 밀리는(스웨이) 것과 연결되는지 확인해 볼 만해요.";
+    if(a.t.id==="balance"||a.t.id==="oneChair"||a.t.id==="bridge")return lead?"앞쪽 다리로 버티는 힘이 약해요. 피니시에서 버티기 힘든지 확인해 볼 만해요.":"뒤쪽 다리로 버티는 힘이 약해요. 백스윙에서 오른쪽으로 밀리는지 확인해 볼 만해요.".replace("오른쪽",c.hand==="L"?"왼쪽":"오른쪽");
+    if(a.t.id==="ninety"&&!lead)return "뒤쪽 어깨가 덜 돌아요. 백스윙 탑에서 팔꿈치가 들리는(플라잉 엘보) 것과 연결되는지 확인해 볼 만해요.";
+    return "";
+  }
+  function summaryOf(res){
+    if(res.pri.length)return "우선 확인: "+res.pri.slice(0,2).map(regName).join(", ");
+    var w=REG.filter(function(r){return res.regions[r.id].st==="watch";});
+    if(w.length)return "큰 제한은 없고 "+w.map(function(r){return r.n;}).slice(0,2).join(", ")+" 확인 가치";
+    return "뚜렷한 제한이 안 보여요";
+  }
+  function renderResult(){
+    var c=cur(),res=judge(c);
+    var h='<div class="gx-hero"><small>신체 검사 결과</small><b class="gp-hero">'+(res.pri.length?"먼저 확인할 곳: "+esc(regName(res.pri[0])):"몸에서는 큰 제한이 안 보여요")+'</b>'+
+      (res.pri[1]?'<span>다음으로: '+esc(regName(res.pri[1]))+'</span>':'')+'<span class="gp-fine">"우선 확인"은 원인을 정한 게 아니라, 먼저 살펴볼 곳이라는 뜻이에요.</span></div>';
+    if(res.pain.length)h+='<div class="card gp-warn"><b>아파서 멈춘 검사가 있어요</b><p>'+esc(res.pain.join(", "))+'. 이 검사는 판정에서 뺐어요. 같은 동작에서 계속 아프면 점수보다 전문가 확인이 먼저예요.</p></div>';
+    h+='<div class="card"><h2>영역별 상태</h2><ul class="gp-regs">'+REG.map(function(r){var R=res.regions[r.id],s=ST[R.st];
+      var line=R.st==="pri"||R.st==="watch"?r.txt:R.st==="good"?"뚜렷한 제한이 안 보여요.":R.st==="hold"?"아프거나 뺀 검사가 있어서 판정을 미뤘어요.":"아직 검사하지 않았어요.";
+      if(R.st==="watch"&&!R.ev&&R.small)line="좌우 차이가 조금 보여요. 아래 '좌우 차이'를 봐 주세요.";
+      return '<li><div class="gp-reg-h"><b>'+esc(r.n)+'</b><span class="gp-pill '+s[1]+'">'+s[0]+'</span></div><p>'+esc(line)+'</p>'+(R.st==="pri"&&res.facts[r.id].length?'<ul class="gp-facts">'+res.facts[r.id].map(function(f){return '<li>'+esc(f)+'</li>';}).join("")+'</ul>':'')+'</li>';}).join("")+'</ul></div>';
+    if(res.asym.length)h+='<div class="card"><h2>좌우 차이</h2><ul class="gp-regs">'+res.asym.map(function(a){var note=swingNote(a,c);return '<li><div class="gp-reg-h"><b>'+esc(a.t.n)+'</b><span class="gp-pill '+(a.big?"gp-pri":"gp-watch")+'">'+(a.big?"뚜렷하게":"조금")+' 약함</span></div><p>'+esc(sideName(a.weak,c))+'이 더 약해요.'+(note?" "+esc(note):"")+'</p></li>';}).join("")+'</ul></div>';
+    var nxt=[];
+    if(res.pri.length)nxt.push("먼저 확인할 곳에 맞는 스트레칭·운동은 유료 신체 검사에서 골라 드릴 예정이에요.");
+    else nxt.push("몸에서 큰 제한이 안 보이면 스윙(GSAS)·클럽(GCAS)·라운드 운영(GRAS)을 같이 보는 게 좋아요.");
+    if(!res.endOK)nxt.push("지속성 질문을 다 답하지 않아서 후반 체력은 판정하지 않았어요.");
+    if(res.excluded.length)nxt.push("뺀 검사: "+res.excluded.join(", "));
+    nxt.push("2~4주 뒤에 같은 조건(시간·신발·바닥)으로 다시 재 보면 변화가 보여요.");
+    h+='<div class="card"><h2>다음 할 일</h2><ul class="gx-list">'+nxt.map(function(x){return '<li>'+esc(x)+'</li>';}).join("")+'</ul>'+
+      '<p class="gx-fine">혼자 잰 자가 검사라 의료 진단이 아니에요. 아프거나 저림이 계속되면 전문가에게 먼저 확인받으세요. 결과는 이 기기에만 저장돼요.</p></div>';
+    h+='<div class="gp-nav"><button type="button" class="btn btn-plain" data-gp="copy">결과 복사</button><button type="button" class="btn btn-plain" data-gp="new">다시 하기</button><button type="button" class="btn btn-flag" data-tab="home">홈으로</button></div><textarea class="gp-copyfb" id="gpCopyFb" hidden readonly aria-label="복사할 결과"></textarea>';
+    root.innerHTML=h;
+    P.last={date:new Date().toLocaleDateString("ko-KR"),summary:summaryOf(res),pri:res.pri.slice(0,2),hand:c.hand};
+    P.lastC=c;save();
+  }
+  function copyText(){
+    var c=cur(),res=judge(c),L=["[신체 검사 결과] "+summaryOf(res)];
+    REG.forEach(function(r){L.push("· "+r.n+": "+ST[res.regions[r.id].st][0]);});
+    res.asym.forEach(function(a){L.push("· 좌우: "+a.t.n+" "+sideName(a.weak,c)+" "+(a.big?"뚜렷하게":"조금")+" 약함");});
+    L.push("— WISE QUAD 신체 검사(GPAS) · 슬기로운골프생활 · WISE GOLF");
+    return L.join("\n");
+  }
+
+  /* ---- 입력 처리 ---- */
+  function msg(t){var m=$("gpMsg");if(m)m.textContent=t;}
+  function needAnswered(t,c){if(c.restricted.indexOf(t.id)>=0)return true;var a=c.ans[t.id]||{};return sides(t).every(function(k){return a[k]==="pain"||gradeOf(t,a[k]);});}
+  function readNums(){var c=cur();if(!c||c.step!=="test")return;var t=ORDER[c.i];if(!t||t.kind==="grade")return;
+    c.ans[t.id]=c.ans[t.id]||{};sides(t).forEach(function(k){var el=$("gpN"+k);if(el&&c.ans[t.id][k]!=="pain")c.ans[t.id][k]=el.value===""?null:el.value;});save();}
+  document.addEventListener("input",function(e){var el=e.target;if(el.dataset&&el.dataset.gpn){var c=cur(),t=ORDER[c.i];c.ans[t.id]=c.ans[t.id]||{};c.ans[t.id][el.dataset.gpn]=el.value===""?null:el.value;save();}});
+  document.addEventListener("change",function(e){var el=e.target;if(el.dataset&&el.dataset.gpx){var c=cur(),id=el.dataset.gpx,i=c.restricted.indexOf(id);if(el.checked&&i<0)c.restricted.push(id);if(!el.checked&&i>=0)c.restricted.splice(i,1);save();}
+    if(el.id==="gpAdult"){cur().adult=el.checked;save();}});
+  document.addEventListener("click",function(e){
+    var b=e.target.closest("[data-gp]");if(!b)return;var d=b.dataset,c=cur(),act=d.gp;
+    if(act==="new"){stopTimer();P.cur=fresh();save();render();return;}
+    if(act==="showLast"){if(P.lastC){P.cur=P.lastC;P.cur.step="result";save();render();}return;}
+    if(act==="quit"){stopTimer();P.cur=null;save();render();return;}
+    if(!c)return;
+    if(act==="hand"){c.hand=d.v;save();render();return;}
+    if(act==="toSafety"){if(!c.adult){msg("만 19세 이상만 할 수 있어요.");return;}if(!c.hand){msg("오른손·왼손 골퍼를 골라 주세요.");return;}c.step="safety";save();render();return;}
+    if(act==="safe"){c.safe[+d.i]=+d.v;save();render();return;}
+    if(act==="safeNext"){for(var i=0;i<SAFE.length;i++)if(c.safe[i]==null){msg((i+1)+"번 질문에 답해 주세요.");return;}
+      if(c.safe.slice(1).some(function(v){return v===1;})){c.step="stop";}else if(c.safe[0]===1){c.step="injury";}else{c.step="test";c.i=c.i||0;}
+      save();render();return;}
+    if(act==="injNext"){var inj=$("gpInj");c.injury=inj?inj.value.trim():"";c.step="test";save();render();return;}
+    if(act==="back"){c.step=c.step==="safety"?"intro":c.step==="stop"?"safety":c.step==="injury"?"safety":"intro";save();render();return;}
+    if(act==="g"){var t=ORDER[c.i];c.ans[t.id]=c.ans[t.id]||{};var cur0=c.ans[t.id][d.k];c.ans[t.id][d.k]=cur0===d.v?null:d.v;
+      if(d.v==="pain"&&c.ans[t.id][d.k]==="pain"){var ne=$("gpN"+d.k);if(ne)ne.value="";}
+      save();renderKeepScroll();return;}
+    if(act==="next"||act==="skip"){readNums();var t2=ORDER[c.i];
+      if(act==="next"&&!needAnswered(t2,c)){msg(t2.side?"왼쪽·오른쪽 모두 골라 주세요. 못 하면 '건너뛰기'를 눌러요.":"단계를 골라 주세요. 못 하면 '건너뛰기'를 눌러요.");return;}
+      if(act==="skip"){delete c.ans[t2.id];}
+      c.i++;if(c.i===P1N&&ORDER[c.i-1].part===1){c.step="break1";}save();render();return;}
+    if(act==="prev"){readNums();if(c.step==="endure"){c.step="test";c.i=ORDER.length-1;while(c.i>0&&c.restricted.indexOf(ORDER[c.i].id)>=0)c.i--;save();render();return;}
+      if(c.i===0){c.step="safety";save();render();return;}c.i--;while(c.i>0&&c.restricted.indexOf(ORDER[c.i].id)>=0)c.i--;save();render();return;}
+    if(act==="pause"){readNums();save();P.cur=c;toast("여기까지 저장했어요. 진단 탭에서 이어 할 수 있어요.");stopTimer();P.paused=true;save();goHome();return;}
+    if(act==="pauseQuit"){c.step="test";save();toast("1부까지 저장했어요. 진단 탭에서 이어 할 수 있어요.");goHome();return;}
+    if(act==="part2"){c.step="test";save();render();return;}
+    if(act==="end"){c.end[d.r]=d.v==="na"?"na":+d.v;save();renderKeepScroll();return;}
+    if(act==="endSkip"){c.endSkip=true;c.step="result";save();render();return;}
+    if(act==="finish"){for(var j=0;j<END.length;j++)if(c.end[END[j][0]]==null){msg((j+1)+"번 질문에 답해 주세요. 건너뛰려면 '질문 건너뛰고 결과'를 눌러요.");return;}c.endSkip=false;c.step="result";save();render();return;}
+    if(act==="copy"){var txt=copyText(),fb=$("gpCopyFb");var fail=function(){fb.value=txt;fb.hidden=false;fb.focus();fb.select();toast("자동 복사가 막혔어요. 아래 글을 길게 눌러 복사하세요.");};
+      try{navigator.clipboard.writeText(txt).then(function(){toast("결과를 복사했어요");},fail);}catch(err){fail();}return;}
+    if(act==="timer"){var t3=ORDER[c.i];if(TM.on){stopTimer();$("gpTimerBtn").textContent="다시 시작";if(t3.timer==="up"){var p=$("gpTimerPut");if(p)p.hidden=false;}return;}
+      TM.on=true;TM.t0=Date.now();$("gpTimerBtn").textContent="멈춤";var p2=$("gpTimerPut");if(p2)p2.hidden=true;
+      TM.id=setInterval(function(){var s=(Date.now()-TM.t0)/1000,el=$("gpTime");if(!el){stopTimer();return;}
+        if(t3.timer==="up"){TM.val=Math.min(30,s);el.textContent=TM.val.toFixed(1);if(s>=30){stopTimer();$("gpTimerBtn").textContent="다시 시작";var p3=$("gpTimerPut");if(p3)p3.hidden=false;}}
+        else{var left=Math.max(0,30-s);el.textContent=Math.ceil(left);if(left<=0){stopTimer();$("gpTimerBtn").textContent="다시 시작";el.textContent="끝!";}}},100);return;}
+    if(act==="put"){var t4=ORDER[c.i];c.ans[t4.id]=c.ans[t4.id]||{};var v=Math.floor(TM.val);c.ans[t4.id][d.k]=String(v);var ni=$("gpN"+d.k);if(ni)ni.value=v;save();toast((d.k==="L"?"왼쪽":"오른쪽")+"에 "+v+"초를 넣었어요");return;}
+  });
+  function renderKeepScroll(){var y=window.scrollY;render();window.scrollTo(0,y);}
+  function goHome(){var nb=document.querySelector('[data-tab="home"]');if(nb)nb.click();}
+
+  window.GPAS_OPEN=function(){if(P.cur&&P.cur.step==="result"){} render();};
+  window.GPAS_HOME=function(){
+    if(P.cur&&P.cur.step!=="result"&&P.cur.step!=="intro")return {state:"doing",text:"이어 하기",sub:(P.cur.i||0)+" / "+ORDER.length+" 검사"};
+    if(P.last)return {state:"done",text:P.last.pri&&P.last.pri.length?"우선: "+regName(P.last.pri[0]):"큰 제한 없음",sub:P.last.date};
+    return {state:"none",text:"검사하기",sub:"신체 검사 · 20분"};
+  };
 })();
 </script>
 
