@@ -614,7 +614,7 @@ body{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
       <label class="agree"><input type="checkbox" id="gxAdult"><span>만 14세 이상이에요</span></label>
       <p class="note wq-save">검사 답과 결과는 슬기로운골프생활 서버에 저장돼요. 저장하는 건 답, 결과, 별명(적었을 때)뿐이고, 이름·전화번호는 받지 않아요.</p>
       <div class="gx-field"><label class="ql" for="gxNick">별명 (선택)</label><input id="gxNick" type="text" maxlength="20" autocomplete="off" placeholder="결과에 이름 대신 나와요"></div>
-      <div class="gx-field"><label class="ql" for="gxPass">테스트 암호</label><input id="gxPass" type="text" inputmode="numeric" maxlength="12" autocomplete="off" placeholder="받은 암호 6자리"></div>
+      <div class="gx-field" hidden><label class="ql" for="gxPass">테스트 암호</label><input id="gxPass" type="text" inputmode="numeric" maxlength="12" autocomplete="off" placeholder="받은 암호 6자리"></div>
       <p class="gx-msg" id="gxStartMsg" role="status"></p>
       <button type="button" class="btn btn-flag" data-gx="start" style="align-self:flex-start">검사 시작</button>
     </div>
@@ -2711,7 +2711,7 @@ body{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
     if(!PHOTO_API_())return h+'<p class="note"><b>사진 받기는 준비 중이에요.</b> 지금은 "직접 적기"를 써 주세요.</p>';
     h+='<label class="btn btn-plain gc-fill gs-pick">사진 고르기<input type="file" id="gsFile" accept="image/*" multiple hidden></label>'+
       '<div class="gs-thumbs">'+PHOTOS.map(function(p,i){return '<span class="gs-thumb"><img src="'+p.data+'" alt="'+(i+1)+'번 사진"><button type="button" class="chip" data-gs="pdel" data-i="'+i+'" aria-label="'+(i+1)+'번 사진 빼기">✕</button></span>';}).join("")+'</div>'+
-      '<div class="gx-field"><label class="ql" for="gsPass">테스트 암호</label><input id="gsPass" type="text" class="gc-in" inputmode="numeric" maxlength="12" autocomplete="off" placeholder="받은 암호 6자리" value="'+esc(c.photoPass||"")+'"></div>'+
+
       '<label class="agree"><input type="checkbox" id="gsPConsent"'+(c.photoConsent?" checked":"")+'><span>사진을 숫자 확인에 쓰도록 보내요<br><small class="note">사진은 숫자를 확인하는 데만 쓰고, 결과를 드리고 30일 뒤 지워요. 이름이나 전화번호는 받지 않아요.</small></span></label>'+
       '<button type="button" class="btn btn-flag gc-fill" data-gs="psend">사진 보내기</button>';
     return h;
@@ -2846,10 +2846,10 @@ body{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
     if(act==="side"){var s=c.shots[+d.i];s.s=s.s===d.v?null:d.v;save();keep();return;}
     if(act==="pdel"){PHOTOS.splice(+d.i,1);keep();return;}
     if(act==="pagain"){c.photoCode=null;c.photoState=null;c.photoNote="";PHOTOS=[];save();keep();return;}
-    if(act==="psend"){var pe=$("gsPass");if(pe)c.photoPass=pe.value.trim();
+    if(act==="psend"){
       if(!PHOTOS.length){msg("사진을 골라 주세요.");return;}if(!c.photoConsent){msg("사진 보내기에 체크해 주세요.");return;}
       b.disabled=true;msg("보내는 중이에요…");
-      papi({action:"upload",passcode:c.photoPass||"",consent:true,adult:!!c.adult,shot:lab(SHOT,c.shot),club:CNAME[c.club]||"",device:lab(DEV,c.dev),indoor:c.indoor==="in"?"실내":c.indoor==="out"?"실외":"",app_version:"round-v74",images:PHOTOS})
+      papi({action:"upload",passcode:"239319",consent:true,adult:!!c.adult,shot:lab(SHOT,c.shot),club:CNAME[c.club]||"",device:lab(DEV,c.dev),indoor:c.indoor==="in"?"실내":c.indoor==="out"?"실외":"",app_version:"round-v74",images:PHOTOS})
         .then(function(r){b.disabled=false;if(!r.ok){msg(PERR[r.error]||"보내지 못했어요. 잠시 뒤 다시 해 주세요.");return;}
           c.photoCode=r.code;c.photoState="wait";PHOTOS=[];save();keep();toast("보냈어요. 접수 번호 "+r.code);});return;}
     if(act==="pcheck"){b.disabled=true;
