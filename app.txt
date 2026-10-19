@@ -379,12 +379,51 @@ body{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
 .gp-good{background:var(--fairway);color:#fff}
 .gp-hold,.gp-none{background:var(--chip);color:var(--muted)}
 .gp-facts{margin:0;padding-left:18px;font-size:13px;color:var(--muted)}
+.gp-vid{align-self:flex-start;min-height:40px;display:inline-flex;align-items:center;gap:6px;text-decoration:none}.gp-vid small{color:var(--muted);font-weight:500}
 .gp-copyfb{width:100%;min-height:120px;border:1px solid var(--line);border-radius:10px;padding:8px;font:13px var(--font-body);background:var(--surface);color:var(--ink)}
+/* ---- 클럽 진단 (GCAS) ---- */
+.gc-in{width:100%;min-height:42px;border:1.5px solid var(--line);border-radius:10px;padding:0 10px;font:500 15px var(--font-body);background:var(--surface);color:var(--ink);box-sizing:border-box}
+.gc-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+@media (max-width:420px){.gc-grid{grid-template-columns:minmax(0,1fr)}}
+.gc-col{display:flex;flex-direction:column;gap:6px;align-items:stretch}
+.gc-wide{text-align:left;justify-content:flex-start}
+.gc-tip{background:var(--chip);border-radius:12px;padding:10px 12px;font-size:13.5px}
+.gc-tip ul{margin:4px 0 0}
+.gc-hr{border:0;border-top:1px solid var(--line);margin:6px 0}
+.gc-fill{align-self:flex-start;min-height:40px}
+.gc-comp{display:flex;flex-direction:column;gap:6px;padding:10px 0;border-top:1px dashed var(--line)}
+.gc-m{display:flex;align-items:center;gap:6px}.gc-m .gc-in{max-width:120px}
+.gc-notice{font-size:13.5px;line-height:1.55;background:var(--chip);border-radius:12px;padding:10px 12px;margin:0}
+.gc-cad small{color:var(--fairway);font-weight:700}.gc-cad p{margin:2px 0 0;font-size:15px}
+.gc-stat{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+.gc-stat li{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:14.5px}
+.gc-facts{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:4px;font-size:14px}
+.gc-facts small{color:var(--muted);font-size:12px}
+.gc-tag{font-size:12.5px;padding:3px 10px;border-radius:999px;border:1px dashed var(--line);color:var(--muted)}
+/* ---- 스윙 진단 (GSAS) ---- */
+@media (max-width:520px){.gp-switch{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));border-radius:16px;align-self:stretch}.gp-switch button{border-radius:12px}}
+.gs-rows{display:flex;flex-direction:column;gap:6px}
+.gs-row{display:grid;grid-template-columns:22px minmax(0,1fr) minmax(0,1fr) auto;gap:6px;align-items:end}
+.gs-no{font:700 14px var(--font-display);color:var(--muted);padding-bottom:11px;text-align:right}
+.gs-f{display:flex;flex-direction:column;gap:2px;font-size:11.5px;color:var(--muted);min-width:0}
+.gs-lr{display:flex;gap:4px}.gs-side{min-width:40px;padding:0 8px;min-height:42px}
+.gs-cnt{display:flex;flex-direction:column;gap:6px}
+.gs-st{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:14.5px;padding:4px 0;border-bottom:1px dashed var(--line)}
+.gs-sb{display:flex;align-items:center;gap:10px}.gs-sb b{min-width:22px;text-align:center;font:700 18px var(--font-display)}
+.gs-sb .chip{min-width:44px;min-height:40px;font-size:18px;justify-content:center}
+.gs-h2{margin-top:10px}.gs-warn{color:var(--over)}
+.gs-steps{display:flex;flex-direction:column;gap:6px}
+.gs-next{font-size:18px;margin:0}
+.wq-save{font-size:12.5px;background:var(--chip);border-radius:10px;padding:8px 10px;margin:0}
+.wq-forget{display:block;margin-top:8px;min-height:36px;font-size:12.5px}
+.gs-photo{display:flex;flex-direction:column;gap:8px}.gs-code{font:700 22px var(--font-display);letter-spacing:.5px}
+.gs-pick{display:inline-flex;align-items:center;cursor:pointer}
+.gs-thumbs{display:flex;flex-wrap:wrap;gap:8px}.gs-thumb{position:relative;width:96px;height:96px}.gs-thumb img{width:100%;height:100%;object-fit:cover;border-radius:10px;border:1px solid var(--line)}.gs-thumb .chip{position:absolute;top:4px;right:4px;min-width:30px;min-height:30px;padding:0;justify-content:center}
 </style>
 
 <div class="wrap">
   <div class="tabs">
-    <div class="brand"><b>슬기로운골프생활<span class="beta">시험판</span></b><span class="tag">이 기기에만 저장 · 돈은 계산만</span></div>
+    <div class="brand"><b>슬기로운골프생활<span class="beta">시험판</span></b><span class="tag">가입 없이 · 돈은 계산만</span></div>
     <div class="seg" id="segRound" role="tablist" aria-label="라운드 화면">
       <button type="button" role="tab" id="tab-plan" data-tab="plan">다음 라운드</button>
       <button type="button" role="tab" id="tab-go" data-tab="go">가는 길</button>
@@ -563,7 +602,7 @@ body{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
   <!-- ===================== 골프 유형 검사 ===================== -->
   <section id="view-type" class="wrap" hidden aria-labelledby="gxTitle">
     <div class="gx-head">
-      <div class="gp-switch" role="group" aria-label="진단 고르기"><button type="button" data-tab="type" aria-current="true">운영 GRAS</button><button type="button" data-tab="gpas">신체 GPAS</button></div>
+      <div class="gp-switch" role="group" aria-label="진단 고르기"><button type="button" data-tab="type" aria-current="true">운영 GRAS</button><button type="button" data-tab="gpas">신체 GPAS</button><button type="button" data-tab="gcas">클럽 GCAS</button><button type="button" data-tab="gsas">스윙 GSAS</button></div>
       <h1 id="gxTitle">골프 유형 검사</h1>
       <p>20문제 · 3분이면 끝나요</p>
     </div>
@@ -572,8 +611,8 @@ body{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
     <div id="gxStart" class="card">
       <h2>시작하기 전에</h2>
       <p class="note">요즘 라운드 때 내 모습을 떠올리며 답해 주세요. 내가 어떤 스타일로 공을 치는지, 어떤 순간에 무너지는지, 누구랑 잘 맞는지 알려 드려요.</p>
-      <label class="agree"><input type="checkbox" id="gxAdult"><span>만 19세 이상이에요</span></label>
-      <label class="agree"><input type="checkbox" id="gxConsent"><span>내 답을 검사 다듬는 데 써도 괜찮아요<br><small class="note">저장하는 건 답, 결과, 별명(적었을 때)뿐이에요. 이름이나 전화번호는 안 받아요.</small></span></label>
+      <label class="agree"><input type="checkbox" id="gxAdult"><span>만 14세 이상이에요</span></label>
+      <p class="note wq-save">검사 답과 결과는 슬기로운골프생활 서버에 저장돼요. 저장하는 건 답, 결과, 별명(적었을 때)뿐이고, 이름·전화번호는 받지 않아요.</p>
       <div class="gx-field"><label class="ql" for="gxNick">별명 (선택)</label><input id="gxNick" type="text" maxlength="20" autocomplete="off" placeholder="결과에 이름 대신 나와요"></div>
       <div class="gx-field"><label class="ql" for="gxPass">테스트 암호</label><input id="gxPass" type="text" inputmode="numeric" maxlength="12" autocomplete="off" placeholder="받은 암호 6자리"></div>
       <p class="gx-msg" id="gxStartMsg" role="status"></p>
@@ -596,14 +635,34 @@ body{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
   <!-- ===================== 신체 검사 (GPAS) ===================== -->
   <section id="view-gpas" class="wrap" hidden aria-labelledby="gpTitle">
     <div class="gx-head">
-      <div class="gp-switch" role="group" aria-label="진단 고르기"><button type="button" data-tab="type">운영 GRAS</button><button type="button" data-tab="gpas" aria-current="true">신체 GPAS</button></div>
+      <div class="gp-switch" role="group" aria-label="진단 고르기"><button type="button" data-tab="type">운영 GRAS</button><button type="button" data-tab="gpas" aria-current="true">신체 GPAS</button><button type="button" data-tab="gcas">클럽 GCAS</button><button type="button" data-tab="gsas">스윙 GSAS</button></div>
       <h1 id="gpTitle">신체 검사</h1>
       <p>검사 20개 · 질문 7개 · 20~25분</p>
     </div>
     <div id="gpRoot" class="gp-root"></div>
   </section>
 
-  <p class="note">슬기로운골프생활 시험판입니다. 가입이나 서버 저장 없이 이 기기 브라우저에만 남습니다. 골프 유형 검사 응답만 검사 서버에 저장됩니다. 신체 검사 기록은 이 기기에만 남습니다. 정산은 계산만 해 주고, 돈은 주고받지 않습니다.</p>
+  <!-- ===================== 클럽 진단 (GCAS) ===================== -->
+  <section id="view-gcas" class="wrap" hidden aria-labelledby="gcTitle">
+    <div class="gx-head">
+      <div class="gp-switch" role="group" aria-label="진단 고르기"><button type="button" data-tab="type">운영 GRAS</button><button type="button" data-tab="gpas">신체 GPAS</button><button type="button" data-tab="gcas" aria-current="true">클럽 GCAS</button><button type="button" data-tab="gsas">스윙 GSAS</button></div>
+      <h1 id="gcTitle">클럽 진단</h1>
+      <p>질문 9단계 · 5분 · 몰라도 고르기만</p>
+    </div>
+    <div id="gcRoot" class="gp-root"></div>
+  </section>
+
+  <!-- ===================== 스윙 진단 (GSAS) ===================== -->
+  <section id="view-gsas" class="wrap" hidden aria-labelledby="gsTitle">
+    <div class="gx-head">
+      <div class="gp-switch" role="group" aria-label="진단 고르기"><button type="button" data-tab="type">운영 GRAS</button><button type="button" data-tab="gpas">신체 GPAS</button><button type="button" data-tab="gcas">클럽 GCAS</button><button type="button" data-tab="gsas" aria-current="true">스윙 GSAS</button></div>
+      <h1 id="gsTitle">스윙 진단</h1>
+      <p>질문 8단계 · 같은 채로 10구 · 기기 없어도 돼요</p>
+    </div>
+    <div id="gsRoot" class="gp-root"></div>
+  </section>
+
+  <p class="note">슬기로운골프생활 시험판입니다. 가입 없이 쓰고, 라운드·정산 기록은 이 기기 브라우저에만 남습니다. 진단(유형·신체·클럽·스윙) 결과는 슬기로운골프생활 서버에 저장되며, 이름·전화번호는 받지 않습니다. 정산은 계산만 해 주고, 돈은 주고받지 않습니다. <button type="button" class="btn btn-plain wq-forget" data-wq="forget">서버에 저장된 내 신체·클럽·스윙 진단 기록 지우기</button></p>
 </div>
 <nav class="bnav" aria-label="앱 메뉴">
   <button type="button" data-tab="home" id="nav-home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 11l8-7 8 7v9h-5v-6H9v6H4z"></path></svg>홈</button>
@@ -616,7 +675,7 @@ body{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
 /* ---------- 골프 유형 검사 (GRAS ERFA) — 문항과 채점은 검사 서버에만 있다 ---------- */
 (function(){
   var GRAS_API = "https://script.google.com/macros/s/AKfycbz4aGblc6lrfqolwbt6x9imyHetDBVgHcPnb5SeZJsmbqnmnkEciMFo1xt3NoIPcwDJ/exec";               /* 배포한 Apps Script 웹 앱 주소(…/exec) */
-  var APP_VERSION = "round-v73";
+  var APP_VERSION = "round-v74";
   var LKEY = "gras_app_v1";
 
   function $(id){return document.getElementById(id);}
@@ -630,7 +689,7 @@ body{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
   var ERR = {
     PASSCODE:"테스트 암호가 맞지 않아요. 받은 암호를 다시 확인해 주세요.",
     CONSENT:"동의에 체크해야 검사할 수 있어요.",
-    AGE:"만 19세 이상만 검사할 수 있어요.",
+    AGE:"만 14세 이상만 검사할 수 있어요.",
     ANSWERS:"답하지 않은 문제가 있어요.",
     SERVER:"검사 서버에서 오류가 났어요. 잠시 뒤 다시 해 주세요.",
     BAD_REQUEST:"요청이 올바르지 않아요. 앱을 새로고침한 뒤 다시 해 주세요.",
@@ -659,7 +718,6 @@ body{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
   /* ---------- 1. 시작 ---------- */
   function start(btn){
     if(!$("gxAdult").checked){msg("gxStartMsg",ERR.AGE);return;}
-    if(!$("gxConsent").checked){msg("gxStartMsg",ERR.CONSENT);return;}
     G.pass=$("gxPass").value.trim();G.nick=$("gxNick").value.trim();store();
     busy(btn,true,"불러오는 중…");msg("gxStartMsg","");
     api({action:"questions",passcode:G.pass}).then(function(r){
@@ -1296,12 +1354,14 @@ body{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
   /* ---------- 탭 ---------- */
   function showTab(t){
     S.tab=t;save();
-    ["home","plan","go","score","type","gpas"].forEach(function(x){$("view-"+x).hidden=x!==t;var tb=$("tab-"+x);if(tb)tb.setAttribute("aria-selected",String(x===t));});
+    ["home","plan","go","score","type","gpas","gcas","gsas"].forEach(function(x){$("view-"+x).hidden=x!==t;var tb=$("tab-"+x);if(tb)tb.setAttribute("aria-selected",String(x===t));});
     var inRound=t==="plan"||t==="go"||t==="score";$("segRound").hidden=!inRound;$("sampleBar").hidden=!(inRound&&S.sample);
-    [["nav-home",t==="home"],["nav-round",inRound],["nav-diag",t==="type"||t==="gpas"]].forEach(function(n){var el=$(n[0]);if(n[1])el.setAttribute("aria-current","page");else el.removeAttribute("aria-current");});
+    [["nav-home",t==="home"],["nav-round",inRound],["nav-diag",t==="type"||t==="gpas"||t==="gcas"||t==="gsas"]].forEach(function(n){var el=$(n[0]);if(n[1])el.setAttribute("aria-current","page");else el.removeAttribute("aria-current");});
     if(t==="home")renderHome();
     if(t==="type"&&window.GRAS_OPEN)window.GRAS_OPEN();
     if(t==="gpas"&&window.GPAS_OPEN)window.GPAS_OPEN();
+    if(t==="gcas"&&window.GCAS_OPEN)window.GCAS_OPEN();
+    if(t==="gsas"&&window.GSAS_OPEN)window.GSAS_OPEN();
     try{history.replaceState(null,"","#"+t);}catch(e){}
     window.scrollTo(0,0);
   }
@@ -1325,7 +1385,11 @@ body{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
       :'<button type="button" data-tab="type"><span class="nm">운영 GRAS</span><b style="font:700 13px var(--font-body)">검사하기</b><span class="fr">골프 유형 검사 · 3분</span></button>';
     var gpI=window.GPAS_HOME?window.GPAS_HOME():{text:"검사하기",sub:"신체 검사 · 20분"};
     var gp='<button type="button" data-tab="gpas"><span class="nm">신체 GPAS</span><b style="font:700 13px var(--font-body)">'+hEsc(gpI.text)+'</b><span class="fr">'+hEsc(gpI.sub)+'</span></button>';
-    $("hmQuad").innerHTML=gr+gp+["클럽 GCAS","스윙 GSAS"].map(function(nm){return '<div class="off"><span class="nm">'+nm+'</span><b>공개 예정</b></div>';}).join("");
+    var gcI=window.GCAS_HOME?window.GCAS_HOME():{text:"진단하기",sub:"클럽 진단 · 5분"};
+    var gc='<button type="button" data-tab="gcas"><span class="nm">클럽 GCAS</span><b style="font:700 13px var(--font-body)">'+hEsc(gcI.text)+'</b><span class="fr">'+hEsc(gcI.sub)+'</span></button>';
+    var gsI=window.GSAS_HOME?window.GSAS_HOME():{text:"진단하기",sub:"스윙 진단 · 10구"};
+    var gs='<button type="button" data-tab="gsas"><span class="nm">스윙 GSAS</span><b style="font:700 13px var(--font-body)">'+hEsc(gsI.text)+'</b><span class="fr">'+hEsc(gsI.sub)+'</span></button>';
+    $("hmQuad").innerHTML=gr+gp+gc+gs;
   }
   function changed(){S.sample=false;save();render();}
 
@@ -1424,6 +1488,22 @@ body{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
 
   render();
   var h0=(location.hash||"").slice(1);showTab(["home","plan","go","score","type"].indexOf(h0)>=0?h0:"home");
+})();
+</script>
+<script>
+/* ---------- 와이즈쿼드 서버 (사진 받기 + 진단 결과 모으기) — 이름·전화번호·직접 쓴 글·아픈 곳 답은 보내지 않음 ---------- */
+(function(){
+  var WQ=window.WQ={api:"https://script.google.com/macros/s/AKfycbwr-N3r2leolAFnQQ9HCX12dm1KgpPdixQ8UzOd8IUwhaentwcqf7-ZIypu8rpmnUNO/exec"};   /* 와이즈쿼드 서버(Apps Script 웹 앱 …/exec) — 배포 뒤 주소를 넣음 */
+  WQ.deviceId=function(){var k="wq_device_id",v=null;try{v=localStorage.getItem(k);}catch(e){}
+    if(!v||!/^[a-z0-9]{12,40}$/.test(v)){var a="abcdefghijkmnpqrstuvwxyz23456789";v="";for(var i=0;i<20;i++)v+=a.charAt(Math.floor(Math.random()*a.length));try{localStorage.setItem(k,v);}catch(e){}}
+    return v;};
+  WQ.post=function(body){if(!WQ.api)return Promise.resolve({ok:false,error:"NO_SERVER"});
+    return fetch(WQ.api,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(body)}).then(function(r){return r.json();}).catch(function(){return {ok:false,error:"NETWORK"};});};
+  WQ.save=function(kind,summary,result,answers){return WQ.post({action:"save",kind:kind,device_id:WQ.deviceId(),app_version:"round-v74",summary:summary,result:result,answers:answers});};
+  document.addEventListener("click",function(e){var b=e.target.closest("[data-wq]");if(!b)return;
+    if(b.dataset.wq==="forget"){if(!WQ.api){alertMsg("서버 저장이 아직 시작되지 않아서 지울 기록이 없어요.");return;}
+      b.disabled=true;WQ.post({action:"forget",device_id:WQ.deviceId()}).then(function(r){b.disabled=false;alertMsg(r.ok?"서버에 저장된 이 기기의 신체·클럽·스윙 진단 기록 "+(r.deleted||0)+"개를 지웠어요.":"지우지 못했어요. 인터넷 연결을 확인하고 다시 해 주세요.");});}});
+  function alertMsg(t){var el=document.querySelector(".toast");if(!el){el=document.createElement("div");el.className="toast";el.setAttribute("role","status");document.body.appendChild(el);}el.textContent=t;el.hidden=false;clearTimeout(alertMsg.t);alertMsg.t=setTimeout(function(){el.hidden=true;},2600);}
 })();
 </script>
 <script>
@@ -1762,11 +1842,15 @@ body{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
   function renderIntro(){
     var c=cur();
     root.innerHTML='<div class="card"><h2>시작하기 전에</h2>'+
-      '<p class="note">이 검사는 의료 진단이 아니에요. 검사 중에 아프거나 저리면 바로 멈추고 "아파서 멈춤"을 눌러 주세요.</p>'+
-      '<label class="agree"><input type="checkbox" id="gpAdult"'+(c.adult?" checked":"")+'><span>만 19세 이상이에요</span></label>'+
+      '<div class="card gp-warn"><b>저리거나, 갑자기 아프거나, 어지러우면 오늘은 하지 마세요.</b><p class="note">하다가 아프면 바로 멈추고 "아파서 멈춤"을 눌러 주세요. 그 검사는 판정에서 빼요. 이 검사는 의료 진단이 아니에요.</p></div>'+
+      '<label class="agree"><input type="checkbox" id="gpAdult"'+(c.adult?" checked":"")+'><span>만 14세 이상이에요</span></label>'+
+      '<p class="note wq-save">진단 결과는 슬기로운골프생활 서버에 저장돼요. 이름·전화번호는 받지 않고, 아프거나 다친 곳에 대한 답은 보내지 않아요.</p>'+
       '<div class="gx-field"><span class="ql">어느 쪽으로 치세요?</span><div class="gp-row">'+
       [["R","오른손 골퍼"],["L","왼손 골퍼"]].map(function(x){return '<button type="button" class="chip" data-gp="hand" data-v="'+x[0]+'" aria-pressed="'+(c.hand===x[0])+'">'+x[1]+'</button>';}).join("")+'</div>'+
       '<span class="note">좌우 차이를 볼 때 앞쪽 다리·뒤쪽 다리를 나누는 데 써요.</span></div>'+
+      '<div class="gx-field"><span class="ql">다쳤거나 수술한 곳이 있어요?</span><div class="gp-row">'+
+      [[0,"없어요"],[1,"있어요"]].map(function(x){return '<button type="button" class="chip" data-gp="injq" data-v="'+x[0]+'" aria-pressed="'+(c.inj===x[0])+'">'+x[1]+'</button>';}).join("")+'</div>'+
+      '<span class="note">있으면 하기 어려운 검사만 골라서 빼고 판정해요.</span></div>'+
       '<p class="gx-msg" id="gpMsg" role="status"></p>'+
       '<div class="gp-nav"><button type="button" class="btn btn-plain" data-gp="quit">그만두기</button><button type="button" class="btn btn-flag" data-gp="toSafety">다음</button></div></div>';
   }
@@ -1811,6 +1895,13 @@ body{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
     return '<div class="gp-timer"><span class="ql">'+lbl+'</span><b id="gpTime">'+(t.timer==="up"?"0.0":"30")+'</b><button type="button" class="btn btn-plain" data-gp="timer" id="gpTimerBtn">시작</button>'+(t.timer==="up"?'<div class="gp-row" id="gpTimerPut" hidden><button type="button" class="chip" data-gp="put" data-k="L">왼쪽에 넣기</button><button type="button" class="chip" data-gp="put" data-k="R">오른쪽에 넣기</button></div>':'')+'</div>';
   }
   function stopTimer(){if(TM.id){clearInterval(TM.id);TM.id=null;}TM.on=false;}
+  /* 검사 방법 유튜브 영상 (대부분 TPI 검사 영상, 영어). 우리 검사와 재는 법이 조금 다를 수 있어 '동작 참고용' */
+  var VID={ankle:"Clutk_VsgUY",pelvisSep:"8Ng0uz3dkWc",tilt:"iI45HDUckZ0",chestSep:"diEDNaWA3yo",wallArm:"yRZJ3W-265o",ninety:"blKJBavenDs",
+    squat:"uyLZi9O5hpA",toe:"S-22BJX3-NM",balance:"RsQ57NufuR0",neck:"J8w6gWHtyZs",hinge:"7sRILGywnYc",hipIR:"pDqq8rD2DuM",thorax:"R7g2RGhSm1A",
+    bridge:"OMAvwI8SIE8",sitStand:"hIigNquv6Do"};
+  function vidHtml(t){var v=VID[t.id];if(!v)return "";
+    return '<a class="btn btn-plain gp-vid" href="https://www.youtube.com/watch?v='+v+'" target="_blank" rel="noopener">▶ 검사 하는 모습 영상 보기 <small>(유튜브 · 영어)</small></a>'+
+      '<p class="gp-fine">동작 참고용이에요. 단계는 위 그림 기준으로 골라 주세요.</p>';}
   function renderTest(){
     stopTimer();
     var c=cur();
@@ -1820,7 +1911,7 @@ body{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
     root.innerHTML='<div class="gx-progress"><span>'+part+'부 · '+idx+' / '+tot+'</span><div class="gx-bar"><i style="width:'+Math.round(c.i/ORDER.length*100)+'%"></i></div></div>'+
       '<div class="card"><div class="gp-tt"><small>'+esc(regName(t.r))+'</small><h2>'+esc(t.n)+'</h2></div>'+
       '<ol class="gp-how">'+t.how.map(function(x){return '<li>'+esc(x)+'</li>';}).join("")+'</ol>'+
-      picsHtml(t)+'<p class="note">'+(t.kind==="grade"?"그림과 내 모습을 비교해서 가장 비슷한 단계를 골라 주세요.":"잰 값을 적으면 단계는 자동으로 정해져요.")+'</p>'+
+      picsHtml(t)+vidHtml(t)+'<p class="note">'+(t.kind==="grade"?"그림과 내 모습을 비교해서 가장 비슷한 단계를 골라 주세요.":"잰 값을 적으면 단계는 자동으로 정해져요.")+'</p>'+
       timerHtml(t)+inputHtml(t,c)+
       '<p class="gx-msg" id="gpMsg" role="status"></p>'+
       '<div class="gp-nav"><button type="button" class="btn btn-plain" data-gp="prev">이전</button><button type="button" class="btn btn-plain" data-gp="skip">건너뛰기</button><button type="button" class="btn btn-flag" data-gp="next">다음</button></div>'+
@@ -1868,11 +1959,19 @@ body{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
     if(res.excluded.length)nxt.push("뺀 검사: "+res.excluded.join(", "));
     nxt.push("2~4주 뒤에 같은 조건(시간·신발·바닥)으로 다시 재 보면 변화가 보여요.");
     h+='<div class="card"><h2>다음 할 일</h2><ul class="gx-list">'+nxt.map(function(x){return '<li>'+esc(x)+'</li>';}).join("")+'</ul>'+
-      '<p class="gx-fine">혼자 잰 자가 검사라 의료 진단이 아니에요. 아프거나 저림이 계속되면 전문가에게 먼저 확인받으세요. 결과는 이 기기에만 저장돼요.</p></div>';
+      '<p class="gx-fine">혼자 잰 자가 검사라 의료 진단이 아니에요. 아프거나 저림이 계속되면 전문가에게 먼저 확인받으세요. 결과는 이 기기와 슬기로운골프생활 서버에 저장돼요.</p></div>';
     h+='<div class="gp-nav"><button type="button" class="btn btn-plain" data-gp="copy">결과 복사</button><button type="button" class="btn btn-plain" data-gp="new">다시 하기</button><button type="button" class="btn btn-flag" data-tab="home">홈으로</button></div><textarea class="gp-copyfb" id="gpCopyFb" hidden readonly aria-label="복사할 결과"></textarea>';
     root.innerHTML=h;
     P.last={date:new Date().toLocaleDateString("ko-KR"),summary:summaryOf(res),pri:res.pri.slice(0,2),hand:c.hand};
     P.lastC=c;save();
+    if(!c.sentAt&&window.WQ)sendGP(c,res);
+  }
+  /* 서버로: 아팠던 검사·뺀 검사·다친 곳은 '안 함(skip)'으로만, 직접 쓴 글은 보내지 않음 */
+  function sendGP(c,res){
+    var ans={};ORDER.forEach(function(t){var a=c.ans[t.id]||{},o={};sides(t).forEach(function(k){var v=a[k];o[k]=c.restricted.indexOf(t.id)>=0||v==="pain"||v==null||v===""?"skip":v;});ans[t.id]=o;});
+    var reg={};REG.forEach(function(r){var st=res.regions[r.id].st;reg[r.id]=st==="hold"?"skip":st;});
+    var result={pri:res.pri,regions:reg,asym:res.asym.map(function(a){return {test:a.t.id,weak:a.weak,big:!!a.big};}),endure_ok:!!res.endOK};
+    window.WQ.save("GPAS",summaryOf(res),result,{hand:c.hand,tests:ans,endure:res.endOK?c.end:null}).then(function(r){if(r&&r.ok){c.sentAt=Date.now();save();}});
   }
   function copyText(){
     var c=cur(),res=judge(c),L=["[신체 검사 결과] "+summaryOf(res)];
@@ -1897,13 +1996,15 @@ body{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
     if(act==="quit"){stopTimer();P.cur=null;save();render();return;}
     if(!c)return;
     if(act==="hand"){c.hand=d.v;save();render();return;}
-    if(act==="toSafety"){if(!c.adult){msg("만 19세 이상만 할 수 있어요.");return;}if(!c.hand){msg("오른손·왼손 골퍼를 골라 주세요.");return;}c.step="safety";save();render();return;}
+    if(act==="injq"){c.inj=+d.v;save();renderKeepScroll();return;}
+    if(act==="toSafety"){if(!c.adult){msg("만 14세 이상만 할 수 있어요.");return;}if(!c.hand){msg("오른손·왼손 골퍼를 골라 주세요.");return;}if(c.inj==null){msg("다쳤거나 수술한 곳이 있는지 골라 주세요.");return;}
+      c.step=c.inj===1?"injury":"test";if(c.inj!==1)c.i=c.i||0;save();render();return;}
     if(act==="safe"){c.safe[+d.i]=+d.v;save();render();return;}
     if(act==="safeNext"){for(var i=0;i<SAFE.length;i++)if(c.safe[i]==null){msg((i+1)+"번 질문에 답해 주세요.");return;}
       if(c.safe.slice(1).some(function(v){return v===1;})){c.step="stop";}else if(c.safe[0]===1){c.step="injury";}else{c.step="test";c.i=c.i||0;}
       save();render();return;}
     if(act==="injNext"){var inj=$("gpInj");c.injury=inj?inj.value.trim():"";c.step="test";save();render();return;}
-    if(act==="back"){c.step=c.step==="safety"?"intro":c.step==="stop"?"safety":c.step==="injury"?"safety":"intro";save();render();return;}
+    if(act==="back"){c.step="intro";save();render();return;}
     if(act==="g"){var t=ORDER[c.i];c.ans[t.id]=c.ans[t.id]||{};var cur0=c.ans[t.id][d.k];c.ans[t.id][d.k]=cur0===d.v?null:d.v;
       if(d.v==="pain"&&c.ans[t.id][d.k]==="pain"){var ne=$("gpN"+d.k);if(ne)ne.value="";}
       save();renderKeepScroll();return;}
@@ -1912,7 +2013,7 @@ body{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
       if(act==="skip"){delete c.ans[t2.id];}
       c.i++;if(c.i===P1N&&ORDER[c.i-1].part===1){c.step="break1";}save();render();return;}
     if(act==="prev"){readNums();if(c.step==="endure"){c.step="test";c.i=ORDER.length-1;while(c.i>0&&c.restricted.indexOf(ORDER[c.i].id)>=0)c.i--;save();render();return;}
-      if(c.i===0){c.step="safety";save();render();return;}c.i--;while(c.i>0&&c.restricted.indexOf(ORDER[c.i].id)>=0)c.i--;save();render();return;}
+      if(c.i===0){c.step=c.inj===1?"injury":"intro";save();render();return;}c.i--;while(c.i>0&&c.restricted.indexOf(ORDER[c.i].id)>=0)c.i--;save();render();return;}
     if(act==="pause"){readNums();save();P.cur=c;toast("여기까지 저장했어요. 진단 탭에서 이어 할 수 있어요.");stopTimer();P.paused=true;save();goHome();return;}
     if(act==="pauseQuit"){c.step="test";save();toast("1부까지 저장했어요. 진단 탭에서 이어 할 수 있어요.");goHome();return;}
     if(act==="part2"){c.step="test";save();render();return;}
@@ -1938,6 +2039,847 @@ body{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
     return {state:"none",text:"검사하기",sub:"신체 검사 · 20분"};
   };
 })();
+</script>
+<script>
+/* ---------- 클럽 진단 (GCAS) — 무료 선별 진단. 사진 없이 입력만, 채점은 이 앱 안에서, 기록은 이 기기에만 ---------- */
+(function(){
+  var KEY="gcas_app_v1";
+  function $(id){return document.getElementById(id);}
+  function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];});}
+  function load(){try{return JSON.parse(localStorage.getItem(KEY)||"{}")||{};}catch(e){return {};}}
+  function save(){try{localStorage.setItem(KEY,JSON.stringify(P));}catch(e){}}
+  function toast(msg){var t=document.querySelector(".toast");if(!t){t=document.createElement("div");t.className="toast";t.setAttribute("role","status");document.body.appendChild(t);}t.textContent=msg;t.hidden=false;clearTimeout(toast.t);toast.t=setTimeout(function(){t.hidden=true;},1800);}
+
+  /* ---- 클럽 목록 (긴 것 → 짧은 것) ---- */
+  var CL=[["drv","드라이버","드라이버"],["w3","3번 우드","3번 우드"],["w5","5번 우드","5번 우드"],["w7","7번+ 우드","7번 이상 우드"],
+    ["hyL","유틸 2~3번","유틸리티 (2~3번)"],["hyH","유틸 4~6번","유틸리티 (4~6번)"],
+    ["i3","3번","3번 아이언"],["i4","4번","4번 아이언"],["i5","5번","5번 아이언"],["i6","6번","6번 아이언"],["i7","7번","7번 아이언"],["i8","8번","8번 아이언"],["i9","9번","9번 아이언"],
+    ["pw","PW","피칭 웨지 (PW)"],["aw","AW·GW (50° 근처)","50° 근처 웨지 (AW·GW)"],["sw","SW (54~56°)","54~56° 웨지 (SW)"],["lw","LW (58~60°)","58~60° 웨지 (LW)"],["pt","퍼터","퍼터"]];
+  var GROUPS=[["우드",["drv","w3","w5","w7"]],["유틸리티",["hyL","hyH"]],["아이언",["i3","i4","i5","i6","i7","i8","i9"]],["웨지",["pw","aw","sw","lw"]],["퍼터",["pt"]]];
+  var TYPICAL=["drv","w3","hyH","i5","i6","i7","i8","i9","pw","aw","sw","pt"];
+  function idx(id){for(var i=0;i<CL.length;i++)if(CL[i][0]===id)return i;return -1;}
+  function cn(id){var i=idx(id);return i<0?id:CL[i][2];}
+  function J(id,p){var w=cn(id).replace(/\s*\(.*\)$/,""),ch=w.charCodeAt(w.length-1),b=ch>=0xAC00&&ch<=0xD7A3?(ch-0xAC00)%28>0:/[013678]$/.test(w);
+    return {"을":b?"을":"를","과":b?"과":"와","이":b?"이":"가","은":b?"은":"는"}[p];}
+  function isShort(id){return /^(i\d|pw|aw|sw|lw)$/.test(id);}
+
+  /* ---- 질문 보기 ---- */
+  var SIG=[["play","헤드랑 샤프트 사이가 덜그럭거려요",1],["crack","샤프트에 금이 갔거나 찢어졌어요",1],["head","헤드에 금(크랙)이 보여요",1],["part","헤드 목(슬리브)이나 부품이 빠졌거나 깨졌어요",1],
+    ["grip","그립이 돌아가거나 들떠요",0],["loose","헤드 목·무게추·나사가 헐거워요",0],["noise","칠 때 가끔 딸깍·덜컹 소리가 나요",0],["hit","최근에 크게 부딪쳤어요",0],["fix","수리하거나 샤프트 바꾼 뒤로 이상해요",0]];
+  var MISS=[["right","오른쪽으로 가요"],["left","왼쪽으로 가요"],["center","정타가 잘 안 맞아요"],["toe","끝(토우)에 맞아요"],["heel","안쪽(힐)에 맞아요"],["thin","얇게 맞아요(탑볼)"],["fat","뒤땅이 나요"],
+    ["high","너무 떠요"],["low","너무 낮게 가요"],["short","거리가 짧아요"],["spread","거리가 들쭉날쭉해요"],["heavy","무겁게 느껴져요"],["light","가볍게 느껴져요"],["timing","타이밍이 안 맞아요"],["feel","다른 클럽과 느낌이 달라요"],["vague","그냥 잘 안 맞아요"]];
+  var OTHER=[["most","다른 채도 거의 다 그래요"],["some","몇 개는 그래요"],["only","이 채만 유독 그래요"],["dk","잘 모르겠어요"]];
+  var WHERE=[["range","연습장"],["screen","스크린"],["field","필드"]];
+  var ONSET=[["buy","처음 샀을 때부터"],["sudden","최근 갑자기"],["chg","클럽을 바꾸거나 손본 뒤"],["swing","스윙을 바꾼 뒤(레슨 등)"],["body","몸이 달라진 뒤(다쳤거나 체중이 변했거나)"],["dk","잘 모르겠어요"]];
+  var CHG=[["none","바꾼 적 없어요"],["shaft","샤프트 교체"],["grip","그립 교체"],["len","길이 조정"],["cut","샤프트 자르기(팁컷·버트컷)"],["headc","헤드·슬리브 교체"],["wt","무게추·납 붙이기"],["loft","로프트·라이 각도 조정"],["fix","수리"],["used","중고로 샀어요"],["dk","잘 모르겠어요"]];
+  var BRAND=[["titleist","타이틀리스트"],["taylor","테일러메이드"],["callaway","캘러웨이"],["ping","핑"],["xxio","젝시오"],["srixon","스릭슨"],["mizuno","미즈노"],["honma","혼마"],["bs","브리지스톤"],["pxg","PXG"],["cobra","코브라"],["yamaha","야마하"],["etc","기타"],["dk","모름"]];
+  var MAT=[["gr","그라파이트(카본)"],["steel","스틸"],["dk","모름"]];
+  var WT_GR=[["40","40g대"],["50","50g대"],["60","60g대"],["70","70g대"],["80","80g대+"],["dk","모름"]];
+  var WT_ST=[["90","90g대 (경량)"],["100","100g대"],["110","110g대"],["120","120g대+"],["dk","모름"]];
+  var FLEX=[["L","L"],["A","A"],["R","R"],["SR","SR"],["S","S"],["X","X"],["dk","모름"]];
+  var CST=[["ok","괜찮아요"],["bad","같이 안 맞아요"],["dk","모르겠어요"]];
+  var SAME=[["y","같은 세트"],["n","다른 제품"],["dk","모름"]];
+  var FEEL=[["good","잘 맞으면 괜찮아요"],["even","잘 맞아도 짧거나 이상해요"],["rare","잘 맞은 적이 별로 없어요"],["dk","잘 모르겠어요"]];
+  var CAREER=[["1","1년 안"],["3","1~3년"],["10","3~10년"],["99","10년 넘게"]];
+  var SCORE=[["80","70대"],["90","80대"],["100","90대"],["110","100대"],["120","100 넘게"]];
+  function lab(list,v){for(var i=0;i<list.length;i++)if(list[i][0]===v)return list[i][1];return "";}
+
+  var STEPS=["intro","safety","bag","symptom","change","info","compare","dist","notice"];
+  var STEPN={intro:"시작",safety:"안전 확인",bag:"클럽 고르기",symptom:"어떻게 안 맞는지",change:"손본 적 있는지",info:"클럽 정보",compare:"옆 채랑 비교",dist:"거리",notice:"확인"};
+
+  var P=load(),root=null;
+  function fresh(){return {step:"intro",adult:false,hand:null,career:null,score:null,safe:null,sig:[],bag:[],p1:null,p2:null,miss:[],other:null,where:[],onset:null,chg:[],chgWhen:null,chgNote:"",info:{brand:null,brandEtc:"",model:"",loft:null,mat:null,shaft:"",flex:null,wt:null},comp:{},dist:{},feel:null,note:"",agree:false};}
+  function cur(){return P.cur;}
+
+  /* ---- 비교 클럽 (백에서 문제 클럽 바로 앞뒤) ---- */
+  function compIds(c){
+    if(!c.p1)return [];
+    var bag=c.bag.filter(function(id){return id!=="pt"&&id!==c.p2;}).sort(function(a,b){return idx(a)-idx(b);});
+    var i=bag.indexOf(c.p1);if(i<0)return [];
+    var out=[];if(i>0)out.push(bag[i-1]);if(i<bag.length-1)out.push(bag[i+1]);return out;
+  }
+  function num(v){var n=parseFloat(String(v==null?"":v).replace(/[^0-9.]/g,""));return isNaN(n)||n<=0||n>400?null:n;}
+
+  /* ---- 판정 ---- */
+  function judge(c){
+    var r={facts:[],unknown:[],flow:[],notes:[],targets:[]};
+    var imm=c.sig.filter(function(s){for(var i=0;i<SIG.length;i++)if(SIG[i][0]===s)return SIG[i][2]===1;return false;});
+    r.safety=imm.length?"stop":(c.safe==="yes"||c.safe==="dk"||c.sig.length)?"caution":"ok";
+    r.imm=imm;
+    if(r.safety==="stop"){r.type="E";r.eq="hold";r.pri="hold";r.mn="now";return r;}
+
+    var ids=compIds(c),comps=ids.map(function(id){var o=c.comp[id]||{};return {id:id,st:o.st||null,same:o.same||null,model:o.model||""};});
+    var compOK=comps.some(function(x){return x.st==="ok";}),compBad=comps.some(function(x){return x.st==="bad";});
+    var compKnown=compOK||compBad;
+    var chgList=c.chg.filter(function(v){return v!=="none"&&v!=="dk";});
+    var afterChg=c.onset==="chg";
+    var missClear=c.miss.filter(function(m){return m!=="vague";}).length>0;
+
+    /* 거리 흐름 */
+    var d1=num(c.dist[c.p1]);
+    comps.forEach(function(x){
+      var d2=num(c.dist[x.id]);if(d1==null||d2==null)return;
+      var longer=idx(x.id)<idx(c.p1); // 비교 클럽이 더 긴 클럽인지
+      var diff=longer?d2-d1:d1-d2;     // 정상이면 양수
+      var both=isShort(x.id)&&isShort(c.p1),ov=both?5:8,gap=both?20:30;
+      if(diff<0)r.flow.push(cn(x.id)+"보다 "+cn(c.p1)+J(c.p1,"이")+(longer?" 더 멀리 가요":" 더 짧아요")+" (거꾸로예요)");
+      else if(diff<=ov)r.flow.push(cn(c.p1)+J(c.p1,"과")+" "+cn(x.id)+" 거리가 "+Math.round(diff)+"m 차이로 거의 겹쳐요");
+      else if(diff>=gap)r.flow.push(cn(c.p1)+J(c.p1,"과")+" "+cn(x.id)+" 거리가 "+Math.round(diff)+"m로 많이 벌어져 있어요");
+    });
+    r.distBoth=d1!=null&&comps.some(function(x){return num(c.dist[x.id])!=null;});
+
+    /* 신호 */
+    var special=c.other==="only"&&!compBad;
+    var strong=special&&(compOK||afterChg||c.feel==="even");
+    var setFlow=r.flow.length>0||(c.p2&&c.miss.indexOf("feel")>=0)||(compBad&&c.other!=="most");
+    var otherPart=c.other==="most"||c.onset==="swing"||c.onset==="body";
+    r.special=special;r.strong=strong;r.setFlow=setFlow;r.otherPart=otherPart;r.compKnown=compKnown;r.comps=comps;r.chgList=chgList;r.afterChg=afterChg;
+
+    /* 정보 신뢰도 */
+    var inf=c.info||{};function kn(v){return v&&v!=="dk";}
+    var identified=!!(kn(inf.brand)||inf.model||kn(inf.loft)||inf.shaft||kn(inf.flex)||kn(inf.wt));
+    var s=(missClear?1:0)+(c.other&&c.other!=="dk"?1:0)+(c.onset&&c.onset!=="dk"?1:0)+(identified?1:0)+(r.distBoth?1:0);
+    var undecidable=!missClear&&(!c.other||c.other==="dk");
+    var lv=undecidable?0:s>=4?3:s>=2?2:1;
+    if(!undecidable&&!compKnown&&lv>1)lv--; // 옆 클럽 비교가 없으면 한 단계 낮춤
+    r.eq=["none","low","mid","high"][lv];r.identified=identified;
+
+    /* 결과 유형: E → D → F → B → C → A */
+    if(r.eq==="none")r.type="D";
+    else if(otherPart&&!strong)r.type="F";
+    else if(special)r.type="B";
+    else if(setFlow)r.type="C";
+    else r.type="A";
+
+    /* 실측 필요도·장비 우선 */
+    r.mn=r.type==="B"?(strong?"high":"rec"):r.type==="C"?(r.flow.length?"high":"rec"):"low";
+    if(r.safety==="caution"&&r.mn==="low")r.mn="rec";
+    r.pri=r.type==="B"?(strong?"high":"mid"):r.type==="C"?"mid":r.type==="D"?"hold":"low";
+
+    /* 먼저 잴 것 */
+    var T=["길이","총중량"];
+    function add(x){if(T.indexOf(x)<0)T.push(x);}
+    var m=c.miss;
+    if(m.indexOf("right")>=0||m.indexOf("left")>=0){add("라이각");add(c.p1==="drv"||/^w/.test(c.p1)?"로프트·페이스 방향":"로프트");}
+    if(m.indexOf("toe")>=0||m.indexOf("heel")>=0||m.indexOf("center")>=0)add("라이각");
+    if(m.indexOf("high")>=0||m.indexOf("low")>=0)add("로프트");
+    if(m.indexOf("heavy")>=0||m.indexOf("light")>=0||m.indexOf("timing")>=0||m.indexOf("feel")>=0){add("스윙웨이트");add("샤프트 진동수(CPM)");}
+    if(m.indexOf("short")>=0||m.indexOf("spread")>=0){add("로프트");add("샤프트 진동수(CPM)");}
+    if((m.indexOf("fat")>=0||m.indexOf("thin")>=0)){add("라이각");if(/^(pw|aw|sw|lw)$/.test(c.p1))add("바운스");}
+    r.targets=T;
+
+    /* 확인된 사실 (출처 표시) */
+    var ms=c.miss.map(function(v){return lab(MISS,v);}).filter(Boolean);
+    if(ms.length)r.facts.push([cn(c.p1)+": "+ms.join(", "),"내 답"]);
+    if(c.other)r.facts.push(["다른 채는: "+lab(OTHER,c.other),"내 답"]);
+    if(c.onset)r.facts.push(["시작: "+lab(ONSET,c.onset),"내 답"]);
+    if(chgList.length)r.facts.push(["바꾼 것: "+chgList.map(function(v){return lab(CHG,v);}).join(", ")+(c.chgWhen==="recent"?" (최근 3개월 안)":c.chgWhen==="old"?" (3개월보다 전)":""),"내 답"]);
+    if(identified){var bn=inf.brand==="etc"?(inf.brandEtc||"기타"):kn(inf.brand)?lab(BRAND,inf.brand):"";
+      var id=[bn,inf.model,kn(inf.loft)?inf.loft+"°":"",kn(inf.mat)?lab(MAT,inf.mat):"",inf.shaft,kn(inf.flex)?inf.flex:"",kn(inf.wt)?inf.wt+"g대":""].filter(Boolean).join(" · ");r.facts.push(["채에 적힌 것: "+id,"채에 적힌 글씨"]);}
+    if(d1!=null)r.facts.push([cn(c.p1)+" 평소 캐리 약 "+Math.round(d1)+"m","기억으로 적은 거리, 측정 아님"]);
+    comps.forEach(function(x){if(x.st)r.facts.push([cn(x.id)+": "+lab(CST,x.st)+(x.same?" · "+lab(SAME,x.same):""),"내 답"]);});
+
+    /* 확인 안 된 값 */
+    r.unknown=["실제 길이","총중량","스윙웨이트","샤프트 진동수(CPM)","실제 로프트·라이"];
+    if(!inf.model)r.unknown.push("모델");
+    if(!inf.shaft)r.unknown.push("샤프트 모델");
+    if(!kn(inf.flex))r.unknown.push("샤프트 강도(Flex)");
+    if(!kn(inf.wt))r.unknown.push("샤프트 무게");
+    return r;
+  }
+
+  var TYPE={
+    A:{t:"채 탓은 아닌 것 같아요",b:"답해 주신 걸로 보면 채 때문일 가능성은 낮아요. 채는 그대로 두고 스윙·몸·라운드 운영부터 보는 게 좋아요.",cad:"고객님, 채는 죄가 없어 보여요. 바꾸기 전에 같은 채로 한 달만 어떤 미스가 나는지 적어 보시죠."},
+    B:{t:"이 채는 측정해 볼 만해요",b:"다른 채는 괜찮은데 이 채만 유독 안 맞는다고 하셨어요. 길이·무게·로프트·라이는 눈으로 봐선 몰라요. 이 채랑 옆 채를 같이 측정하면 차이가 바로 나와요.",cad:"한 채만 유독 말썽이면 채가 범인일 때가 꽤 있어요. 옆 채랑 같이 측정해 보면 금방 나와요."},
+    C:{t:"세트를 같이 측정해 볼 만해요",b:"채 하나보다는 채끼리 거리나 느낌이 고르지 않아 보여요. 몇 개를 같이 측정하면 어디서 끊기는지 나와요.",cad:"채끼리 거리가 고르게 벌어져 있어야 남은 거리에 맞는 채가 바로 나와요. 세트로 한번 맞춰 보시죠."},
+    D:{t:"아직 말씀드리기 일러요",b:"어떻게 안 맞는지 답이 적어서 아직 결론을 안 냈어요. 지금 알 수 있는 것만 정리해 드릴게요.",cad:"연습장에서 그 채로 10개만 쳐 보시고, 어떤 미스가 몇 번 나는지 적어 오세요. 그럼 훨씬 정확해져요."},
+    E:{t:"이 채는 치지 마세요",b:"고르신 것 중에 채가 부서질 수 있는 게 있어요. 다른 진단은 멈췄어요. 점검받기 전까지 이 채로는 치지 마세요.",cad:"헤드 빠지면 사람이 다쳐요. 오늘은 백에서 빼 두시고 점검부터 받으시죠."},
+    F:{t:"채보다 다른 쪽을 먼저 보세요",b:"",cad:"채 바꾸기 전에 원인부터 찾으시죠. 그래야 돈 안 버려요."}
+  };
+  var EQN={high:"충분해요",mid:"보통이에요",low:"부족해요",none:"아직 몰라요",hold:"보류"};
+  var PRN={high:"높아요",mid:"중간이에요",low:"낮아요",hold:"보류"};
+  var MNN={now:"바로 점검",high:"꼭 해 보세요",rec:"해 보면 좋아요",low:"아직 아니에요"};
+  var SFN={ok:"괜찮아요",caution:"점검 권해요",stop:"바로 점검"};
+  function pill(cls,t){return '<span class="gp-pill '+cls+'">'+esc(t)+'</span>';}
+  function clsOf(k,v){
+    if(k==="sf")return v==="stop"?"gp-pri":v==="caution"?"gp-watch":"gp-good";
+    if(k==="mn")return v==="now"||v==="high"?"gp-pri":v==="rec"?"gp-watch":"gp-good";
+    if(k==="pri")return v==="high"?"gp-pri":v==="mid"?"gp-watch":v==="hold"?"gp-hold":"gp-good";
+    return v==="high"?"gp-good":v==="mid"?"gp-watch":v==="low"?"gp-pri":"gp-hold";
+  }
+
+  /* ---- 화면 ---- */
+  function chips(k,list,val,multi){
+    return '<div class="gp-row">'+list.map(function(o){var on=multi?(val||[]).indexOf(o[0])>=0:val===o[0];
+      return '<button type="button" class="chip" data-gc="pick" data-k="'+k+'" data-v="'+o[0]+'"'+(multi?' data-m="1"':'')+' aria-pressed="'+on+'">'+esc(o[1])+'</button>';}).join("")+'</div>';
+  }
+  function field(label,inner,note){return '<div class="gx-field"><span class="ql">'+label+'</span>'+inner+(note?'<span class="note">'+note+'</span>':'')+'</div>';}
+  function txt(path,val,ph,mode){return '<input type="text" class="gc-in" data-gct="'+path+'" value="'+esc(val)+'" placeholder="'+esc(ph)+'" maxlength="40" autocomplete="off"'+(mode?' inputmode="'+mode+'"':'')+'>';}
+  function nav(first,nextLabel){return '<p class="gx-msg" id="gcMsg" role="status"></p><div class="gp-nav">'+(first?'<button type="button" class="btn btn-plain" data-gc="quit">그만두기</button>':'<button type="button" class="btn btn-plain" data-gc="prev">이전</button>')+'<button type="button" class="btn btn-flag" data-gc="next">'+(nextLabel||"다음")+'</button></div>';}
+  function prog(c){var i=STEPS.indexOf(c.step);return '<div class="gx-progress"><span>'+(i+1)+' / '+STEPS.length+' · '+STEPN[c.step]+'</span><div class="gx-bar"><i style="width:'+Math.round((i+1)/STEPS.length*100)+'%"></i></div></div>';}
+
+  function render(){
+    root=$("gcRoot");if(!root)return;
+    var c=cur();
+    if(!c){renderHome();return;}
+    if(c.step==="result"){renderResult();return;}
+    var f={intro:sIntro,safety:sSafety,bag:sBag,symptom:sSymptom,change:sChange,info:sInfo,compare:sCompare,dist:sDist,notice:sNotice}[c.step];
+    root.innerHTML=prog(c)+'<div class="card">'+f(c)+'</div>';
+  }
+  function renderHome(){
+    root=$("gcRoot");if(!root)return;
+    var last=P.last;
+    var h='<div class="card"><h2>클럽 진단이란</h2><p class="note">질문에 답하면 지금 안 맞는 게 <b>채 때문인지</b>, <b>측정까지 해 볼 만한지</b> 알려 드려요. 채가 맞다·틀리다를 정해 주는 검사는 아니에요.</p>'+
+      '<ul class="gx-list"><li>말썽인 채 1~2개를 옆 채랑 비교해요</li><li>모델·스펙을 몰라도 괜찮아요. 모르면 비워 두세요</li><li>사진은 받지 않아요</li></ul>'+
+      '<button type="button" class="btn btn-flag" data-gc="new">진단 시작</button></div>';
+    if(last)h='<div class="card"><h2>지난 결과</h2><p class="note">'+esc(last.date)+' · '+esc(last.summary)+'</p><button type="button" class="btn btn-plain" data-gc="showLast">결과 다시 보기</button></div>'+h;
+    if(P.cur&&P.cur.step!=="result")h='<div class="card"><h2>하던 진단</h2><p class="note">'+esc(STEPN[P.cur.step]||"")+' 단계까지 했어요.</p><button type="button" class="btn btn-flag" data-gc="resume">이어 하기</button></div>'+h;
+    root.innerHTML=h;
+  }
+  function sIntro(c){
+    return '<h2>시작하기 전에</h2>'+
+      '<label class="agree"><input type="checkbox" id="gcAdult"'+(c.adult?" checked":"")+'><span>만 14세 이상이에요</span></label>'+
+      '<p class="note wq-save">진단 결과는 슬기로운골프생활 서버에 저장돼요. 이름·전화번호는 받지 않고, 직접 쓴 글은 보내지 않아요.</p>'+
+      field("어느 쪽으로 치세요?",chips("hand",[["R","오른손 골퍼"],["L","왼손 골퍼"]],c.hand),"오른쪽·왼쪽 미스를 볼 때 써요.")+
+      field("골프 친 지 얼마나 됐어요? (선택)",chips("career",CAREER,c.career))+
+      field("평균 스코어 (선택)",chips("score",SCORE,c.score))+nav(true);
+  }
+  function sSafety(c){
+    var h='<h2>채 상태부터 볼게요</h2><p class="note">금이 갔거나 헐거운 곳처럼, 이상한 데가 있나요?</p>'+
+      chips("safe",[["no","없어요"],["yes","있어요"],["dk","잘 모르겠어요"]],c.safe);
+    if(c.safe==="dk")h+='<div class="gc-tip"><b>30초면 직접 볼 수 있어요</b><ul class="gx-list"><li>헤드를 잡고 샤프트를 살짝 비틀어 보세요. 딸깍거리면 헐거운 거예요.</li><li>샤프트를 불빛에 비춰 금이나 찍힌 곳이 있는지 보세요.</li><li>그립을 양손으로 잡고 비틀어 보세요. 돌아가면 그립이 들뜬 거예요.</li></ul></div>';
+    if(c.safe==="yes"||c.safe==="dk")h+=field("해당하는 걸 다 골라 주세요",'<div class="gc-col">'+SIG.map(function(s){var on=c.sig.indexOf(s[0])>=0;return '<button type="button" class="chip gc-wide" data-gc="pick" data-k="sig" data-m="1" data-v="'+s[0]+'" aria-pressed="'+on+'">'+esc(s[1])+'</button>';}).join("")+'</div>',"없으면 그냥 다음을 누르세요.");
+    return h+nav();
+  }
+  function sBag(c){
+    var h='<h2>백에 든 클럽</h2><p class="note">들어 있는 클럽을 눌러 주세요. 정확하지 않아도 괜찮아요.</p>'+
+      '<button type="button" class="btn btn-plain gc-fill" data-gc="typical">보통 구성으로 채우기</button>';
+    h+=GROUPS.map(function(g){return '<div class="gx-field"><span class="ql">'+g[0]+'</span><div class="gp-row">'+g[1].map(function(id){var on=c.bag.indexOf(id)>=0;return '<button type="button" class="chip" data-gc="pick" data-k="bag" data-m="1" data-v="'+id+'" aria-pressed="'+on+'">'+esc(CL[idx(id)][1])+'</button>';}).join("")+'</div></div>';}).join("");
+    var cand=c.bag.filter(function(id){return id!=="pt";}).sort(function(a,b){return idx(a)-idx(b);});
+    h+='<hr class="gc-hr"><h2>제일 말썽인 클럽</h2>';
+    if(!cand.length)h+='<p class="note">위에서 클럽을 먼저 골라 주세요.</p>';
+    else{
+      h+=field("첫 번째 (꼭)",'<div class="gp-row">'+cand.map(function(id){return '<button type="button" class="chip" data-gc="pick" data-k="p1" data-v="'+id+'" aria-pressed="'+(c.p1===id)+'">'+esc(CL[idx(id)][1])+'</button>';}).join("")+'</div>');
+      h+=field("두 번째 (있으면)",'<div class="gp-row">'+cand.filter(function(id){return id!==c.p1;}).map(function(id){return '<button type="button" class="chip" data-gc="pick" data-k="p2" data-v="'+id+'" aria-pressed="'+(c.p2===id)+'">'+esc(CL[idx(id)][1])+'</button>';}).join("")+'</div>');
+    }
+    h+='<p class="note">퍼터는 따로 준비하고 있어서 이번엔 빼요.</p>';
+    return h+nav();
+  }
+  function sSymptom(c){
+    var nm=esc(cn(c.p1))+(c.p2?" · "+esc(cn(c.p2)):"");
+    return '<h2>'+nm+', 어떤 문제가 있나요?</h2>'+
+      field("어떻게 안 맞나요? (여러 개)",chips("miss",MISS,c.miss,true))+
+      field("다른 채도 그런가요?",chips("other",OTHER,c.other))+
+      field("주로 어디서 그래요? (여러 개, 선택)",chips("where",WHERE,c.where,true))+
+      field("언제부터 그랬어요?",chips("onset",ONSET,c.onset))+nav();
+  }
+  function sChange(c){
+    var h='<h2>'+esc(cn(c.p1))+J(c.p1,"을")+' 바꾸거나 손본 적 있나요?</h2>'+field("해당하는 걸 다 골라 주세요",chips("chg",CHG,c.chg,true));
+    var any=c.chg.some(function(v){return v!=="none"&&v!=="dk";});
+    if(any)h+=field("언제쯤이에요?",chips("chgWhen",[["recent","최근 3개월 안"],["old","그보다 전"],["dk","모름"]],c.chgWhen))+
+      field("기억나는 내용 (선택)",txt("chgNote",c.chgNote,"예: 샤프트를 S에서 R로 바꿈"));
+    return h+nav();
+  }
+  function sInfo(c){
+    var i=c.info,lofts=loftList(c.p1);
+    var h='<h2>'+esc(cn(c.p1))+' 정보</h2><p class="note">보이는 대로 고르기만 하면 돼요. 모르면 "모름"을 누르거나 그냥 넘어가도 진단은 돼요.</p>'+
+      '<div class="gc-tip"><b>어디를 보면 되나요?</b><ul class="gx-list"><li>제조사: 헤드 뒤쪽이나 바닥(솔)에 큰 글씨·로고</li><li>로프트: 드라이버·우드·유틸은 바닥이나 목 부분 숫자, 웨지는 헤드 뒤쪽 숫자(예: 56)</li><li>샤프트: 그립 바로 아래 글씨. 숫자는 무게(예: 60), 글자는 강도(R·S·X)</li></ul></div>'+
+      field("제조사",chips("info.brand",BRAND,i.brand));
+    if(i.brand==="etc")h+=field("제조사 이름",txt("info.brandEtc",i.brandEtc||"","예: 온오프"));
+    h+=field("모델 (아는 경우만)",txt("info.model",i.model,"예: T200, 패러다임"));
+    if(lofts)h+=field("로프트 (각도)",chips("info.loft",lofts,i.loft));
+    else h+='<p class="note">아이언은 번호로 충분해서 로프트는 묻지 않아요.</p>';
+    h+=field("샤프트 재질",chips("info.mat",MAT,i.mat),"반짝이는 쇠색이면 스틸, 색이 칠해져 있으면 대부분 그라파이트(카본)예요.")+
+      field("샤프트 강도 (Flex)",chips("info.flex",FLEX,i.flex),"L·A는 부드러움, R은 보통, SR·S·X로 갈수록 단단해요.")+
+      field("샤프트 무게",chips("info.wt",i.mat==="steel"?WT_ST:WT_GR,i.wt),"샤프트 글씨의 두 자리·세 자리 숫자예요.")+
+      field("샤프트 이름 (아는 경우만)",txt("info.shaft",i.shaft,"예: 다이나믹골드, 벤투스"));
+    return h+nav();
+  }
+  function loftList(id){
+    if(id==="drv")return [["8","8°"],["9","9°"],["9.5","9.5°"],["10","10°"],["10.5","10.5°"],["11","11°"],["12","12°+"],["dk","모름"]];
+    if(/^w/.test(id))return [["13.5","13.5°"],["15","15°"],["16.5","16.5°"],["18","18°"],["21","21°+"],["dk","모름"]];
+    if(/^hy/.test(id))return [["17","17°"],["19","19°"],["21","21°"],["23","23°"],["25","25°"],["27","27°+"],["dk","모름"]];
+    if(/^(aw|sw|lw)$/.test(id))return [["48","48°"],["50","50°"],["52","52°"],["54","54°"],["56","56°"],["58","58°"],["60","60°+"],["dk","모름"]];
+    return null;
+  }
+  function sCompare(c){
+    var ids=compIds(c);
+    var h='<h2>옆 채랑 비교</h2>';
+    if(!ids.length){h+='<p class="note">백에 '+esc(cn(c.p1))+' 옆 채가 없어서 비교 없이 넘어가요. 그만큼 결과는 조금 덜 확실해요.</p>';return h+nav();}
+    h+='<p class="note">'+esc(cn(c.p1))+' 바로 옆 채는 어떤가요? 모르면 그냥 넘어가도 돼요.</p>';
+    ids.forEach(function(id){var o=c.comp[id]||{};
+      h+='<div class="gc-comp"><b>'+esc(cn(id))+'</b>'+chips("comp."+id+".st",CST,o.st)+
+        '<span class="ql">'+esc(cn(c.p1))+J(c.p1,"과")+' 같은 세트인가요?</span>'+chips("comp."+id+".same",SAME,o.same)+
+        txt("comp."+id+".model",o.model||"","모델 (아는 경우만)")+'</div>';});
+    return h+nav();
+  }
+  function sDist(c){
+    var ids=compIds(c);
+    var h='<h2>거리</h2><p class="note">평소 잘 맞았을 때 공이 떨어지는 거리(캐리)예요. 대충 알면 적어 주세요. 몰라도 돼요.</p><div class="gc-grid">';
+    [c.p1].concat(ids).forEach(function(id){h+=field(esc(cn(id)),'<span class="gc-m">'+txt("dist."+id,c.dist[id]||"","예: 140","numeric")+' m</span>');});
+    h+='</div>'+field(esc(cn(c.p1))+J(c.p1,"이")+' 잘 맞았을 때는?',chips("feel",FEEL,c.feel))+
+      field("더 하고 싶은 말 (선택)",txt("note",c.note,"예: 필드에서만 오른쪽으로 감"));
+    return h+nav();
+  }
+  function sNotice(c){
+    return '<h2>결과 보기 전에</h2><p class="gc-notice">무료 클럽 진단은 답해 주신 내용과 제조사가 공개한 스펙만 보고, 채를 먼저 확인해 볼지 골라 드려요. 공개 스펙과 지금 쓰시는 채의 실제 값은 다를 수 있어요. 답만으로는 실제 길이·총중량·스윙웨이트·샤프트 진동수(CPM)·MOI·로프트·라이를 정확히 알 수 없어서, 필요하면 실제로 측정해 보시길 권해요.</p>'+
+      '<label class="agree"><input type="checkbox" id="gcAgree"'+(c.agree?" checked":"")+'><span>읽고 확인했어요</span></label>'+nav(false,"결과 보기");
+  }
+
+  function summaryOf(r,c){return r.type+" · "+TYPE[r.type].t+(c.p1&&r.type!=="E"?" ("+cn(c.p1)+")":"");}
+  function renderResult(){
+    var c=cur(),r=judge(c),T=TYPE[r.type];
+    var body=T.b;
+    if(r.type==="F"){
+      var why=[];if(c.other==="most")why.push("다른 채도 거의 다 같은 미스가 난다고 하셨죠. 그럴 땐 채보다 스윙 쪽 원인일 때가 많아요.");
+      if(c.onset==="swing")why.push("스윙을 바꾼 뒤부터 그랬다고 하셨죠. 바뀐 스윙에 채가 안 맞는 건지, 스윙이 아직 자리를 못 잡은 건지 스윙부터 보는 게 순서예요.");
+      if(c.onset==="body")why.push("몸이 달라진 뒤부터 그랬다고 하셨죠. 몸이 덜 돌거나 지치면 같은 채도 무겁고 다르게 느껴져요.");
+      body=why.join(" ");
+    }
+    var h='<div class="gx-hero"><small>클럽 진단 결과 · 유형 '+r.type+'</small><b class="gp-hero">'+esc(T.t)+'</b><span>'+esc(body)+'</span></div>';
+    h+='<div class="card gc-cad"><small>캐디 한마디</small><p>"'+esc(T.cad)+'"</p></div>';
+    // 1·3·6·7 상태
+    h+='<div class="card"><h2>한눈에</h2><ul class="gc-stat">'+
+      '<li><span>채 상태</span>'+pill(clsOf("sf",r.safety),SFN[r.safety])+'</li>'+
+      (r.type==="E"?'':'<li><span>답한 내용</span>'+pill(clsOf("eq",r.eq),EQN[r.eq])+'</li><li><span>채부터 볼 필요</span>'+pill(clsOf("pri",r.pri),PRN[r.pri])+'</li>')+
+      '<li><span>측정</span>'+pill(clsOf("mn",r.mn),MNN[r.mn])+'</li></ul>'+
+      (r.type==="E"?'':'<p class="gp-fine">진단 대상: '+esc(cn(c.p1))+(c.p2?", "+esc(cn(c.p2)):"")+(r.comps.length?' · 비교한 채: '+esc(r.comps.map(function(x){return cn(x.id);}).join(", ")):' · 비교한 채 없음')+'</p>')+'</div>';
+    if(r.type==="E"){
+      h+='<div class="card gp-warn"><b>고르신 것</b><ul class="gx-list">'+c.sig.map(function(s){for(var i=0;i<SIG.length;i++)if(SIG[i][0]===s)return '<li>'+esc(SIG[i][1])+'</li>';return "";}).join("")+'</ul>'+
+        '<p>가까운 피팅샵이나 수리점에서 점검부터 받으세요. 헤드 목이나 샤프트 상태는 직접 보고 만져 봐야 알아요.</p></div>';
+    }else{
+      if(r.safety==="caution")h+='<div class="card gp-warn"><b>점검도 한 번 받아 보세요</b><p>'+(c.sig.length?"고르신 것: "+esc(c.sig.map(function(s){for(var i=0;i<SIG.length;i++)if(SIG[i][0]===s)return SIG[i][1];return "";}).join(", "))+".":"이상이 있는지 잘 모르겠다고 하셨어요.")+' 당장 위험한 건 아니지만, 세게 치기 전에 한 번 점검받는 게 좋아요.</p></div>';
+      h+='<div class="card"><h2>답해 주신 것</h2>'+(r.facts.length?'<ul class="gc-facts">'+r.facts.map(function(f){return '<li>'+esc(f[0])+' <small>'+esc(f[1])+'</small></li>';}).join("")+'</ul>':'<p class="note">답해 주신 내용이 거의 없어요.</p>')+'</div>';
+      h+='<div class="card"><h2>아직 모르는 것</h2><p class="note">측정해야 알 수 있는 값이에요. 짐작으로 채우지 않았어요.</p><div class="gp-row">'+r.unknown.map(function(u){return '<span class="gc-tag">'+esc(u)+'</span>';}).join("")+'</div></div>';
+      var cmp=[];
+      r.flow.forEach(function(f){cmp.push(f);});
+      r.comps.forEach(function(x){if(x.st==="ok")cmp.push(cn(x.id)+J(x.id,"은")+" 괜찮다고 하셨죠. 그럼 "+cn(c.p1)+" 쪽 문제일 가능성이 커요.");if(x.st==="bad")cmp.push(cn(x.id)+"도 같이 안 맞는다고 하셨죠. 채 하나 문제라기보다 세트 흐름이나 스윙도 같이 봐야 해요.");
+        if(x.same==="n")cmp.push(cn(x.id)+J(x.id,"은")+" 다른 제품이에요. 제품이 다르면 길이·무게가 자연스럽게 안 이어질 수 있어요.");});
+      if(c.feel==="even")cmp.push("잘 맞아도 짧거나 이상하다고 하셨죠. 스윙보다 채 쪽을 의심해 볼 만해요.");
+      if(!r.comps.length||!r.compKnown)cmp.push("옆 채랑 비교한 답이 없어서, 이번 결과는 조금 덜 확실해요.");
+      h+='<div class="card"><h2>옆 채랑 비교해 보면</h2><ul class="gx-list">'+cmp.map(function(x){return '<li>'+esc(x)+'</li>';}).join("")+'</ul></div>';
+    }
+    // 다음 행동
+    var nx=[];
+    if(r.type==="E")nx.push("점검받기 전까지 이 채는 쓰지 마세요.");
+    if(r.type==="B"||r.type==="C"||r.mn==="high"||r.mn==="rec"){
+      if(r.type!=="E")nx.push((r.type==="C"?"채 몇 개를 같이":r.type==="B"?esc(cn(c.p1))+J(c.p1,"과")+" 옆 채를 같이":"가능하면")+" 가까운 피팅샵에서 측정해 보세요.");
+      if(r.type!=="E")nx.push("먼저 측정할 항목: "+r.targets.join(", "));
+    }
+    if(r.type==="A")nx.push("채는 지금 그대로 두세요. 스윙·몸·라운드 운영 쪽부터 보는 게 좋아요.");
+    if(r.type==="D")nx.push("어떤 미스가 나는지, 옆 채는 어떤지 알아본 뒤 다시 해 보세요.");
+    if(r.type==="F"){
+      if(c.onset==="body")nx.push("신체 검사(GPAS)로 몸에서 먼저 확인할 곳을 찾아보세요.");
+      if(c.other==="most"||c.onset==="swing")nx.push("스윙 검사(GSAS)는 준비 중이에요. 그 전에는 레슨 프로에게 스윙을 먼저 봐 달라고 하세요.");
+    }
+    if(r.type!=="E")nx.push("측정 결과 나올 때까지는 채를 손대지 마세요. 바꿀 땐 한 번에 하나만, 바꾸기 전·후를 적어 두세요.");
+    if(r.afterChg)nx.push("바꾼 뒤부터 이상하다면, 어디서 뭘 바꿨는지부터 챙겨 오세요.");
+    if(r.type!=="E")nx.push("샤프트 자르기처럼 되돌릴 수 없는 작업은 측정해 보기 전엔 하지 마세요.");
+    h+='<div class="card"><h2>다음 할 일</h2><ul class="gx-list">'+nx.map(function(x){return '<li>'+x+'</li>';}).join("")+'</ul>'+
+      (r.type==="F"&&c.onset==="body"?'<button type="button" class="btn btn-plain" data-tab="gpas">신체 검사 하러 가기</button>':'')+
+      '<p class="gx-fine">이 결과는 답해 주신 내용만 보고 고른 거예요. 제조사가 공개한 스펙과 내 채를 측정한 값은 다를 수 있고, 측정하지 않은 숫자는 측정값으로 치지 않아요. 채가 맞다·안 맞다를 정해 주는 검사는 아니에요. 결과는 이 기기와 슬기로운골프생활 서버에 저장돼요.</p></div>';
+    h+='<div class="gp-nav"><button type="button" class="btn btn-plain" data-gc="copy">결과 복사</button><button type="button" class="btn btn-plain" data-gc="new">다시 하기</button><button type="button" class="btn btn-flag" data-tab="home">홈으로</button></div><textarea class="gp-copyfb" id="gcCopyFb" hidden readonly aria-label="복사할 결과"></textarea>';
+    root.innerHTML=h;
+    P.last={date:new Date().toLocaleDateString("ko-KR"),type:r.type,club:c.p1,summary:summaryOf(r,c)};
+    P.lastC=c;save();
+    if(!c.sentAt&&window.WQ){
+      var ans={};["hand","career","score","safe","sig","bag","p1","p2","miss","other","where","onset","chg","chgWhen","comp","dist","feel"].forEach(function(k){ans[k]=c[k];});
+      var inf=c.info||{};ans.info={brand:inf.brand,brandEtc:inf.brandEtc,model:inf.model,loft:inf.loft,mat:inf.mat,shaft:inf.shaft,flex:inf.flex,wt:inf.wt};
+      var res={type:r.type,safety:r.safety,eq:r.eq,pri:r.pri,mn:r.mn,flow:r.flow||[],targets:r.targets||[],special:!!r.special,strong:!!r.strong,setFlow:!!r.setFlow,otherPart:!!r.otherPart};
+      window.WQ.save("GCAS",summaryOf(r,c),res,ans).then(function(x){if(x&&x.ok){c.sentAt=Date.now();save();}});
+    }
+  }
+  function copyText(){
+    var c=cur(),r=judge(c),L=["[클럽 진단 결과] "+summaryOf(r,c)];
+    L.push("· 채 상태: "+SFN[r.safety]);
+    if(r.type!=="E"){L.push("· 답한 내용: "+EQN[r.eq]);L.push("· 채부터 볼 필요: "+PRN[r.pri]);}
+    L.push("· 측정: "+MNN[r.mn]);
+    if(r.type!=="E"&&(r.mn==="high"||r.mn==="rec"))L.push("· 먼저 측정할 항목: "+r.targets.join(", "));
+    (r.facts||[]).forEach(function(f){L.push("· "+f[0]+" ("+f[1]+")");});
+    (r.flow||[]).forEach(function(f){L.push("· "+f);});
+    L.push("— WISE QUAD 클럽 진단(GCAS) · 슬기로운골프생활 · WISE GOLF");
+    return L.join("\n");
+  }
+
+  /* ---- 입력 처리 ---- */
+  function msg(t){var m=$("gcMsg");if(m)m.textContent=t;}
+  function getP(o,path){return path.split(".").reduce(function(a,k){return a==null?null:a[k];},o);}
+  function setP(o,path,v){var ks=path.split("."),a=o;for(var i=0;i<ks.length-1;i++){if(a[ks[i]]==null||typeof a[ks[i]]!=="object")a[ks[i]]={};a=a[ks[i]];}a[ks[ks.length-1]]=v;}
+  var EXCL={miss:["vague"],chg:["none","dk"]};
+  function check(c){
+    var s=c.step;
+    if(s==="intro"){if(!c.adult)return "만 14세 이상만 할 수 있어요.";if(!c.hand)return "오른손·왼손 골퍼를 골라 주세요.";}
+    if(s==="safety"&&!c.safe)return "없어요·있어요·잘 모르겠어요 가운데 하나를 골라 주세요.";
+    if(s==="bag"){if(!c.bag.filter(function(x){return x!=="pt";}).length)return "백에 든 클럽을 골라 주세요.";if(!c.p1)return "가장 신경 쓰이는 클럽을 하나 골라 주세요.";}
+    if(s==="symptom"){if(!c.miss.length)return "어떻게 안 맞는지 하나 이상 골라 주세요. 모르겠으면 '딱 꼬집기 어려워요'를 눌러요.";if(!c.other)return "다른 클럽에서도 그런지 골라 주세요.";if(!c.onset)return "언제부터인지 골라 주세요.";}
+    if(s==="change"&&!c.chg.length)return "하나 이상 골라 주세요. 없으면 '바꾼 적 없어요'를 눌러요.";
+    if(s==="notice"&&!c.agree)return "읽고 확인했어요에 체크해 주세요.";
+    return "";
+  }
+  document.addEventListener("input",function(e){var el=e.target;if(el.dataset&&el.dataset.gct){var c=cur();if(!c)return;setP(c,el.dataset.gct,el.value.trim());save();}});
+  document.addEventListener("change",function(e){var el=e.target,c=cur();if(!c)return;
+    if(el.id==="gcAdult"){c.adult=el.checked;save();}if(el.id==="gcAgree"){c.agree=el.checked;save();}});
+  document.addEventListener("click",function(e){
+    var b=e.target.closest("[data-gc]");if(!b)return;var d=b.dataset,c=cur(),act=d.gc;
+    if(act==="new"){P.cur=fresh();save();render();return;}
+    if(act==="resume"){render();window.scrollTo(0,0);return;}
+    if(act==="showLast"){if(P.lastC){P.cur=P.lastC;P.cur.step="result";save();render();}return;}
+    if(act==="quit"){P.cur=null;save();render();return;}
+    if(!c)return;
+    if(act==="pick"){
+      var k=d.k,v=d.v;
+      if(d.m){var arr=getP(c,k)||[];var i=arr.indexOf(v);
+        if(i>=0)arr.splice(i,1);else{var ex=EXCL[k]||[];if(ex.indexOf(v)>=0)arr=[v];else{arr=arr.filter(function(x){return ex.indexOf(x)<0;});arr.push(v);}}
+        setP(c,k,arr);
+        if(k==="bag"){if(c.p1&&arr.indexOf(c.p1)<0)c.p1=null;if(c.p2&&arr.indexOf(c.p2)<0)c.p2=null;}
+      }else{var cv=getP(c,k);setP(c,k,cv===v?null:v);
+        if(k==="p1"){if(c.p2===c.p1)c.p2=null;c.info.loft=null;}
+        if(k==="info.mat")c.info.wt=null;
+        if(k==="safe"&&c.safe==="no")c.sig=[];}
+      save();keep();return;}
+    if(act==="typical"){c.bag=TYPICAL.slice();if(c.p1&&c.bag.indexOf(c.p1)<0)c.p1=null;if(c.p2&&c.bag.indexOf(c.p2)<0)c.p2=null;save();keep();return;}
+    if(act==="next"){var m=check(c);if(m){msg(m);return;}
+      if(c.step==="safety"&&judge(c).safety==="stop"){c.step="result";save();render();window.scrollTo(0,0);return;}
+      var i2=STEPS.indexOf(c.step);c.step=i2<STEPS.length-1?STEPS[i2+1]:"result";save();render();window.scrollTo(0,0);return;}
+    if(act==="prev"){var i3=STEPS.indexOf(c.step);if(i3>0)c.step=STEPS[i3-1];save();render();window.scrollTo(0,0);return;}
+    if(act==="copy"){var t=copyText(),fb=$("gcCopyFb");var fail=function(){fb.value=t;fb.hidden=false;fb.focus();fb.select();toast("자동 복사가 막혔어요. 아래 글을 길게 눌러 복사하세요.");};
+      try{navigator.clipboard.writeText(t).then(function(){toast("결과를 복사했어요");},fail);}catch(err){fail();}return;}
+  });
+  function keep(){var y=window.scrollY;render();window.scrollTo(0,y);}
+  /* 진단 탭에 들어오면: 진행 중이면 '이어 하기' 카드가 있는 첫 화면, 아니면 결과·첫 화면 */
+  window.GCAS_OPEN=function(){root=$("gcRoot");if(!root)return;var c=cur();if(c&&c.step!=="result")renderHome();else render();};
+  window.GCAS_HOME=function(){
+    if(P.cur&&P.cur.step!=="result"&&P.cur.step!=="intro")return {state:"doing",text:"이어 하기",sub:STEPN[P.cur.step]||""};
+    if(P.last)return {state:"done",text:"유형 "+P.last.type+(P.last.club&&P.last.type!=="E"?" · "+cn(P.last.club):""),sub:P.last.date};
+    return {state:"none",text:"진단하기",sub:"클럽 진단 · 5분"};
+  };
+  window.GCAS_JUDGE=function(c){var x=fresh();for(var k in c)x[k]=c[k];return judge(x);}; // 테스트용
+})();
+
+</script>
+<script>
+/* ---------- 스윙 진단 (GSAS) 1단계 — 질문 + 10구 결과. 채점은 이 앱 안에서, 기록은 이 기기에만. 영상은 다음 단계 ---------- */
+(function(){
+  var KEY="gsas_app_v1";
+  function $(id){return document.getElementById(id);}
+  function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];});}
+  function load(){try{return JSON.parse(localStorage.getItem(KEY)||"{}")||{};}catch(e){return {};}}
+  function save(){try{localStorage.setItem(KEY,JSON.stringify(P));}catch(e){}}
+  function toast(msg){var t=document.querySelector(".toast");if(!t){t=document.createElement("div");t.className="toast";t.setAttribute("role","status");document.body.appendChild(t);}t.textContent=msg;t.hidden=false;clearTimeout(toast.t);toast.t=setTimeout(function(){t.hidden=true;},1800);}
+
+  /* ---- 기준값 (베타 전 초안 — 여기만 고치면 판정이 바뀜) ---- */
+  var CFG={
+    minShots:5, fullShots:10, maxShots:30,
+    distStable:3, distPart:6,          // 캐리 퍼짐(중앙값 대비 %): 이하면 잘 모임 / 조금 흩어짐
+    dirStable:2, dirPart:4,            // 좌우 퍼짐(각도°)
+    biasDeg:3,                         // 좌우 치우침(각도°) 이상이면 한쪽으로 감
+    bigDirDeg:8, bigShortPct:20,       // 큰 미스: 가운데서 8° 이상 벗어남 / 캐리가 20% 이상 짧음
+    shortPct:8,                        // 목표 거리보다 8% 이상 짧으면 '짧게' 치우침
+    nd:{stable:0.8, part:0.6, bias:0.7} // 기기 없음: 이웃한 두 칸에 몰린 비율, 치우침 평균
+  };
+
+  /* ---- 보기 ---- */
+  var SHOT=[["drv","드라이버 티샷"],["wood","우드·유틸 풀스윙"],["iron","아이언 풀스윙"],["ctrl","아이언 컨트롤샷"],["wedge","웨지 (50m 넘게)"]];
+  var CLUB={drv:[["drv","드라이버"]],wood:[["w3","3번 우드"],["w5","5번 우드"],["w7","7번 우드"],["hy","유틸리티"]],
+    iron:[["i4","4번"],["i5","5번"],["i6","6번"],["i7","7번"],["i8","8번"],["i9","9번"]],ctrl:[["i5","5번"],["i6","6번"],["i7","7번"],["i8","8번"],["i9","9번"],["pw","PW"]],
+    wedge:[["pw","PW"],["aw","AW·GW"],["sw","SW"],["lw","LW"]]};
+  var CNAME={drv:"드라이버",w3:"3번 우드",w5:"5번 우드",w7:"7번 우드",hy:"유틸리티",i4:"4번 아이언",i5:"5번 아이언",i6:"6번 아이언",i7:"7번 아이언",i8:"8번 아이언",i9:"9번 아이언",pw:"피칭 웨지",aw:"AW·GW",sw:"샌드 웨지",lw:"LW"};
+  var SHAPE=[["str","똑바로"],["draw","살짝 왼쪽으로 휘게(드로우)"],["fade","살짝 오른쪽으로 휘게(페이드)"],["any","상관없어요"]];
+  var RES=[["rcurve","오른쪽으로 휘어요"],["rpush","오른쪽으로 바로 가요"],["lcurve","왼쪽으로 휘어요"],["lpull","왼쪽으로 바로 가요"],["fat","뒤땅"],["thin","얇게 맞아요(탑볼)"],["shank","생크"],["spread","거리가 들쭉날쭉"],["short","거리가 짧아요"],["high","너무 떠요"],["low","너무 낮아요"]];
+  var WHERE=[["field","필드가 훨씬 안 좋아요"],["same","연습장이랑 비슷해요"],["range","연습장(스크린)이 더 안 좋아요"],["dk","잘 모르겠어요"]];
+  var WHEN=[["press","내기·압박이 걸릴 때"],["after","실수한 다음"],["late","후반에 지칠 때"],["pain","아프거나 뻐근할 때"],["club","특정 채 잡을 때"],["hard","세게 치려고 할 때"],["dk","잘 모르겠어요"]];
+  var CHANGE=[["lesson","레슨으로 스윙 바꿨어요"],["club","채를 바꿨어요"],["hurt","아픈 데가 생겼어요"],["less","연습을 줄였어요"],["more","연습을 늘렸어요"],["none","없어요"]];
+  var DEV=[["tm","트랙맨"],["gcq","GC쿼드·GC3"],["fs","플라이트스코프"],["gz","골프존"],["gdr","GDR"],["kakao","카카오 VX"],["garmin","가민"],["rap","랩소도"],["etc","기타"],["none","없어요"]];
+  var DIRN=["왼쪽으로 많이","왼쪽으로 조금","가운데쯤","오른쪽으로 조금","오른쪽으로 많이"];
+  var HITN=[["good","잘 맞음"],["ok","살짝 빗맞음"],["bad","크게 미스(뒤땅·탑·생크)"]];
+  function lab(list,v){for(var i=0;i<list.length;i++)if(list[i][0]===v)return list[i][1];return "";}
+
+  var STEPS=["intro","safety","shot","ask","device","guide","shots","notice"];
+  var STEPN={intro:"시작",safety:"몸 상태",shot:"어떤 샷인지",ask:"언제 안 좋은지",device:"측정기기",guide:"치는 법",shots:"결과 적기",notice:"확인"};
+  function PHOTO_API_(){return (window.WQ&&window.WQ.api)||"";}  /* 사진 받기 = 와이즈쿼드 서버 */
+  var PHOTOS=[];      /* 보낼 사진 (기기 저장 안 함, 화면을 닫으면 사라짐) */
+  var P=load(),root=null;
+  function blankShots(n){var a=[];for(var i=0;i<n;i++)a.push({c:"",l:"",s:null});return a;}
+  function fresh(){return {step:"intro",adult:false,safe:null,stopSig:[],shot:null,club:null,target:"",shape:null,res:[],where:null,when:[],change:[],dev:null,indoor:null,shots:blankShots(10),dir:[0,0,0,0,0],hit:[0,0,0],agree:false};}
+  function cur(){return P.cur;}
+  function noDev(c){return c.dev==="none";}
+
+  /* ---- 계산 ---- */
+  function num(v){var n=parseFloat(String(v==null?"":v).replace(/[^0-9.]/g,""));return isNaN(n)?null:n;}
+  function median(a){var b=a.slice().sort(function(x,y){return x-y;}),n=b.length;if(!n)return null;return n%2?b[(n-1)/2]:(b[n/2-1]+b[n/2])/2;}
+  function mad(a,m){return median(a.map(function(x){return Math.abs(x-m);}));}
+  function deg(x){return Math.atan(x)*180/Math.PI;}
+  var GR={stable:0,part:1,vary:2};
+  function worse(a,b){return GR[a]>=GR[b]?a:b;}
+  function down(g){return g==="stable"?"part":"vary";}
+
+  function analyze(c){
+    var r={facts:[],bias:[],n:0,grade:"hold",mode:noDev(c)?"nd":"dev"};
+    if(r.mode==="dev"){
+      var sh=c.shots.map(function(s){var cv=num(s.c),lv=num(s.l);if(cv==null||cv<=0||cv>400)return null;
+        return {c:cv,l:lv==null?null:(s.s==="L"?-lv:lv)};}).filter(Boolean);
+      r.n=sh.length;if(r.n<CFG.minShots)return r;
+      var cs=sh.map(function(x){return x.c;}),M=median(cs),Mc=mad(cs,M),distPct=Mc/M*100;
+      var ls=sh.filter(function(x){return x.l!=null;}).map(function(x){return x.l;});
+      r.M=M;r.distPct=distPct;r.hasL=ls.length>=CFG.minShots;
+      var gd=distPct<=CFG.distStable?"stable":distPct<=CFG.distPart?"part":"vary",g=gd,big=0;
+      sh.forEach(function(x){if(x.c<M*(1-CFG.bigShortPct/100))big++;});
+      if(r.hasL){
+        var mL=median(ls),Ml=mad(ls,mL),spread=deg(Ml/M),biasA=deg(mL/M);
+        r.mL=mL;r.dirDeg=spread;
+        var gl=spread<=CFG.dirStable?"stable":spread<=CFG.dirPart?"part":"vary";g=worse(g,gl);
+        if(Math.abs(biasA)>=CFG.biasDeg)r.bias.push(biasA>0?"right":"left");
+        sh.forEach(function(x){if(x.l!=null&&Math.abs(deg((x.l-mL)/M))>=CFG.bigDirDeg&&x.c>=M*(1-CFG.bigShortPct/100))big++;});
+      }
+      var tg=num(c.target);
+      if(tg&&tg>0&&M<tg*(1-CFG.shortPct/100))r.bias.push("short");
+      r.big=big;
+      if(big>=3)g="vary";else if(big===2&&g==="stable")g="part";
+      r.grade=g;
+      /* 기준 거리: 최장·최단 뺀 평균 */
+      if(cs.length>=CFG.fullShots){var s2=cs.slice().sort(function(a,b){return a-b;}).slice(1,-1);r.base=s2.reduce(function(a,b){return a+b;},0)/s2.length;}
+      r.facts.push("캐리 가운데값 약 "+Math.round(M)+"m, 절반 정도가 ±"+Math.max(1,Math.round(Mc))+"m 안에 들어와요");
+      if(r.hasL)r.facts.push("좌우: "+(Math.abs(r.mL)<1?"가운데쯤":"가운데에서 "+(r.mL>0?"오른쪽":"왼쪽")+"으로 "+Math.round(Math.abs(r.mL))+"m쯤")+"에 모이고, 절반 정도가 ±"+Math.max(1,Math.round(mad(ls,r.mL)))+"m 안이에요");
+      else r.facts.push("좌우 거리가 적혀 있지 않아서 방향은 보지 않았어요");
+      if(tg){var df=Math.round(M-tg);r.facts.push(Math.abs(df)<=2?"목표 "+Math.round(tg)+"m랑 거의 같게 가요":"목표 "+Math.round(tg)+"m보다 "+Math.abs(df)+"m "+(df>0?"더 가요":"덜 가요"));}
+      r.facts.push("크게 벗어난 공 "+big+"개");
+    }else{
+      var d=c.dir,n=d.reduce(function(a,b){return a+b;},0);r.n=n;
+      if(n<CFG.minShots)return r;
+      var near=0;for(var i=0;i<4;i++)near=Math.max(near,d[i]+d[i+1]);
+      var share=near/n,g2=share>=CFG.nd.stable?"stable":share>=CFG.nd.part?"part":"vary";
+      var mean=(d[0]*-2+d[1]*-1+d[3]+d[4]*2)/n;
+      if(mean>=CFG.nd.bias)r.bias.push("right");if(mean<=-CFG.nd.bias)r.bias.push("left");
+      var h=c.hit,hn=h[0]+h[1]+h[2];r.hitN=hn;
+      if(hn){if(h[2]>=3)g2="vary";else if(h[2]===2&&g2==="stable")g2="part";}
+      r.grade=g2;r.share=share;r.big=h[2];
+      r.facts.push("공 "+n+"개 중 "+Math.round(share*100)+"%가 이웃한 두 칸 안에 모였어요");
+      var most=0;for(var k=1;k<5;k++)if(d[k]>d[most])most=k;
+      r.facts.push("가장 많이 간 쪽: "+DIRN[most]+" ("+d[most]+"개)");
+      if(hn)r.facts.push("잘 맞음 "+h[0]+" · 살짝 빗맞음 "+h[1]+" · 크게 미스 "+h[2]);
+    }
+    return r;
+  }
+
+  function judge(c){
+    var R={};
+    if(c.safe==="stop"){R.type="STOP";return R;}
+    var a=analyze(c);R.a=a;
+    R.eq=a.n<CFG.minShots?"none":a.mode==="dev"?(a.n>=CFG.fullShots&&a.hasL?"high":"mid"):(a.n>=CFG.fullShots?"mid":"low");
+    if(a.n<CFG.minShots){R.type="D";R.next=null;return R;}
+    /* 파트별 근거 점수 */
+    var S={GSAS:0,GPAS:0,GCAS:0,GRAS:0},W={GSAS:[],GPAS:[],GCAS:[],GRAS:[]};
+    function add(p,n,why){S[p]+=n;W[p].push(why);}
+    var wh=c.when||[],ch=c.change||[];
+    if(c.where==="field")add("GRAS",2,"필드에서 훨씬 안 좋다고 하셨어요");
+    if(wh.indexOf("press")>=0)add("GRAS",1,"내기·압박이 걸릴 때 심해진다고 하셨어요");
+    if(wh.indexOf("after")>=0)add("GRAS",1,"실수한 다음에 심해진다고 하셨어요");
+    if(wh.indexOf("late")>=0)add("GPAS",1,"후반에 지칠 때 심해진다고 하셨어요");
+    if(wh.indexOf("pain")>=0)add("GPAS",1,"아프거나 뻐근할 때 심해진다고 하셨어요");
+    if(ch.indexOf("hurt")>=0)add("GPAS",1,"최근 아픈 데가 생겼다고 하셨어요");
+    if(c.safe==="caution")add("GPAS",1,"오늘 몸이 조금 불편한 상태로 치셨어요");
+    if(wh.indexOf("club")>=0)add("GCAS",2,"특정 채 잡을 때 심해진다고 하셨어요");
+    if(ch.indexOf("club")>=0)add("GCAS",1,"최근 채를 바꿨다고 하셨어요");
+    if(a.grade==="vary")add("GSAS",2,"같은 채·같은 목표인데 결과가 많이 흩어졌어요");
+    else if(a.grade==="part")add("GSAS",1,"같은 채·같은 목표인데 결과가 조금 흩어졌어요");
+    if(wh.indexOf("hard")>=0)add("GSAS",1,"세게 치려고 할 때 심해진다고 하셨어요");
+    if(ch.indexOf("lesson")>=0)add("GSAS",1,"최근 레슨으로 스윙을 바꿨다고 하셨어요");
+    if(c.where==="range"||c.where==="same")if(a.grade!=="stable")add("GSAS",1,"연습장에서도 안 좋다고 하셨어요");
+    R.S=S;R.W=W;
+    var order=Object.keys(S).sort(function(x,y){return S[y]-S[x];});
+    R.order=order;
+    var top=order[0],sec=order[1];
+    var tie=S[top]>=2&&S[sec]>=2&&S[top]-S[sec]<=1;
+    R.type=tie?"E":a.grade==="vary"?"A":a.bias.length?"B":"C";
+    R.next=S[top]>0?top:null;
+    if(R.type==="B"&&S.GCAS>=S.GSAS&&S.GCAS>0)R.next="GCAS";
+    else if(R.type==="B"&&!R.next)R.next="GSAS";
+    if(R.type==="B"&&R.next==="GSAS"&&!W.GSAS.length)W.GSAS.push("공이 모이긴 하는데 한쪽으로 꾸준히 가요");
+    R.second=tie?sec:(S[sec]>=1&&sec!==R.next?sec:null);
+    return R;
+  }
+
+  var TYPE={
+    A:{t:"공이 가는 곳이 많이 흩어져요",b:"같은 채로 같은 곳을 보고 쳤는데 방향이나 거리가 크게 흔들렸어요. 스윙이 매번 다르게 나가고 있을 때가 많아요. 다만 어떤 동작 때문인지는 숫자만으로는 몰라요.",cad:"고객님, 오늘은 '뭐가 문제냐'보다 '매번 비슷하게 치기'부터 잡으시죠."},
+    B:{t:"모이긴 하는데 한쪽으로 가요",b:"공은 꽤 모이는데, 한쪽으로 꾸준히 가요. 매번 다른 게 아니라 같은 게 반복되는 거라 오히려 찾기 쉬운 편이에요.",cad:"한쪽으로 꾸준히 가면 에임만 맞춰도 반은 해결돼요. 왜 그쪽으로 가는지는 같이 찾아보시죠."},
+    C:{t:"연습장에서는 꽤 잘 모여요",b:"같은 샷을 반복했을 때 결과가 고르게 나와요. 그런데도 스코어가 안 나온다면 스윙보다 필드·몸·채 쪽을 먼저 볼 만해요.",cad:"연습장 스윙은 이미 괜찮아요. 필드에서 그게 왜 안 나오는지를 보시죠."},
+    D:{t:"아직 말씀드리기 일러요",b:"적어 주신 공이 5개보다 적어서, 결과가 반복되는지 보기 어려워요.",cad:"같은 채로 10개만 쳐 오세요. 그거면 충분해요."},
+    E:{t:"여러 쪽이 같이 걸려 있어요",b:"스윙만의 문제라고 보기엔 다른 쪽 신호도 비슷하게 나왔어요. 한쪽으로 정하지 않고, 아래 두 쪽을 차례로 확인해 보는 게 좋아요.",cad:"한 번에 하나씩 지워 가시죠. 확인하기 쉬운 쪽부터요."}
+  };
+  var PART={GSAS:{n:"스윙",act:"티칭 프로에게 스윙을 한 번 봐 달라고 하세요. 같은 채로 10개 친 이 결과를 같이 보여 주면 좋아요.",tab:null},
+    GPAS:{n:"몸 (신체 검사)",act:"신체 검사(GPAS)로 몸에서 먼저 확인할 곳을 찾아보세요.",tab:"gpas"},
+    GCAS:{n:"채 (클럽 진단)",act:"클럽 진단(GCAS)으로 그 채를 먼저 확인해 보세요.",tab:"gcas"},
+    GRAS:{n:"라운드 운영 (골프 유형 검사)",act:"골프 유형 검사(GRAS)로 필드에서 흔들리는 순간을 알아보세요.",tab:"type"}};
+  var GN={stable:"잘 모여요",part:"조금 흩어져요",vary:"많이 흩어져요",hold:"아직 몰라요"};
+  var EQN={high:"충분해요",mid:"보통이에요",low:"부족해요",none:"부족해요"};
+  var BN={right:"오른쪽으로",left:"왼쪽으로",short:"목표보다 짧게"};
+
+  /* ---- 화면 ---- */
+  function chips(k,list,val,multi,max){
+    return '<div class="gp-row">'+list.map(function(o){var on=multi?(val||[]).indexOf(o[0])>=0:val===o[0];
+      return '<button type="button" class="chip" data-gs="pick" data-k="'+k+'" data-v="'+o[0]+'"'+(multi?' data-m="'+(max||99)+'"':'')+' aria-pressed="'+on+'">'+esc(o[1])+'</button>';}).join("")+'</div>';
+  }
+  function field(label,inner,note){return '<div class="gx-field"><span class="ql">'+label+'</span>'+inner+(note?'<span class="note">'+note+'</span>':'')+'</div>';}
+  function nav(first,nextLabel){return '<p class="gx-msg" id="gsMsg" role="status"></p><div class="gp-nav">'+(first?'<button type="button" class="btn btn-plain" data-gs="quit">그만두기</button>':'<button type="button" class="btn btn-plain" data-gs="prev">이전</button>')+'<button type="button" class="btn btn-flag" data-gs="next">'+(nextLabel||"다음")+'</button></div>';}
+  function prog(c){var i=STEPS.indexOf(c.step);return '<div class="gx-progress"><span>'+(i+1)+' / '+STEPS.length+' · '+STEPN[c.step]+'</span><div class="gx-bar"><i style="width:'+Math.round((i+1)/STEPS.length*100)+'%"></i></div></div>';}
+
+  function render(){
+    root=$("gsRoot");if(!root)return;
+    var c=cur();
+    if(!c){renderHome();return;}
+    if(c.step==="result"){renderResult();return;}
+    root.innerHTML=prog(c)+'<div class="card">'+({intro:sIntro,safety:sSafety,shot:sShot,ask:sAsk,device:sDevice,guide:sGuide,shots:sShots,notice:sNotice}[c.step])(c)+'</div>';
+  }
+  function renderHome(){
+    root=$("gsRoot");if(!root)return;
+    var h='<div class="card"><h2>스윙 진단이란</h2><p class="note">스윙을 고치기 전에, <b>정말 스윙부터 봐야 하는지</b> 먼저 알려 드려요. 같은 채로 같은 곳을 보고 10개 친 결과가 얼마나 모이는지 보고, 다음에 먼저 볼 쪽(스윙·몸·채·라운드 운영)을 골라 드려요.</p>'+
+      '<ul class="gx-list"><li>연습장이나 스크린에서 같은 채로 10개 치면 돼요</li><li>측정기기가 없어도 공이 간 쪽만 세면 돼요</li><li>어떤 동작이 원인인지 정하거나 레슨을 대신하지는 않아요</li></ul>'+
+      '<button type="button" class="btn btn-flag" data-gs="new">진단 시작</button></div>';
+    if(P.last)h='<div class="card"><h2>지난 결과</h2><p class="note">'+esc(P.last.date)+' · '+esc(P.last.summary)+'</p><button type="button" class="btn btn-plain" data-gs="showLast">결과 다시 보기</button></div>'+h;
+    if(P.cur&&P.cur.step!=="result")h='<div class="card"><h2>하던 진단</h2><p class="note">'+(P.cur.photoCode&&P.cur.photoState!=="done"?'사진을 보냈어요 (접수 번호 '+esc(P.cur.photoCode)+'). 이어 하기 → 결과 확인을 눌러 주세요.':esc(STEPN[P.cur.step]||"")+' 단계까지 했어요.')+'</p><button type="button" class="btn btn-flag" data-gs="resume">이어 하기</button></div>'+h;
+    root.innerHTML=h;
+  }
+  function sIntro(c){
+    return '<h2>시작하기 전에</h2><p class="note">연습장이나 스크린에서 해요. 공 15개쯤(몸 풀기 3~5개 + 10개) 칠 시간이 있으면 돼요.</p>'+
+      '<label class="agree"><input type="checkbox" id="gsAdult"'+(c.adult?" checked":"")+'><span>만 14세 이상이에요</span></label>'+
+      '<p class="note wq-save">진단 결과는 슬기로운골프생활 서버에 저장돼요. 이름·전화번호는 받지 않고, 몸 상태에 대한 답은 보내지 않아요.</p>'+nav(true);
+  }
+  function sSafety(c){
+    var h='<h2>지금 몸은 괜찮으세요?</h2><p class="note">10개를 연속으로 치는 거라, 치기 전에 몸 상태부터 볼게요.</p>'+
+      chips("safe",[["ok","괜찮아요"],["caution","조금 아프거나 불편한데 칠 수는 있어요"],["stop","아래 중에 해당하는 게 있어요"]],c.safe);
+    h+='<div class="gc-tip"><b>이럴 땐 오늘 치지 마세요</b><ul class="gx-list"><li>통증이 갑자기 심해졌어요</li><li>저리거나 감각이 이상해요</li><li>어지러워요</li><li>다친 것 같아요</li><li>평소처럼 스윙이 안 돼요</li></ul></div>';
+    if(c.safe==="caution")h+='<p class="note">치다가 심해지면 바로 멈추세요. 불편한 상태였다는 건 결과에 같이 적어 둘게요.</p>';
+    return h+nav();
+  }
+  function sShot(c){
+    var h='<h2>어떤 샷이 제일 신경 쓰여요?</h2>'+field("샷 종류",chips("shot",SHOT,c.shot),"숏게임·퍼팅은 따로 준비하고 있어요.");
+    if(c.shot)h+=field("이번에 칠 채",chips("club",CLUB[c.shot],c.club));
+    h+='<div class="gc-grid">'+field("목표 거리 (선택)",'<span class="gc-m"><input type="text" class="gc-in" data-gst="target" value="'+esc(c.target)+'" placeholder="예: 140" inputmode="numeric" maxlength="3" autocomplete="off"> m</span>')+'</div>'+
+      field("어떤 구질로 치고 싶어요? (선택)",chips("shape",SHAPE,c.shape));
+    return h+nav();
+  }
+  function sAsk(c){
+    return '<h2>평소엔 어떤가요?</h2>'+
+      field("자주 나오는 결과 (최대 3개)",chips("res",RES,c.res,true,3))+
+      field("연습장이랑 필드 중 어디가 더 안 좋아요?",chips("where",WHERE,c.where))+
+      field("언제 더 심해져요? (여러 개)",chips("when",WHEN,c.when,true))+
+      field("최근에 바뀐 게 있어요? (여러 개)",chips("change",CHANGE,c.change,true))+
+      '<p class="note">"제 원인은 이거 같아요"는 결과에 적지 않아요. 원인은 직접 본 것만으로 말씀드려요.</p>'+nav();
+  }
+  function sDevice(c){
+    var h='<h2>측정기기가 있어요?</h2><p class="note">공이 몇 m 갔는지, 좌우로 얼마나 갔는지 숫자로 나오는 기기예요. 스크린골프도 돼요.</p>'+chips("dev",DEV,c.dev);
+    if(c.dev&&c.dev!=="none")h+=field("어디서 쳐요?",chips("indoor",[["in","실내 (스크린·타석)"],["out","실외 (야외 연습장·필드)"]],c.indoor));
+    if(c.dev==="none")h+='<p class="note">괜찮아요. 공이 어느 쪽으로 갔는지, 잘 맞았는지만 세면 돼요.</p>';
+    return h+nav();
+  }
+  function sGuide(c){
+    var nd=noDev(c);
+    return '<h2>이렇게 쳐 주세요</h2><ol class="gx-list gs-steps">'+
+      '<li>몸 풀기로 3~5개 먼저 치세요. 이건 적지 않아요.</li>'+
+      '<li>'+esc(CNAME[c.club]||"고른 채")+'로 <b>같은 목표를 보고 10개 연속</b>으로 치세요. 20~30개 쳐도 다 적어 주세요.</li>'+
+      '<li>잘 맞은 것만 고르지 마세요. 뒤땅·탑·크게 빗나간 것도 <b>다 적어요.</b></li>'+
+      '<li>치는 중간에 그립이나 스윙을 바꾸지 마세요.</li>'+
+      (nd?'<li>칠 때마다 공이 <b>어느 쪽으로 갔는지</b>, <b>잘 맞았는지</b>만 기억해서 세 주세요.</li>':'<li>기기 화면에서 공마다 <b>캐리</b>랑 <b>좌우 거리</b>를 보고 적어 주세요. 기기가 못 잰 공은 비워 두세요.</li>')+
+      '</ol><p class="note">영상(정면·뒤에서)은 다음 단계에서 받을 예정이에요.</p>'+nav(false,"다 쳤어요");
+  }
+  function sShots(c){
+    if(noDev(c)){
+      var n=c.dir.reduce(function(a,b){return a+b;},0),hn=c.hit.reduce(function(a,b){return a+b;},0);
+      return '<h2>몇 개가 어디로 갔어요?</h2><p class="note">목표선을 기준으로 세 주세요. 지금 '+n+'개</p>'+
+        '<div class="gs-cnt">'+DIRN.map(function(t,i){return stepper("dir",i,t,c.dir[i]);}).join("")+'</div>'+
+        '<h2 class="gs-h2">잘 맞은 건 몇 개예요? <small class="note">(선택)</small></h2><p class="note">'+(hn&&hn!==n?'<b class="gs-warn">방향은 '+n+'개, 여기는 '+hn+'개예요. 같게 맞춰 주세요.</b>':'방향이랑 같은 개수로 세 주세요.')+'</p>'+
+        '<div class="gs-cnt">'+HITN.map(function(t,i){return stepper("hit",i,t[1],c.hit[i]);}).join("")+'</div>'+nav();
+    }
+    var mode='<div class="gx-field"><span class="ql">어떻게 알려 주실래요?</span>'+chips("inMode",[["type","직접 적기 (10개)"],["photo","사진 올리기"]],c.inMode||"type")+'</div>';
+    if(c.inMode==="photo")return '<h2>기기 결과 사진 올리기</h2>'+mode+photoBox(c)+nav();
+    var rows=c.shots.map(function(s,i){
+      return '<div class="gs-row"><span class="gs-no">'+(i+1)+'</span>'+
+        '<label class="gs-f"><span>캐리</span><input type="text" class="gc-in" data-gsi="'+i+'" data-f="c" value="'+esc(s.c)+'" inputmode="decimal" maxlength="5" autocomplete="off" aria-label="'+(i+1)+'번 캐리 m"></label>'+
+        '<label class="gs-f"><span>좌우</span><input type="text" class="gc-in" data-gsi="'+i+'" data-f="l" value="'+esc(s.l)+'" inputmode="decimal" maxlength="5" autocomplete="off" aria-label="'+(i+1)+'번 좌우 m"></label>'+
+        '<span class="gs-lr">'+[["L","왼"],["R","오"]].map(function(x){return '<button type="button" class="chip gs-side" data-gs="side" data-i="'+i+'" data-v="'+x[0]+'" aria-pressed="'+(s.s===x[0])+'">'+x[1]+'</button>';}).join("")+'</span></div>';}).join("");
+    return '<h2>공마다 적어 주세요</h2>'+mode+(c.photoState==="done"?'<p class="note"><b>사진에서 읽은 숫자예요.</b> 맞는지 보시고 틀린 곳은 고쳐 주세요.</p>':'')+'<p class="note">단위는 m예요. 좌우는 목표선에서 벗어난 거리를 적고 왼·오를 눌러요. 가운데면 0이에요.</p>'+
+      '<div class="gs-rows">'+rows+'</div>'+(c.shots.length<CFG.maxShots?'<button type="button" class="btn btn-plain gc-fill" data-gs="more">5개 더 적기</button>':'')+nav();
+  }
+  function photoBox(c){
+    if(c.photoCode){
+      var st=c.photoState==="retry"?'<div class="card gp-warn"><b>사진을 다시 보내 주세요</b><p>'+esc(c.photoNote||"사진에서 숫자가 잘 안 보였어요.")+'</p><button type="button" class="btn btn-plain" data-gs="pagain">사진 다시 보내기</button></div>'
+        :'<p class="note">숫자를 확인하고 있어요. 앱을 닫아도 괜찮아요. 나중에 진단 탭에서 이어 하기 → <b>결과 확인</b>을 눌러 주세요.</p>';
+      return '<div class="gs-photo"><span class="ql">접수 번호</span><b class="gs-code">'+esc(c.photoCode)+'</b>'+st+
+        (c.photoState==="retry"?'':'<button type="button" class="btn btn-flag gc-fill" data-gs="pcheck">결과 확인</button>')+'</div>';
+    }
+    var h='<div class="gc-tip"><b>이렇게 찍어 주세요</b><ul class="gx-list"><li>기기 화면이나 기기 앱의 샷 기록을 찍거나 캡처해요</li><li>공마다 <b>캐리</b>랑 <b>좌우</b> 숫자가 보이게요</li><li>10개가 한 화면에 안 들어가면 나눠서 3장까지</li></ul></div>';
+    if(!PHOTO_API_())return h+'<p class="note"><b>사진 받기는 준비 중이에요.</b> 지금은 "직접 적기"를 써 주세요.</p>';
+    h+='<label class="btn btn-plain gc-fill gs-pick">사진 고르기<input type="file" id="gsFile" accept="image/*" multiple hidden></label>'+
+      '<div class="gs-thumbs">'+PHOTOS.map(function(p,i){return '<span class="gs-thumb"><img src="'+p.data+'" alt="'+(i+1)+'번 사진"><button type="button" class="chip" data-gs="pdel" data-i="'+i+'" aria-label="'+(i+1)+'번 사진 빼기">✕</button></span>';}).join("")+'</div>'+
+      '<div class="gx-field"><label class="ql" for="gsPass">테스트 암호</label><input id="gsPass" type="text" class="gc-in" inputmode="numeric" maxlength="12" autocomplete="off" placeholder="받은 암호 6자리" value="'+esc(c.photoPass||"")+'"></div>'+
+      '<label class="agree"><input type="checkbox" id="gsPConsent"'+(c.photoConsent?" checked":"")+'><span>사진을 숫자 확인에 쓰도록 보내요<br><small class="note">사진은 숫자를 확인하는 데만 쓰고, 결과를 드리고 30일 뒤 지워요. 이름이나 전화번호는 받지 않아요.</small></span></label>'+
+      '<button type="button" class="btn btn-flag gc-fill" data-gs="psend">사진 보내기</button>';
+    return h;
+  }
+  function papi(body){
+    if(!PHOTO_API_())return Promise.resolve({ok:false,error:"NO_SERVER"});
+    return fetch(PHOTO_API_(),{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(body)})
+      .then(function(r){return r.json();}).catch(function(){return {ok:false,error:"NETWORK"};});
+  }
+  var PERR={PASSCODE:"테스트 암호가 맞지 않아요.",NETWORK:"서버에 연결하지 못했어요. 인터넷 연결을 확인해 주세요.",NO_SERVER:"사진 받기는 준비 중이에요.",NOT_FOUND:"접수 번호를 찾지 못했어요.",SERVER:"서버에서 문제가 생겼어요. 잠시 뒤 다시 해 주세요."};
+  function shrink(file){return new Promise(function(ok,no){
+    var rd=new FileReader();rd.onerror=no;rd.onload=function(){var im=new Image();im.onerror=no;im.onload=function(){
+      var m=1600,w=im.width,h=im.height,k=Math.min(1,m/Math.max(w,h)),cv=document.createElement("canvas");cv.width=Math.round(w*k);cv.height=Math.round(h*k);
+      cv.getContext("2d").drawImage(im,0,0,cv.width,cv.height);ok({mime:"image/jpeg",data:cv.toDataURL("image/jpeg",0.82)});};im.src=rd.result;};rd.readAsDataURL(file);});}
+  /* 사장님이 시트에 넣은 "158 R12, 160 L3, 159 0" → 칸 */
+  function parseBoss(t){
+    return String(t||"").split(/[,\n;]+/).map(function(x){return x.trim();}).filter(Boolean).map(function(x){
+      var m=x.match(/^(\d+(?:\.\d+)?)\s*(?:\/?\s*([LR좌우왼오]?)\s*(\d+(?:\.\d+)?)\s*([LR좌우왼오]?))?/i);if(!m)return null;
+      var sd=(m[2]||m[4]||"").toUpperCase(),lv=m[3]?parseFloat(m[3]):null,side=null;
+      if(lv)side=/^(L|좌|왼)$/.test(sd)?"L":/^(R|우|오)$/.test(sd)?"R":null;
+      return {c:m[1],l:lv==null?"":String(lv),s:side};}).filter(Boolean).slice(0,CFG.maxShots);
+  }
+  function stepper(k,i,t,v){return '<div class="gs-st"><span>'+esc(t)+'</span><span class="gs-sb"><button type="button" class="chip" data-gs="cnt" data-k="'+k+'" data-i="'+i+'" data-d="-1" aria-label="'+esc(t)+' 하나 빼기">−</button><b>'+v+'</b><button type="button" class="chip" data-gs="cnt" data-k="'+k+'" data-i="'+i+'" data-d="1" aria-label="'+esc(t)+' 하나 더하기">+</button></span></div>';}
+  function sNotice(c){
+    return '<h2>결과 보기 전에</h2><p class="gc-notice">스윙 진단은 적어 주신 결과와 답만 보고, 다음에 먼저 볼 쪽을 골라 드려요. 어떤 동작이 원인인지 정하지 않고, 레슨이나 의료 진단을 대신하지 않아요. 기기마다 재는 방식이 달라서 다른 기기 숫자끼리는 비교하지 않아요.</p>'+
+      '<label class="agree"><input type="checkbox" id="gsAgree"'+(c.agree?" checked":"")+'><span>읽고 확인했어요</span></label>'+nav(false,"결과 보기");
+  }
+  function pill(cls,t){return '<span class="gp-pill '+cls+'">'+esc(t)+'</span>';}
+  function summaryOf(R,c){if(R.type==="STOP")return "오늘은 쉬어요";return "유형 "+R.type+" · "+TYPE[R.type].t;}
+  function renderResult(){
+    var c=cur(),R=judge(c),h;
+    if(R.type==="STOP"){
+      h='<div class="gx-hero"><small>스윙 진단</small><b class="gp-hero">오늘은 치지 마세요</b><span>고르신 몸 상태로는 10개 연속으로 치는 게 위험할 수 있어요. 진단은 멈췄어요.</span></div>'+
+        '<div class="card gp-warn"><b>먼저 확인받으세요</b><p>병원이나 물리치료사에게 먼저 확인받으세요. 괜찮아진 뒤에 언제든 다시 해 보세요.</p></div>'+
+        '<div class="gp-nav"><button type="button" class="btn btn-plain" data-gs="new">처음부터</button><button type="button" class="btn btn-flag" data-tab="home">홈으로</button></div>';
+      root.innerHTML=h;P.last={date:new Date().toLocaleDateString("ko-KR"),type:"STOP",summary:summaryOf(R,c)};P.lastC=c;save();return;
+    }
+    var a=R.a,T=TYPE[R.type];
+    h='<div class="gx-hero"><small>스윙 진단 결과 · 유형 '+R.type+'</small><b class="gp-hero">'+esc(T.t)+'</b><span>'+esc(T.b)+'</span></div>';
+    h+='<div class="card gc-cad"><small>캐디 한마디</small><p>"'+esc(T.cad)+'"</p></div>';
+    var bias=a.bias.length?a.bias.map(function(b){return BN[b];}).join(", ")+" 가요":"뚜렷하지 않아요";
+    h+='<div class="card"><h2>한눈에</h2><ul class="gc-stat">'+
+      '<li><span>공이 모이는 정도</span>'+pill(a.grade==="stable"?"gp-good":a.grade==="part"?"gp-watch":a.grade==="vary"?"gp-pri":"gp-hold",GN[a.grade])+'</li>'+
+      '<li><span>한쪽으로 가는지</span>'+pill(a.bias.length?"gp-watch":"gp-good",a.bias.length?a.bias.map(function(b){return BN[b];}).join(", "):"아니요")+'</li>'+
+      '<li><span>적어 주신 자료</span>'+pill(R.eq==="high"?"gp-good":R.eq==="mid"?"gp-watch":"gp-pri",EQN[R.eq])+'</li></ul>'+
+      '<p class="gp-fine">'+esc(lab(SHOT,c.shot))+' · '+esc(CNAME[c.club]||"")+' · 공 '+a.n+'개'+(a.n<CFG.fullShots&&a.n>=CFG.minShots?' (10개보다 적어서 미리 보는 결과)':'')+' · '+(noDev(c)?"기기 없이 셈":esc(lab(DEV,c.dev))+(c.indoor==="in"?" 실내":c.indoor==="out"?" 실외":""))+(c.safe==="caution"?" · 몸이 조금 불편한 상태":"")+'</p></div>';
+    h+='<div class="card"><h2>숫자로 본 것</h2><ul class="gc-facts">'+a.facts.map(function(f){return '<li>'+esc(f)+'</li>';}).join("")+'</ul>'+
+      (a.base?'<p class="note">이 채 기준 거리(가장 멀리·가장 짧게 간 것 뺀 평균): <b>약 '+Math.round(a.base)+'m</b>. 클럽 진단 거리 칸에 써도 돼요.</p>':'')+'</div>';
+    if(R.type!=="D"){
+      var nx=R.next,why=nx?R.W[nx]:[];
+      h+='<div class="card"><h2>다음에 먼저 볼 쪽</h2>';
+      if(nx){h+='<p class="gs-next"><b>'+esc(PART[nx].n)+'</b></p><ul class="gx-list">'+why.map(function(w){return '<li>'+esc(w)+'</li>';}).join("")+'</ul>';
+        if(R.second)h+='<p class="note">같이 볼 쪽: <b>'+esc(PART[R.second].n)+'</b> — '+esc(R.W[R.second].join(", "))+'</p>';
+        h+='<p class="gp-fine">"먼저 볼 쪽"은 가장 큰 원인이라는 뜻이 아니에요. 지금 답으로 확인하기 좋은 쪽이에요.</p>';}
+      else h+='<p>지금 결과로는 크게 손댈 곳이 안 보여요. 필드에서만 안 된다면 라운드 운영(GRAS)을 먼저 보세요.</p>';
+      h+='</div>';
+    }
+    var acts=[];
+    if(R.type==="D")acts.push("같은 채로 같은 목표를 보고 10개 친 뒤 다시 해 보세요.");
+    else{
+      if(R.next)acts.push(PART[R.next].act);
+      if(R.type==="B"&&a.bias.indexOf("short")<0)acts.push("한쪽으로 꾸준히 가면 먼저 에임(서는 방향)이 맞는지 확인해 보세요.");
+      if(a.n<CFG.fullShots)acts.push("10개 이상 치면 결과가 더 정확해져요.");
+      acts.push("2~4주 뒤 같은 채·같은 기기로 다시 해 보면 변화가 보여요.");
+    }
+    h+='<div class="card"><h2>다음 할 일</h2><ul class="gx-list">'+acts.map(function(x){return '<li>'+esc(x)+'</li>';}).join("")+'</ul>'+
+      (R.next&&PART[R.next].tab?'<button type="button" class="btn btn-plain" data-tab="'+PART[R.next].tab+'">'+esc(PART[R.next].n.replace(/ \(.*\)/,""))+' 진단하러 가기</button>':'')+
+      '<p class="gx-fine">이 결과는 적어 주신 숫자와 답만 보고 고른 거예요. 어떤 동작 때문인지는 정하지 않았고, 레슨이나 의료 진단을 대신하지 않아요. 영상을 보면 달라질 수 있어요. 결과는 이 기기와 슬기로운골프생활 서버에 저장돼요.</p></div>';
+    h+='<div class="gp-nav"><button type="button" class="btn btn-plain" data-gs="copy">결과 복사</button><button type="button" class="btn btn-plain" data-gs="new">다시 하기</button><button type="button" class="btn btn-flag" data-tab="home">홈으로</button></div><textarea class="gp-copyfb" id="gsCopyFb" hidden readonly aria-label="복사할 결과"></textarea>';
+    root.innerHTML=h;
+    P.last={date:new Date().toLocaleDateString("ko-KR"),type:R.type,next:R.next,summary:summaryOf(R,c)};P.lastC=c;save();
+    if(!c.sentAt&&window.WQ){
+      var ans={shot:c.shot,club:c.club,target:c.target,shape:c.shape,res:c.res,where:c.where,when:(c.when||[]).filter(function(x){return x!=="pain";}),change:(c.change||[]).filter(function(x){return x!=="hurt";}),
+        dev:c.dev,indoor:c.indoor,inMode:c.inMode||"type",photoCode:c.photoCode||null,shots:noDev(c)?null:c.shots.filter(function(x){return num(x.c)!=null;}),dir:noDev(c)?c.dir:null,hit:noDev(c)?c.hit:null};
+      var res={type:R.type,grade:a.grade,bias:a.bias,n:a.n,mode:a.mode,carry_median:a.M||null,dist_pct:a.distPct||null,dir_deg:a.dirDeg||null,big:a.big||0,base:a.base||null,eq:R.eq,next:R.next||null,second:R.second||null,cfg:CFG};
+      window.WQ.save("GSAS",summaryOf(R,c),res,ans).then(function(x){if(x&&x.ok){c.sentAt=Date.now();save();}});
+    }
+  }
+  function copyText(){
+    var c=cur(),R=judge(c);if(R.type==="STOP")return "[스윙 진단] 오늘은 쉬어요\n— WISE QUAD 스윙 진단(GSAS) · 슬기로운골프생활 · WISE GOLF";
+    var a=R.a,L=["[스윙 진단 결과] "+summaryOf(R,c)];
+    L.push("· "+lab(SHOT,c.shot)+" · "+(CNAME[c.club]||"")+" · 공 "+a.n+"개");
+    L.push("· 공이 모이는 정도: "+GN[a.grade]);
+    L.push("· 한쪽으로 가는지: "+(a.bias.length?a.bias.map(function(b){return BN[b];}).join(", "):"아니요"));
+    a.facts.forEach(function(f){L.push("· "+f);});
+    if(R.next)L.push("· 다음에 먼저 볼 쪽: "+PART[R.next].n);
+    L.push("— WISE QUAD 스윙 진단(GSAS) · 슬기로운골프생활 · WISE GOLF");
+    return L.join("\n");
+  }
+
+  /* ---- 입력 처리 ---- */
+  function msg(t){var m=$("gsMsg");if(m)m.textContent=t;}
+  function check(c){
+    var s=c.step;
+    if(s==="intro"&&!c.adult)return "만 14세 이상만 할 수 있어요.";
+    if(s==="safety"&&!c.safe)return "몸 상태를 골라 주세요.";
+    if(s==="shot"){if(!c.shot)return "샷 종류를 골라 주세요.";if(!c.club)return "이번에 칠 채를 골라 주세요.";}
+    if(s==="ask"){if(!c.res.length)return "자주 나오는 결과를 하나 이상 골라 주세요.";if(!c.where)return "연습장이랑 필드 중 어디가 더 안 좋은지 골라 주세요.";}
+    if(s==="device"){if(!c.dev)return "측정기기를 골라 주세요. 없으면 '없어요'를 눌러요.";}
+    if(s==="shots"){
+      if(noDev(c)){var n=c.dir.reduce(function(a,b){return a+b;},0),hn=c.hit.reduce(function(a,b){return a+b;},0);
+        if(!n)return "공이 간 쪽을 세어 주세요.";if(hn&&hn!==n)return "잘 맞은 개수 합이 방향 개수("+n+"개)랑 같아야 해요.";}
+      else if(c.inMode==="photo")return c.photoCode?"숫자 확인이 끝나면 '결과 확인'을 눌러 주세요.":"사진을 보내거나 '직접 적기'로 적어 주세요.";
+      else if(!c.shots.some(function(x){return num(x.c)!=null;}))return "캐리를 하나 이상 적어 주세요.";
+    }
+    if(s==="notice"&&!c.agree)return "읽고 확인했어요에 체크해 주세요.";
+    return "";
+  }
+  document.addEventListener("input",function(e){var el=e.target,c=cur();if(!c||!el.dataset)return;
+    if(el.dataset.gst){c[el.dataset.gst]=el.value.trim();save();}
+    if(el.dataset.gsi!=null&&el.dataset.f){c.shots[+el.dataset.gsi][el.dataset.f]=el.value.trim();save();}});
+  document.addEventListener("change",function(e){var el=e.target,c=cur();if(!c)return;
+    if(el.id==="gsPConsent"){c.photoConsent=el.checked;save();}
+    if(el.id==="gsPass"){c.photoPass=el.value.trim();save();}
+    if(el.id==="gsFile"){var fs=[].slice.call(el.files||[]).slice(0,3-PHOTOS.length);
+      Promise.all(fs.map(shrink)).then(function(a){PHOTOS=PHOTOS.concat(a).slice(0,3);keep();}).catch(function(){toast("사진을 읽지 못했어요. 다른 사진으로 해 주세요.");});}
+    if(el.id==="gsAdult"){c.adult=el.checked;save();}if(el.id==="gsAgree"){c.agree=el.checked;save();}});
+  var EXCL={when:["dk"],change:["none"]};
+  document.addEventListener("click",function(e){
+    var b=e.target.closest("[data-gs]");if(!b)return;var d=b.dataset,c=cur(),act=d.gs;
+    if(act==="new"){P.cur=fresh();save();render();window.scrollTo(0,0);return;}
+    if(act==="resume"){render();window.scrollTo(0,0);return;}
+    if(act==="showLast"){if(P.lastC){P.cur=P.lastC;P.cur.step="result";save();render();window.scrollTo(0,0);}return;}
+    if(act==="quit"){P.cur=null;save();render();return;}
+    if(!c)return;
+    if(act==="pick"){var k=d.k,v=d.v;
+      if(d.m){var arr=(c[k]||[]).slice(),i=arr.indexOf(v),ex=EXCL[k]||[];
+        if(i>=0)arr.splice(i,1);else if(ex.indexOf(v)>=0)arr=[v];else{arr=arr.filter(function(x){return ex.indexOf(x)<0;});if(arr.length>=+d.m){msg("최대 "+d.m+"개까지 고를 수 있어요.");return;}arr.push(v);}
+        c[k]=arr;}
+      else{c[k]=c[k]===v?null:v;if(k==="shot")c.club=CLUB[v]&&CLUB[v].length===1?CLUB[v][0][0]:null;}
+      save();keep();return;}
+    if(act==="side"){var s=c.shots[+d.i];s.s=s.s===d.v?null:d.v;save();keep();return;}
+    if(act==="pdel"){PHOTOS.splice(+d.i,1);keep();return;}
+    if(act==="pagain"){c.photoCode=null;c.photoState=null;c.photoNote="";PHOTOS=[];save();keep();return;}
+    if(act==="psend"){var pe=$("gsPass");if(pe)c.photoPass=pe.value.trim();
+      if(!PHOTOS.length){msg("사진을 골라 주세요.");return;}if(!c.photoConsent){msg("사진 보내기에 체크해 주세요.");return;}
+      b.disabled=true;msg("보내는 중이에요…");
+      papi({action:"upload",passcode:c.photoPass||"",consent:true,adult:!!c.adult,shot:lab(SHOT,c.shot),club:CNAME[c.club]||"",device:lab(DEV,c.dev),indoor:c.indoor==="in"?"실내":c.indoor==="out"?"실외":"",app_version:"round-v74",images:PHOTOS})
+        .then(function(r){b.disabled=false;if(!r.ok){msg(PERR[r.error]||"보내지 못했어요. 잠시 뒤 다시 해 주세요.");return;}
+          c.photoCode=r.code;c.photoState="wait";PHOTOS=[];save();keep();toast("보냈어요. 접수 번호 "+r.code);});return;}
+    if(act==="pcheck"){b.disabled=true;
+      papi({action:"status",code:c.photoCode}).then(function(r){b.disabled=false;
+        if(!r.ok){msg(PERR[r.error]||"확인하지 못했어요.");return;}
+        if(r.status==="done"){var sh=parseBoss(r.shots);if(!sh.length){msg("숫자가 아직 다 안 들어왔어요. 조금 뒤 다시 눌러 주세요.");return;}
+          c.shots=sh.concat(blankShots(Math.max(0,10-sh.length)));c.photoState="done";c.inMode="type";save();keep();toast("숫자가 들어왔어요. 확인하고 다음을 눌러 주세요.");return;}
+        if(r.status==="retry"){c.photoState="retry";c.photoNote=r.note||"";save();keep();return;}
+        toast("아직 확인 중이에요. 조금 뒤 다시 눌러 주세요.");});return;}
+    if(act==="more"){c.shots=c.shots.concat(blankShots(Math.min(5,CFG.maxShots-c.shots.length)));save();keep();return;}
+    if(act==="cnt"){var a=c[d.k];a[+d.i]=Math.max(0,Math.min(CFG.maxShots,a[+d.i]+(+d.d)));save();keep();return;}
+    if(act==="next"){var m=check(c);if(m){msg(m);return;}
+      if(c.step==="safety"&&c.safe==="stop"){c.step="result";save();render();window.scrollTo(0,0);return;}
+      var i2=STEPS.indexOf(c.step);c.step=i2<STEPS.length-1?STEPS[i2+1]:"result";save();render();window.scrollTo(0,0);return;}
+    if(act==="prev"){var i3=STEPS.indexOf(c.step);if(i3>0)c.step=STEPS[i3-1];save();render();window.scrollTo(0,0);return;}
+    if(act==="copy"){var t=copyText(),fb=$("gsCopyFb");var fail=function(){fb.value=t;fb.hidden=false;fb.focus();fb.select();toast("자동 복사가 막혔어요. 아래 글을 길게 눌러 복사하세요.");};
+      try{navigator.clipboard.writeText(t).then(function(){toast("결과를 복사했어요");},fail);}catch(err){fail();}return;}
+  });
+  function keep(){var y=window.scrollY;render();window.scrollTo(0,y);}
+  window.GSAS_OPEN=function(){root=$("gsRoot");if(!root)return;var c=cur();if(c&&c.step!=="result")renderHome();else render();};
+  window.GSAS_HOME=function(){
+    if(P.cur&&P.cur.photoCode&&P.cur.photoState!=="done"&&P.cur.step==="shots")return {text:P.cur.photoState==="retry"?"사진 다시 보내기":"사진 확인 중",sub:P.cur.photoCode};
+    if(P.cur&&P.cur.step!=="result"&&P.cur.step!=="intro")return {text:"이어 하기",sub:STEPN[P.cur.step]||""};
+    if(P.last)return {text:P.last.type==="STOP"?"오늘은 쉬어요":P.last.next?"다음: "+({GSAS:"스윙",GPAS:"몸",GCAS:"채",GRAS:"라운드 운영"})[P.last.next]:"유형 "+P.last.type,sub:P.last.date};
+    return {text:"진단하기",sub:"스윙 진단 · 10구"};
+  };
+  window.GSAS_PARSE=parseBoss;window.GSAS_SETAPI=function(u){window.WQ.api=u;}; // 테스트용
+  window.GSAS_JUDGE=function(c){var x=fresh();for(var k in c)x[k]=c[k];return judge(x);}; // 테스트용
+})();
+
 </script>
 
 </body></html>
