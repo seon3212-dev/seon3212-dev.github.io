@@ -2496,7 +2496,8 @@ body{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
 
   var STEPS=["intro","safety","shot","ask","device","guide","shots","notice"];
   var STEPN={intro:"시작",safety:"몸 상태",shot:"어떤 샷인지",ask:"언제 안 좋은지",device:"측정기기",guide:"치는 법",shots:"결과 적기",notice:"확인"};
-  function PHOTO_API_(){return (window.WQ&&window.WQ.api)||"";}  /* 사진 받기 = 와이즈쿼드 서버 */
+  var PHOTO_OPEN=false;  /* Gemini 자동 읽기가 준비되면 true로 */
+  function PHOTO_API_(){return PHOTO_OPEN&&window.WQ&&window.WQ.api||"";}  /* 사진 받기 = 와이즈쿼드 서버 */
   var PHOTOS=[];      /* 보낼 사진 (기기 저장 안 함, 화면을 닫으면 사라짐) */
   var P=load(),root=null;
   function blankShots(n){var a=[];for(var i=0;i<n;i++)a.push({c:"",l:"",s:null});return a;}
@@ -2697,7 +2698,7 @@ body{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
         '<label class="gs-f"><span>캐리</span><input type="text" class="gc-in" data-gsi="'+i+'" data-f="c" value="'+esc(s.c)+'" inputmode="decimal" maxlength="5" autocomplete="off" aria-label="'+(i+1)+'번 캐리 m"></label>'+
         '<label class="gs-f"><span>좌우</span><input type="text" class="gc-in" data-gsi="'+i+'" data-f="l" value="'+esc(s.l)+'" inputmode="decimal" maxlength="5" autocomplete="off" aria-label="'+(i+1)+'번 좌우 m"></label>'+
         '<span class="gs-lr">'+[["L","왼"],["R","오"]].map(function(x){return '<button type="button" class="chip gs-side" data-gs="side" data-i="'+i+'" data-v="'+x[0]+'" aria-pressed="'+(s.s===x[0])+'">'+x[1]+'</button>';}).join("")+'</span></div>';}).join("");
-    return '<h2>공마다 적어 주세요</h2>'+mode+(c.photoState==="done"?'<p class="note"><b>사진에서 읽은 숫자예요.</b> 맞는지 보시고 틀린 곳은 고쳐 주세요.</p>':'')+'<p class="note">단위는 m예요. 좌우는 목표선에서 벗어난 거리를 적고 왼·오를 눌러요. 가운데면 0이에요.</p>'+
+    return '<h2>공마다 적어 주세요</h2>'+mode+(c.photoState==="done"?'<p class="note gp-warn-line"><b>사진에서 읽은 숫자예요.</b> 사진과 비교해서 틀린 곳만 고쳐 주세요. 특히 왼쪽·오른쪽을 확인해 주세요.</p>':'')+'<p class="note">단위는 m예요. 좌우는 목표선에서 벗어난 거리를 적고 왼·오를 눌러요. 가운데면 0이에요.</p>'+
       '<div class="gs-rows">'+rows+'</div>'+(c.shots.length<CFG.maxShots?'<button type="button" class="btn btn-plain gc-fill" data-gs="more">5개 더 적기</button>':'')+nav();
   }
   function photoBox(c){
@@ -2712,7 +2713,7 @@ body{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
     h+='<label class="btn btn-plain gc-fill gs-pick">사진 고르기<input type="file" id="gsFile" accept="image/*" multiple hidden></label>'+
       '<div class="gs-thumbs">'+PHOTOS.map(function(p,i){return '<span class="gs-thumb"><img src="'+p.data+'" alt="'+(i+1)+'번 사진"><button type="button" class="chip" data-gs="pdel" data-i="'+i+'" aria-label="'+(i+1)+'번 사진 빼기">✕</button></span>';}).join("")+'</div>'+
 
-      '<label class="agree"><input type="checkbox" id="gsPConsent"'+(c.photoConsent?" checked":"")+'><span>사진을 숫자 확인에 쓰도록 보내요<br><small class="note">사진은 숫자를 확인하는 데만 쓰고, 결과를 드리고 30일 뒤 지워요. 이름이나 전화번호는 받지 않아요.</small></span></label>'+
+      '<label class="agree"><input type="checkbox" id="gsPConsent"'+(c.photoConsent?" checked":"")+'><span>사진을 숫자 읽기에 쓰도록 보내요<br><small class="note">사진은 숫자를 읽기 위해 Google AI(Gemini)로 보내요. 다 읽고 30일 뒤 지워요. 얼굴이나 이름이 나오지 않게 찍어 주세요.</small></span></label>'+
       '<button type="button" class="btn btn-flag gc-fill" data-gs="psend">사진 보내기</button>';
     return h;
   }
@@ -2848,10 +2849,13 @@ body{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
     if(act==="pagain"){c.photoCode=null;c.photoState=null;c.photoNote="";PHOTOS=[];save();keep();return;}
     if(act==="psend"){
       if(!PHOTOS.length){msg("사진을 골라 주세요.");return;}if(!c.photoConsent){msg("사진 보내기에 체크해 주세요.");return;}
-      b.disabled=true;msg("보내는 중이에요…");
+      b.disabled=true;msg("보내는 중이에요… AI가 숫자를 읽는 데 10~20초쯤 걸려요.");
       papi({action:"upload",passcode:"239319",consent:true,adult:!!c.adult,shot:lab(SHOT,c.shot),club:CNAME[c.club]||"",device:lab(DEV,c.dev),indoor:c.indoor==="in"?"실내":c.indoor==="out"?"실외":"",app_version:"round-v74",images:PHOTOS})
         .then(function(r){b.disabled=false;if(!r.ok){msg(PERR[r.error]||"보내지 못했어요. 잠시 뒤 다시 해 주세요.");return;}
-          c.photoCode=r.code;c.photoState="wait";PHOTOS=[];save();keep();toast("보냈어요. 접수 번호 "+r.code);});return;}
+          c.photoCode=r.code;PHOTOS=[];
+          var sh=r.ai&&r.shots?parseBoss(r.shots):[];
+          if(sh.length){c.shots=sh.concat(blankShots(Math.max(0,10-sh.length)));c.photoState="done";c.inMode="type";save();keep();toast("사진에서 "+sh.length+"개를 읽었어요. 맞는지 보고 틀린 곳만 고쳐 주세요.");return;}
+          c.photoState="wait";save();keep();toast("보냈어요. 사진에서 숫자를 다 못 읽어서 확인 뒤 알려 드릴게요.");});return;}
     if(act==="pcheck"){b.disabled=true;
       papi({action:"status",code:c.photoCode}).then(function(r){b.disabled=false;
         if(!r.ok){msg(PERR[r.error]||"확인하지 못했어요.");return;}
