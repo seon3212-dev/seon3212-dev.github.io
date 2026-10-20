@@ -2496,7 +2496,7 @@ body{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
 
   var STEPS=["intro","safety","shot","ask","device","guide","shots","notice"];
   var STEPN={intro:"시작",safety:"몸 상태",shot:"어떤 샷인지",ask:"언제 안 좋은지",device:"측정기기",guide:"치는 법",shots:"결과 적기",notice:"확인"};
-  var PHOTO_OPEN=false;  /* Gemini 자동 읽기가 준비되면 true로 */
+  var PHOTO_OPEN=true;  /* Gemini 자동 읽기 (서버 v0.3) */
   function PHOTO_API_(){return PHOTO_OPEN&&window.WQ&&window.WQ.api||"";}  /* 사진 받기 = 와이즈쿼드 서버 */
   var PHOTOS=[];      /* 보낼 사진 (기기 저장 안 함, 화면을 닫으면 사라짐) */
   var P=load(),root=null;
