@@ -167,6 +167,7 @@ input[type=time],input[type=number]{font-family:var(--font-display);font-size:22
 .step{display:flex;align-items:center;gap:6px}
 .step button{width:42px;height:42px;border-radius:50%;border:1px solid var(--line);background:var(--surface);color:var(--ink);font-size:20px;cursor:pointer}
 .step output{font-family:var(--font-display);font-size:30px;font-weight:700;min-width:40px;text-align:center;font-variant-numeric:tabular-nums}
+.shbox{margin:4px 0 10px}.shbox summary{cursor:pointer;font-weight:700}.settle.sh-list li{grid-template-columns:1fr auto auto;align-items:center}.settle.sh-list .amt{font-size:18px}.settle.sh-list .chip{min-height:32px;padding:2px 12px}
 .sc-wrap{overflow-x:auto;margin-inline:-4px;padding-inline:4px}
 table.sc{border-collapse:collapse;font-variant-numeric:tabular-nums;font-size:14px;min-width:100%}
 .sc th,.sc td{text-align:center;padding:6px 4px;border-bottom:1px solid var(--line);min-width:30px}
@@ -582,6 +583,7 @@ body{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
     <section class="card" aria-label="정산">
       <h2>정산</h2>
       <div class="rules"><span id="ruleLine"></span><button type="button" class="btn btn-plain" data-tab="plan">규칙 바꾸기</button></div>
+      <div id="shBox"></div>
       <div id="settle"></div>
       <div class="share"><button class="btn btn-flag" type="button" data-act="copyScore">단톡방에 올릴 결과 복사</button></div>
       <textarea class="copybox" id="scoreCopy" readonly hidden aria-label="복사할 결과"></textarea>
@@ -866,7 +868,7 @@ body{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
     return {tab:"plan",course:"",courseId:null,nines:null,date:today(),tee:"",players:["","","",""],
       move:"self",pick:{},buffer:40,drive:50,traffic:0,first:false,pack:{},
       stops:{coffee:{on:false,where:"course"},gimbap:{on:false,where:"home"},store:{on:false,where:"home"},gas:{on:false,where:"home"},meal:{on:false,where:"course"}},
-      bet:{on:false,game:"tadang",amt:{},bp:{tie3:true,tie4:true,triple:true,par3dbl:true,birdie:true},bpWhen:"next",bonus:{birdie:{mode:"stroke",v:1},putt:{mode:"stroke",v:3},shot:{mode:"stroke",v:5},hio:{mode:"stroke",v:10}},eg:{},pk:{},dr:{},joker:"bogey",drawMode:"app",vtie:"carry",stack:"cap4",hrank:2,skip:{first:"on",last:"on"},nearMode:"carry",order:null,vg:{},hz:{},near:{},dc:{},ab:{},gal:[],uc:{}},age19:false,
+      bet:{on:false,game:"tadang",amt:{},bp:{tie3:true,tie4:true,triple:true,yangpa:false,par3dbl:true,birdie:true},sh:[],shDraft:{},bpWhen:"next",bonus:{birdie:{mode:"stroke",v:1},putt:{mode:"stroke",v:3},shot:{mode:"stroke",v:5},hio:{mode:"stroke",v:10}},eg:{},pk:{},dr:{},joker:"bogey",drawMode:"app",vtie:"carry",stack:"cap4",hrank:2,skip:{first:"on",last:"on"},nearMode:"carry",order:null,vg:{},hz:{},near:{},dc:{},ab:{},gal:[],uc:{}},age19:false,
       par:DEFAULT_PAR.slice(),scores:[0,1,2,3].map(function(){return Array(18).fill(null);}),hole:0,sample:false};
   }
   function sample(){
@@ -1017,6 +1019,7 @@ body{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
         if(bpo.tie3&&a.length>=3&&Object.keys(cnt).some(function(k){return cnt[k]===3;}))trig.push("3명 동타");
         var all4=bpo.tie4&&a.length>=4&&Object.keys(cnt).length===1;if(all4&&!thisH)trig.push("4명 동타");
         if(bpo.triple&&a.some(function(i){return st[i]>=par+3;}))trig.push("트리플");
+        if(bpo.yangpa&&a.some(function(i){return st[i]>=par*2;}))trig.push("양파");
         if(bpo.par3dbl&&par===3&&a.some(function(i){return st[i]>=par+2;}))trig.push("파3 더블");
         if(bpo.birdie&&bset.length)trig.push("버디 이상");
         var dcl=declOf(h,a),dn=dcl?(dcl.auto?"자동 배판(":"배판 선언(")+nameOf(dcl.i)+")":null,gl=null,gm=galM(h);if(gm){trig=[];dn=null;all4=false;}
@@ -1091,7 +1094,25 @@ body{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
     }
     if(G.id==="jopok"||(G.id==="hussein"&&g.hzMode==="pot")){var share=Math.floor(pot/a.length);a.forEach(function(i){tot[i]=win[i]+share-seed;});extra={pot:pot,share:share,rest:pot-share*a.length,seed:seed};}
     if(G.id==="happy"||G.id==="vegas"){var paid=0;a.forEach(function(i){tot[i]=win[i]-seed;paid+=win[i];});extra={seed:seed,left:seed*a.length-paid,fund:fund,bank:bank,np:np,nearNeed:nearNeed};}
-    return {tot:tot,unit:unit,played:played,skipped:skipped,need:need,doubled:doubled,act:a,per:per,game:G,extra:extra,offH:offH};
+    var shL=shList(a);shL.forEach(function(x){tot[x.f]-=x.a;tot[x.t]+=x.a;});
+    return {tot:tot,unit:unit,played:played,skipped:skipped,need:need,doubled:doubled,act:a,per:per,game:G,extra:extra,offH:offH,sh:shL};
+  }
+  /* 선핸디: 라운드 전에 미리 주고받은 돈. 정산 합계에만 더함 (홀별 결과에는 안 넣음) */
+  function shList(a){return (S.bet.sh||[]).filter(function(x){return x&&a.indexOf(x.f)>=0&&a.indexOf(x.t)>=0&&x.f!==x.t&&x.a>0;});}
+  function shText(L){return L.map(function(x){return nameOf(x.f)+" → "+nameOf(x.t)+" "+money(x.a);}).join(", ");}
+  function renderSh(){
+    var box=$("shBox");if(!box)return;
+    if(!S.bet.on){box.innerHTML="";return;}
+    var a=act(),L=S.bet.sh||[],dr=S.bet.shDraft||{};
+    var list=L.map(function(x,k){if(a.indexOf(x.f)<0||a.indexOf(x.t)<0)return "";return '<li><span class="nm">'+esc(nameOf(x.f))+' → '+esc(nameOf(x.t))+'</span><span class="amt">'+money(x.a)+'</span><button type="button" class="chip" data-shdel="'+k+'" aria-label="'+esc(nameOf(x.f))+' 선핸디 지우기">✕</button></li>';}).join("");
+    var pick=function(k,v){return '<div class="quick">'+a.map(function(i){return '<button type="button" class="chip" data-sh="'+k+':'+i+'" aria-pressed="'+(dr[k]===i)+'">'+esc(nameOf(i))+'</button>';}).join("")+'</div>';};
+    box.innerHTML='<details class="shbox"'+(L.length||dr.open?' open':'')+'><summary>선핸디 (라운드 전에 미리 준 돈)'+(L.length?' · '+L.length+'건':'')+'</summary>'+
+      (list?'<ul class="settle sh-list">'+list+'</ul>':'')+
+      '<div class="gctl"><span class="ql">주는 사람</span>'+pick("f")+'<span class="ql">받는 사람</span>'+pick("t")+
+      '<span class="ql">금액</span><div class="quick">'+[10000,20000,30000,50000].map(function(v){return '<button type="button" class="chip" data-sha="'+v+'" aria-pressed="'+(+dr.a===v)+'">'+(v/10000)+'만</button>';}).join("")+
+      '<input type="text" id="shAmt" inputmode="numeric" autocomplete="off" placeholder="직접 넣기 (원)" value="'+(dr.a?dr.a:"")+'" aria-label="선핸디 금액 (원)" style="max-width:150px"></div>'+
+      '<button type="button" class="btn btn-plain" data-act="shAdd">선핸디 넣기</button>'+
+      '<p class="note">넣은 금액은 마지막 정산 합계에 더해져요. 주는 사람은 빼고, 받는 사람은 더해요.</p></div></details>';
   }
   function won(v){return (v>0?"+":(v<0?"−":""))+Math.abs(v).toLocaleString("ko-KR")+"원";}
   function money(v){return Math.abs(v).toLocaleString("ko-KR")+"원";}
@@ -1101,7 +1122,7 @@ body{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
     if(!S.bet.on)return "내기 안 함";
     var g=S.bet,G=gameOf(g.game),u=amt("unit")>0?money(amt("unit")):"금액 미정",sd=amt("seed")>0?money(amt("seed")):"미정";
     if(G.ready===false)return G.name+" (규칙 받는 중)";
-    if(G.id==="tadang"){var bpo=g.bp||{},on=[["tie3","3명 동타"],["tie4","4명 동타"],["triple","트리플"],["par3dbl","파3 더블"],["birdie","버디 이상"]].filter(function(x){return bpo[x[0]];}).map(function(x){return x[1];});
+    if(G.id==="tadang"){var bpo=g.bp||{},on=[["tie3","3명 동타"],["tie4","4명 동타"],["triple","트리플"],["yangpa","양파"],["par3dbl","파3 더블"],["birdie","버디 이상"]].filter(function(x){return bpo[x[0]];}).map(function(x){return x[1];});
       return "타당 "+u+" · 배판 "+(on.length?on.join("·"):"없음")+(function(){var L=BK.map(function(x){var b=(g.bonus||{})[x[0]];if(!b||b.mode==="none")return null;return x[1]+" "+(b.mode==="stroke"?(+b.v||0)+"타":money(+b.v||0));}).filter(Boolean);return L.length?" · "+L.join("·"):"";})()+(on.length?" · "+(g.bpWhen==="this"?"당홀":"다음 홀")+" 배판 · 땅 겹치면 "+(g.stack==="cap2"?"2배까지":"4배까지"):"");}
     if(G.id==="scratch")return "스크래치 한 타 "+u;
     if(G.id==="vegas"&&g.drawMode==="off")return "뽑기(한국식) · 오프라인 진행";
@@ -1204,8 +1225,8 @@ body{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
     var sk=S.bet.skip||{};$("skipChips").innerHTML=[["first","첫 홀"],["last","마지막 홀"]].map(function(x){var cur=sk[x[0]]||"on";if(cur==="birdie"&&G.id!=="tadang")cur="off";return '<div class="skrow"><b>'+x[1]+'</b>'+[["on","내기"],["off","안 함"]].concat(G.id==="tadang"?[["birdie","버디피만"]]:[]).map(function(o){return '<button type="button" class="chip" data-skip="'+x[0]+':'+o[0]+'" aria-pressed="'+(cur===o[0])+'">'+o[1]+'</button>';}).join("")+'</div>';}).join("");$("skipNote").textContent=G.id==="tadang"?"기본은 모든 홀 내기해요. 안 함은 스코어만 적고, 버디피만은 그 홀에서 버디·이글·홀인원 보너스만 주고받아요.":"기본은 모든 홀 내기해요. 안 함을 고른 홀은 스코어만 적어요.";
     $("tadOpts").hidden=G.id!=="tadang";
     if(G.id==="tadang"){var bpo=S.bet.bp||{};
-      $("bpChips").innerHTML=[["tie3","3명 동타"],["tie4","4명 동타 시 다음 홀 배판"],["triple","트리플 이상"],["par3dbl","파3 더블 이상"],["birdie","버디 이상"]].map(function(x){return '<button type="button" class="chip" data-bp="'+x[0]+'" aria-pressed="'+(!!bpo[x[0]])+'">'+x[1]+'</button>';}).join("");
-      var bpAny=["tie3","tie4","triple","par3dbl","birdie"].some(function(k){return bpo[k];});$("bpWhenRow").hidden=!bpAny;var c4=S.bet.stack!=="cap2";$("bpWhenNote").textContent=(S.bet.bpWhen==="this"?"조건이 나온 그 홀이 2배예요.":"조건이 나온 다음 홀이 2배예요.")+" 조건이 두세 개 겹쳐도 2배예요."+(S.bet.bpWhen==="this"&&bpo.tie4?" 4명 동타는 당홀·다음 홀 설정과 상관없이 다음 홀이 배판이에요.":"")+(S.bet.stack!=="cap2"?" 땅·자배와 겹치면 4배예요.":" 땅·자배와 겹쳐도 2배예요.");
+      $("bpChips").innerHTML=[["tie3","3명 동타"],["tie4","4명 동타 시 다음 홀 배판"],["triple","트리플 이상"],["yangpa","양파(더블파) 이상"],["par3dbl","파3 더블 이상"],["birdie","버디 이상"]].map(function(x){return '<button type="button" class="chip" data-bp="'+x[0]+'" aria-pressed="'+(!!bpo[x[0]])+'">'+x[1]+'</button>';}).join("");
+      var bpAny=["tie3","tie4","triple","yangpa","par3dbl","birdie"].some(function(k){return bpo[k];});$("bpWhenRow").hidden=!bpAny;var c4=S.bet.stack!=="cap2";$("bpWhenNote").textContent=(S.bet.bpWhen==="this"?"조건이 나온 그 홀이 2배예요.":"조건이 나온 다음 홀이 2배예요.")+" 조건이 두세 개 겹쳐도 2배예요."+(S.bet.bpWhen==="this"&&bpo.tie4?" 4명 동타는 당홀·다음 홀 설정과 상관없이 다음 홀이 배판이에요.":"")+(S.bet.stack!=="cap2"?" 땅·자배와 겹치면 4배예요.":" 땅·자배와 겹쳐도 2배예요.");
       BK.forEach(function(x){var k=x[0],b=(S.bet.bonus||{})[k]||{mode:"none",v:0};
         $("bm-"+k).innerHTML=[["none","없음"],["stroke","타 더"],["cash","금액"]].map(function(o){return '<button type="button" class="chip" data-bm="'+k+':'+o[0]+'" aria-pressed="'+(b.mode===o[0])+'">'+o[1]+'</button>';}).join("");
         $("bvw-"+k).hidden=b.mode==="none";$("bu-"+k).textContent=b.mode==="cash"?"원":"타 더";$("bv-"+k).step=b.mode==="cash"?"1000":"1";keep("bv-"+k,b.v||"");});}$("hzOpts").hidden=G.id!=="hussein";if(G.id==="hussein"){$("hrNote").textContent=S.bet.hrank==="turn"?"뽑기로 정한 타순대로 한 홀씩 돌아가며 후세인을 맡아요.":(S.bet.hrank==="manual"?"홀마다 스코어 화면에서 후세인을 직접 골라요.":"앞 홀 2등이 후세인이에요. 동타면 그 앞 홀에서 더 잘 친 사람, 끝까지 같으면 타순이 빠른 사람이에요. 1번 홀은 직접 골라요.");var sd3=amt("seed"),u3=amt("unit");$("hzNote").textContent=S.bet.hzMode==="pot"?("각자 같은 돈을 걷어 판을 만들어요. 후세인이 이기면 홀 상금을 혼자, 세 명이 이기면 셋이 나눠 가져요. 비기면 다음 홀로 이월. 끝나고 남은 판돈은 똑같이 나눠요."+(sd3&&u3?" · 판 "+money(sd3*4)+", 18홀이면 최대 "+money(u3*18)+(u3*18>sd3*4?" (판돈이 모자라요)":""):"")):"후세인이 이기면 세 명에게서 금액씩 받고, 지면 세 명에게 금액씩 줘요.";}
@@ -1327,6 +1348,7 @@ body{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
       html+='<td class="sub">'+(s.inN?vp(s.inn):"")+'</td><td class="sub">'+(s.thru?vp(s.vs):"")+'</td></tr>';});
     $("sc").innerHTML=html+'</tbody>';
     $("ruleLine").textContent=ruleText();
+    renderSh();
     var out=$("settle");
     if(!S.bet.on)out.innerHTML='<p class="note">내기를 안 하는 라운드예요. 스코어만 공유돼요.</p>';
     else if(G.ready===false)out.innerHTML='<p class="note">'+G.name+' 규칙을 받는 중이에요.</p>';
@@ -1337,7 +1359,7 @@ body{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
       else if(!r.played)out.innerHTML='<p class="note">모두의 타수가 들어간 홀부터 정산해요.</p>';
       else{var ord=r.act.slice().sort(function(x,y){return r.tot[y]-r.tot[x];});
         var ex=(G.id==="happy"||G.id==="vegas")?' 판돈 1인 '+money(r.extra.seed)+'을 뺀 결과예요. 판돈 중 '+money(r.extra.left)+'이 남아요'+(r.offH&&r.offH.length&&r.extra.left>0?' (빠진 홀 몫 포함 · 나눠 갖거나 캐디팁 등 알아서 써요)':'')+(r.extra.fund?' (공금 '+money(r.extra.fund)+' 포함)':'')+(r.extra.bank?' · 아직 안 준 니어 상금 '+money(r.extra.bank):'')+(r.extra.nearNeed.length?' · 니어 안 고른 '+r.extra.nearNeed.join(", ")+'번 홀':'')+'.':(G.id==="jopok"||(G.id==="hussein"&&S.bet.hzMode==="pot"))?' 판돈 1인 '+money(r.extra.seed)+'을 빼고, 남은 판돈 '+money(r.extra.pot)+'을 '+r.act.length+'명이 '+money(r.extra.share)+'씩 나눈 결과예요'+(r.extra.rest?' (나머지 '+money(r.extra.rest)+'은 따로)':'')+'.':'';
-        out.innerHTML='<ul class="settle">'+ord.map(function(i){var v=r.tot[i];return '<li><span class="nm">'+esc(nameOf(i))+'</span><span class="amt '+(v>0?"plus":(v<0?"minus":""))+'">'+won(v)+'</span></li>';}).join("")+'</ul><p class="note">'+r.played+'홀 정산'+(r.offH&&r.offH.length?' · 내기 안 한 '+r.offH.join(", ")+'번 홀 제외':'')+(r.skipped.length?' · 타수 빠진 '+r.skipped.join(", ")+'번 제외':'')+(r.need.length?' · '+(G.id==="vegas"?"뽑기":"후세인")+' 안 정한 '+r.need.join(", ")+'번 제외':'')+(r.doubled.length?' · 배판 '+r.doubled.join(", "):'')+'.'+ex+'</p>';}}
+        out.innerHTML='<ul class="settle">'+ord.map(function(i){var v=r.tot[i];return '<li><span class="nm">'+esc(nameOf(i))+'</span><span class="amt '+(v>0?"plus":(v<0?"minus":""))+'">'+won(v)+'</span></li>';}).join("")+'</ul><p class="note">'+r.played+'홀 정산'+(r.offH&&r.offH.length?' · 내기 안 한 '+r.offH.join(", ")+'번 홀 제외':'')+(r.skipped.length?' · 타수 빠진 '+r.skipped.join(", ")+'번 제외':'')+(r.need.length?' · '+(G.id==="vegas"?"뽑기":"후세인")+' 안 정한 '+r.need.join(", ")+'번 제외':'')+(r.doubled.length?' · 배판 '+r.doubled.join(", "):'')+(r.sh&&r.sh.length?' · 선핸디 포함('+esc(shText(r.sh))+')':'')+'.'+ex+'</p>';}}
     $("parset").innerHTML=S.par.map(function(p,k){return '<button type="button" data-ph="'+k+'" aria-label="'+(k+1)+'번 홀 파 '+p+'"><span>'+(k+1)+'</span>'+p+'</button>';}).join("");
     $("parTotal").textContent="합계 파 "+S.par.reduce(function(x,y){return x+y;},0)+(S.course?" · "+S.course:"");
   }
@@ -1347,7 +1369,7 @@ body{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
     list.forEach(function(x){mx=Math.max(mx,x.s.thru);L.push(nameOf(x.i)+" "+(x.s.thru?vp(x.s.vs)+" ("+x.s.tot+"타)":"기록 없음"));});
     if(mx<18)L.splice(1,0,mx+"홀까지");
     var r=betReady()?calc():null;
-    if(r&&!r.bad&&r.played){L.push("");L.push("[정산] "+ruleText());r.act.slice().sort(function(x,y){return r.tot[y]-r.tot[x];}).forEach(function(i){L.push(nameOf(i)+" "+won(r.tot[i]));});if(r.doubled.length)L.push("배판: "+r.doubled.join(", "));}
+    if(r&&!r.bad&&r.played){L.push("");L.push("[정산] "+ruleText());r.act.slice().sort(function(x,y){return r.tot[y]-r.tot[x];}).forEach(function(i){L.push(nameOf(i)+" "+won(r.tot[i]));});if(r.doubled.length)L.push("배판: "+r.doubled.join(", "));if(r.sh&&r.sh.length)L.push("선핸디 포함: "+shText(r.sh));}
     L.push("— 슬기로운골프생활 · WISE GOLF");return L.join("\n");
   }
 
@@ -1415,6 +1437,9 @@ body{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
       if(bm[0]==="birdie"&&bm[1]!=="none"){["putt","shot","hio"].forEach(function(k){S.bet.bonus[k]={mode:bm[1],v:bm[1]==="cash"?(+cur.v||10000)*MUL[k]:MUL[k]};});}
       changed();return;}
     if(d.eg){var ep=d.eg.split(":");S.bet.eg[ep[0]]=ep[1];changed();return;}
+    if(d.sh){var sp=d.sh.split(":");S.bet.shDraft=Object.assign({},S.bet.shDraft||{},{open:true});S.bet.shDraft[sp[0]]=S.bet.shDraft[sp[0]]===+sp[1]?null:+sp[1];changed();return;}
+    if(d.sha){S.bet.shDraft=Object.assign({},S.bet.shDraft||{},{open:true,a:+d.sha});changed();return;}
+    if(d.shdel!=null){S.bet.sh=(S.bet.sh||[]).slice();S.bet.sh.splice(+d.shdel,1);S.bet.shDraft=Object.assign({},S.bet.shDraft||{},{open:true});changed();toast("선핸디를 지웠어요.");return;}
     if(d.bp){S.bet.bp=Object.assign({},S.bet.bp||{});S.bet.bp[d.bp]=!S.bet.bp[d.bp];changed();return;}
     if(d.vg){var vp2=d.vg.split(":");S.bet.vg[vp2[0]]=+vp2[1];changed();return;}
     if(d.ord!=null){var a5=act(),dr=(S.bet.orderDraft||[]).slice();if(dr.indexOf(+d.ord)<0)dr.push(+d.ord);if(dr.length>=a5.length-1){a5.forEach(function(i){if(dr.indexOf(i)<0)dr.push(i);});S.bet.order=dr;S.bet.orderDraft=null;toast("타순: "+dr.map(nameOf).join(" → "));}else S.bet.orderDraft=dr;changed();return;}
@@ -1454,11 +1479,16 @@ body{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
       case "drivePlus":S.drive=Math.min(300,S.drive+5);changed();return;
       case "copyGo":copy(goText(),"goCopy","문구를 복사했어요. 단톡방에 붙여넣으세요.");return;
       case "copyScore":copy(scoreText(),"scoreCopy","결과를 복사했어요. 단톡방에 붙여넣으세요.");return;
+      case "shAdd":{var dr=S.bet.shDraft||{},av=Math.floor(+String(dr.a||"").replace(/[^0-9]/g,"")||0);
+        if(dr.f==null||dr.t==null){toast("주는 사람과 받는 사람을 골라 주세요.");return;}
+        if(dr.f===dr.t){toast("주는 사람과 받는 사람이 같아요.");return;}
+        if(!(av>0)){toast("금액을 넣어 주세요.");return;}
+        S.bet.sh=(S.bet.sh||[]).concat([{f:dr.f,t:dr.t,a:av}]);S.bet.shDraft={open:true};changed();toast(nameOf(dr.f)+" → "+nameOf(dr.t)+" "+money(av)+" 넣었어요.");return;}
       case "askNew":$("resetArea").innerHTML='<div class="confirm"><span>지금 라운드 기록이 지워져요.</span><button class="btn btn-plain" type="button" data-act="new">지우고 새로 시작</button><button class="btn btn-plain" type="button" data-act="cancelNew">취소</button></div>';return;
       case "cancelNew":$("resetArea").innerHTML='<button class="btn btn-plain" type="button" data-act="askNew">새 라운드 시작</button>';return;
       case "new":
         var keep=S.sample?null:{players:S.players.slice(),bet:Object.assign({},S.bet),stops:JSON.parse(JSON.stringify(S.stops)),drive:S.drive,first:false};
-        S=blank();if(keep){S.players=keep.players;S.bet=keep.bet;S.bet.vg={};S.bet.hz={};S.bet.near={};S.bet.order=null;S.bet.eg={};S.bet.pk={};S.bet.dr={};S.bet.dc={};S.bet.ab={};S.bet.gal=[];S.bet.uc={};S.stops=keep.stops;S.drive=keep.drive;}
+        S=blank();if(keep){S.players=keep.players;S.bet=keep.bet;S.bet.vg={};S.bet.hz={};S.bet.near={};S.bet.order=null;S.bet.eg={};S.bet.pk={};S.bet.dr={};S.bet.dc={};S.bet.ab={};S.bet.gal=[];S.bet.uc={};S.bet.sh=[];S.bet.shDraft={};S.stops=keep.stops;S.drive=keep.drive;}
         $("resetArea").innerHTML='<button class="btn btn-plain" type="button" data-act="askNew">새 라운드 시작</button>';
         save();render();showTab("plan");toast("새 라운드를 시작해요. 공치러 어디 가세요?");return;
     }
@@ -1468,6 +1498,7 @@ body{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
     if(t.id==="course"){S.course=t.value;S.courseId=null;S.nines=null;changed();return;}
     if(t.id==="cq"){renderSearch();return;}
     if(t.id==="date"){S.date=t.value;changed();return;}
+    if(t.id==="shAmt"){S.bet.shDraft=Object.assign({},S.bet.shDraft||{},{open:true,a:t.value.replace(/[^0-9]/g,"")});save();return;}
     if(t.id==="tee"){if(t.value){S.tee=t.value;changed();}return;}
     if(d.pn!=null){S.players[+d.pn]=t.value;changed();return;}
     if(d.bv){S.bet.bonus=JSON.parse(JSON.stringify(S.bet.bonus||{}));var nv2=Math.max(0,Math.floor(+t.value||0)),ob3=S.bet.bonus[d.bv]||{};
