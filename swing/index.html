@@ -160,36 +160,55 @@ $("go").onclick=async()=>{
   }
 };
 
+// 2단계 추출: ①거친 훑기로 스윙 구간을 찾고 ②그 구간만 원본 프레임을 촘촘히 담아
+// 다운스윙 해상도를 최대화(30fps 일반 영상에서도 템포 오차 축소). 슬로모면 자동으로 더 정밀.
 function runPose(f){
   return new Promise((resolve,reject)=>{
     const vid=$("vid"), cv=$("cv"), ctx=cv.getContext("2d");
     vid.src=URL.createObjectURL(f);
-    vid.onloadedmetadata=()=>{
+    vid.onerror=()=>reject(new Error("영상을 읽지 못했습니다"));
+    vid.onloadedmetadata=async ()=>{
+     try{
       const W=vid.videoWidth, H=vid.videoHeight, dur=vid.duration;
       cv.width=W; cv.height=H;
-      const N=Math.min(300, Math.max(30, Math.round(dur*30))); // 최대 300샘플
-      const frames=[]; let i=0;
-      const step=()=>{
-        if(i>=N){resolve({frames,W,H,dur}); return;}
-        const t=dur*i/(N-1);
-        vid.currentTime=Math.min(t, Math.max(0,dur-0.001));
-        i++;
-      };
-      vid.onseeked=()=>{
-        ctx.drawImage(vid,0,0,W,H);
-        let lm=null;
-        try{
-          const r=landmarker.detectForVideo(cv, performance.now());
-          if(r.landmarks&&r.landmarks[0]) lm=r.landmarks[0].map(p=>({x:p.x*W,y:p.y*H}));
-        }catch(e){}
-        frames.push(lm);
-        const pct=Math.round(100*frames.length/N);
-        $("pbar").style.width=pct+"%"; $("pmsg").textContent=`분석 중… ${pct}%`;
-        step();
-      };
-      step();
+      let ts=0;
+      const seek=t=>new Promise(res=>{ const tt=Math.min(Math.max(0,t),Math.max(0,dur-0.001));
+        if(Math.abs(vid.currentTime-tt)<1e-4){ res(); return; } vid.onseeked=()=>res(); vid.currentTime=tt; });
+      const detectAt=async t=>{ await seek(t); ctx.drawImage(vid,0,0,W,H); let lm=null;
+        try{ ts+=40; const r=landmarker.detectForVideo(cv, ts); if(r.landmarks&&r.landmarks[0]) lm=r.landmarks[0].map(p=>({x:p.x*W,y:p.y*H})); }catch(e){} return lm; };
+      const prog=(p,msg)=>{ $("pbar").style.width=p+"%"; $("pmsg").textContent=msg; };
+
+      // ── 1단계: 거친 훑기(≈4fps) → 스윙 구간 탐지 ──
+      const C=Math.max(8, Math.round(dur*4)), cT=[], cY=[], cSW=[];
+      for(let i=0;i<C;i++){
+        const t=dur*i/(C-1), lm=await detectAt(t);
+        cT.push(t); cY.push(lm?((lm[15].y+lm[16].y)/2):null);
+        if(lm) cSW.push(Math.hypot(lm[11].x-lm[12].x,lm[11].y-lm[12].y));
+        prog(Math.round(40*(i+1)/C), `스윙 구간 찾는 중… ${Math.round(100*(i+1)/C)}%`);
+      }
+      const shoulderW=cSW.length?median(cSW):H*0.18, okY=cY.filter(v=>v!=null);
+      let winS=0, winE=dur, fine=false;
+      if(okY.length>=5){
+        const base=median(okY), rise=Math.max(shoulderW*0.8, H*0.10);
+        // 손이 baseline보다 rise 이상 올라간(y 작아진) 전체 활성 구간을 포함(백스윙~임팩트~피니시).
+        // 정밀 탑/임팩트는 2단계 analyze가 잡으므로, 여기선 스윙을 '자르지 않는' 것이 목적.
+        let fS=-1, fE=-1;
+        for(let i=0;i<C;i++){ if(cY[i]!=null && cY[i]<base-rise){ if(fS<0)fS=i; fE=i; } }
+        if(fS>=0){ winS=Math.max(0,cT[fS]-1.0); winE=Math.min(dur,cT[fE]+1.0);
+          fine = (winE-winS)>0.5 && (winE-winS)<dur-0.3; }
+      }
+
+      // ── 2단계: 구간만 촘촘히(원본 프레임 다 담기, 최대 ~120fps 상당·260장) ──
+      const start=fine?winS:0, span=fine?(winE-winS):dur;
+      const N=Math.min(260, Math.max(40, Math.round(span*120)));
+      const frames=[];
+      for(let i=0;i<N;i++){
+        frames.push(await detectAt(start + span*i/(N-1)));
+        prog(40+Math.round(60*(i+1)/N), `분석 중… ${Math.round(100*(i+1)/N)}%`);
+      }
+      resolve({frames,W,H,dur, window: fine?{start:winS,end:winE}:null});
+     }catch(err){ reject(err); }
     };
-    vid.onerror=()=>reject(new Error("영상을 읽지 못했습니다"));
   });
 }
 
