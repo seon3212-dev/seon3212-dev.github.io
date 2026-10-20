@@ -1487,7 +1487,8 @@ body{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
   });
 
   render();
-  var h0=(location.hash||"").slice(1);showTab(["home","plan","go","score","type"].indexOf(h0)>=0?h0:"home");
+  var h0=(location.hash||"").slice(1);window.START_TAB=h0;showTab(["home","plan","go","score","type"].indexOf(h0)>=0?h0:"home");
+  window.SHOW_TAB=showTab;  /* 진단 탭 바로가기(#gpas·#gcas·#gsas)는 맨 아래에서 — 진단 화면이 다 준비된 뒤 */
 })();
 </script>
 <script>
@@ -2895,6 +2896,10 @@ body{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
   window.GSAS_JUDGE=function(c){var x=fresh();for(var k in c)x[k]=c[k];return judge(x);}; // 테스트용
 })();
 
+</script>
+<script>
+/* 바로가기 주소: …/#gpas · #gcas · #gsas 로 들어오면 그 진단을 바로 엶 (예: 스윙 분석에서 'GSAS로 돌아가기') */
+(function(){var h=window.START_TAB||"";if(["gpas","gcas","gsas"].indexOf(h)>=0&&window.SHOW_TAB)window.SHOW_TAB(h);})();
 </script>
 
 </body></html>
