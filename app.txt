@@ -2504,6 +2504,7 @@ body{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
   function fresh(){return {step:"intro",adult:false,safe:null,stopSig:[],shot:null,club:null,target:"",shape:null,res:[],where:null,when:[],change:[],dev:null,indoor:null,shots:blankShots(10),dir:[0,0,0,0,0],hit:[0,0,0],agree:false};}
   function cur(){return P.cur;}
   function noDev(c){return c.dev==="none";}
+  function DKN(c){return c&&c.dk==="total"?"토탈":"캐리";}  /* 거리 기준: 캐리(기본) / 토탈 */
 
   /* ---- 계산 ---- */
   function num(v){var n=parseFloat(String(v==null?"":v).replace(/[^0-9.]/g,""));return isNaN(n)?null:n;}
@@ -2539,7 +2540,7 @@ body{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
       r.grade=g;
       /* 기준 거리: 최장·최단 뺀 평균 */
       if(cs.length>=CFG.fullShots){var s2=cs.slice().sort(function(a,b){return a-b;}).slice(1,-1);r.base=s2.reduce(function(a,b){return a+b;},0)/s2.length;}
-      r.facts.push("캐리 가운데값 약 "+Math.round(M)+"m, 절반 정도가 ±"+Math.max(1,Math.round(Mc))+"m 안에 들어와요");
+      r.facts.push(DKN(c)+" 가운데값 약 "+Math.round(M)+"m, 절반 정도가 ±"+Math.max(1,Math.round(Mc))+"m 안에 들어와요");
       if(r.hasL)r.facts.push("좌우: "+(Math.abs(r.mL)<1?"가운데쯤":"가운데에서 "+(r.mL>0?"오른쪽":"왼쪽")+"으로 "+Math.round(Math.abs(r.mL))+"m쯤")+"에 모이고, 절반 정도가 ±"+Math.max(1,Math.round(mad(ls,r.mL)))+"m 안이에요");
       else r.facts.push("좌우 거리가 적혀 있지 않아서 방향은 보지 않았어요");
       if(tg){var df=Math.round(M-tg);r.facts.push(Math.abs(df)<=2?"목표 "+Math.round(tg)+"m랑 거의 같게 가요":"목표 "+Math.round(tg)+"m보다 "+Math.abs(df)+"m "+(df>0?"더 가요":"덜 가요"));}
@@ -2680,7 +2681,7 @@ body{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
       '<li>'+esc(CNAME[c.club]||"고른 채")+'로 <b>같은 목표를 보고 10개 연속</b>으로 치세요. 20~30개 쳐도 다 적어 주세요.</li>'+
       '<li>잘 맞은 것만 고르지 마세요. 뒤땅·탑·크게 빗나간 것도 <b>다 적어요.</b></li>'+
       '<li>치는 중간에 그립이나 스윙을 바꾸지 마세요.</li>'+
-      (nd?'<li>칠 때마다 공이 <b>어느 쪽으로 갔는지</b>, <b>잘 맞았는지</b>만 기억해서 세 주세요.</li>':'<li>기기 화면에서 공마다 <b>캐리</b>랑 <b>좌우 거리</b>를 보고 적어 주세요. 기기가 못 잰 공은 비워 두세요.</li>')+
+      (nd?'<li>칠 때마다 공이 <b>어느 쪽으로 갔는지</b>, <b>잘 맞았는지</b>만 기억해서 세 주세요.</li>':'<li>기기 화면에서 공마다 <b>캐리</b>(없으면 토탈)랑 <b>좌우 거리</b>를 보고 적어 주세요. 기기가 못 잰 공은 비워 두세요.</li>')+
       '</ol><p class="note">영상(정면·뒤에서)은 다음 단계에서 받을 예정이에요.</p>'+nav(false,"다 쳤어요");
   }
   function sShots(c){
@@ -2695,10 +2696,12 @@ body{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
     if(c.inMode==="photo")return '<h2>기기 결과 사진 올리기</h2>'+mode+photoBox(c)+nav();
     var rows=c.shots.map(function(s,i){
       return '<div class="gs-row"><span class="gs-no">'+(i+1)+'</span>'+
-        '<label class="gs-f"><span>캐리</span><input type="text" class="gc-in" data-gsi="'+i+'" data-f="c" value="'+esc(s.c)+'" inputmode="decimal" maxlength="5" autocomplete="off" aria-label="'+(i+1)+'번 캐리 m"></label>'+
+        '<label class="gs-f"><span>'+DKN(c)+'</span><input type="text" class="gc-in" data-gsi="'+i+'" data-f="c" value="'+esc(s.c)+'" inputmode="decimal" maxlength="5" autocomplete="off" aria-label="'+(i+1)+'번 '+DKN(c)+' m"></label>'+
         '<label class="gs-f"><span>좌우</span><input type="text" class="gc-in" data-gsi="'+i+'" data-f="l" value="'+esc(s.l)+'" inputmode="decimal" maxlength="5" autocomplete="off" aria-label="'+(i+1)+'번 좌우 m"></label>'+
         '<span class="gs-lr">'+[["L","왼"],["R","오"]].map(function(x){return '<button type="button" class="chip gs-side" data-gs="side" data-i="'+i+'" data-v="'+x[0]+'" aria-pressed="'+(s.s===x[0])+'">'+x[1]+'</button>';}).join("")+'</span></div>';}).join("");
-    return '<h2>공마다 적어 주세요</h2>'+mode+(c.photoState==="done"?'<p class="note gp-warn-line"><b>사진에서 읽은 숫자예요.</b> 사진과 비교해서 틀린 곳만 고쳐 주세요. 특히 왼쪽·오른쪽을 확인해 주세요.</p>':'')+'<p class="note">단위는 m예요. 좌우는 목표선에서 벗어난 거리를 적고 왼·오를 눌러요. 가운데면 0이에요.</p>'+
+    var dk=field("어떤 거리예요?",chips("dk",[["carry","캐리"],["total","토탈"]],c.dk||"carry"),c.dk==="total"?"토탈은 굴러간 거리까지 들어가서 바닥 상태에 따라 달라져요. 화면에 캐리가 있으면 캐리가 더 정확해요.":"공이 떨어진 곳까지 거리예요. 화면에 토탈만 있으면 토탈을 눌러 주세요.");
+    var noSide=c.photoState==="done"&&!c.shots.some(function(x){return num(x.c)!=null&&String(x.l)!=="";});
+    return '<h2>공마다 적어 주세요</h2>'+mode+(c.photoState==="done"?'<p class="note gp-warn-line"><b>사진에서 읽은 숫자예요.</b> 사진과 비교해서 틀린 곳만 고쳐 주세요.'+(noSide?' 사진에 공마다 좌우 숫자가 없어서 <b>좌우 칸은 비워 뒀어요.</b> 기기에서 보고 적거나, 모르면 비워 두세요.':' 특히 왼쪽·오른쪽을 확인해 주세요.')+'</p>':'')+dk+'<p class="note">단위는 m예요. 좌우는 목표선에서 벗어난 거리를 적고 왼·오를 눌러요. 가운데면 0이에요.</p>'+
       '<div class="gs-rows">'+rows+'</div>'+(c.shots.length<CFG.maxShots?'<button type="button" class="btn btn-plain gc-fill" data-gs="more">5개 더 적기</button>':'')+nav();
   }
   function photoBox(c){
@@ -2708,7 +2711,7 @@ body{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
       return '<div class="gs-photo"><span class="ql">접수 번호</span><b class="gs-code">'+esc(c.photoCode)+'</b>'+st+
         (c.photoState==="retry"?'':'<button type="button" class="btn btn-flag gc-fill" data-gs="pcheck">결과 확인</button>')+'</div>';
     }
-    var h='<div class="gc-tip"><b>이렇게 찍어 주세요</b><ul class="gx-list"><li>기기 화면이나 기기 앱의 샷 기록을 찍거나 캡처해요</li><li>공마다 <b>캐리</b>랑 <b>좌우</b> 숫자가 보이게요</li><li>10개가 한 화면에 안 들어가면 나눠서 3장까지</li></ul></div>';
+    var h='<div class="gc-tip"><b>이렇게 찍어 주세요</b><ul class="gx-list"><li>기기 화면이나 기기 앱의 샷 기록을 찍거나 캡처해요</li><li>공마다 <b>캐리</b>(없으면 토탈)랑 <b>좌우</b> 숫자가 보이게요</li><li>샷 목록에 좌우가 안 나오면 좌우가 나오는 화면도 같이 찍어 주세요</li><li>10개가 한 화면에 안 들어가면 나눠서 3장까지</li></ul></div>';
     if(!PHOTO_API_())return h+'<p class="note"><b>사진 받기는 준비 중이에요.</b> 지금은 "직접 적기"를 써 주세요.</p>';
     h+='<label class="btn btn-plain gc-fill gs-pick">사진 고르기<input type="file" id="gsFile" accept="image/*" multiple hidden></label>'+
       '<div class="gs-thumbs">'+PHOTOS.map(function(p,i){return '<span class="gs-thumb"><img src="'+p.data+'" alt="'+(i+1)+'번 사진"><button type="button" class="chip" data-gs="pdel" data-i="'+i+'" aria-label="'+(i+1)+'번 사진 빼기">✕</button></span>';}).join("")+'</div>'+
@@ -2729,11 +2732,14 @@ body{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
       cv.getContext("2d").drawImage(im,0,0,cv.width,cv.height);ok({mime:"image/jpeg",data:cv.toDataURL("image/jpeg",0.82)});};im.src=rd.result;};rd.readAsDataURL(file);});}
   /* 사장님이 시트에 넣은 "158 R12, 160 L3, 159 0" → 칸 */
   function parseBoss(t){
-    return String(t||"").split(/[,\n;]+/).map(function(x){return x.trim();}).filter(Boolean).map(function(x){
+    var out=String(t||"").split(/[,\n;]+/).map(function(x){return x.trim();}).filter(Boolean).map(function(x){
       var m=x.match(/^(\d+(?:\.\d+)?)\s*(?:\/?\s*([LR좌우왼오]?)\s*(\d+(?:\.\d+)?)\s*([LR좌우왼오]?))?/i);if(!m)return null;
       var sd=(m[2]||m[4]||"").toUpperCase(),lv=m[3]?parseFloat(m[3]):null,side=null;
       if(lv)side=/^(L|좌|왼)$/.test(sd)?"L":/^(R|우|오)$/.test(sd)?"R":null;
       return {c:m[1],l:lv==null?"":String(lv),s:side};}).filter(Boolean).slice(0,CFG.maxShots);
+    /* 좌우가 전부 0이면 화면에 좌우가 없던 것으로 봄 (AI가 0으로 채운 경우) */
+    if(out.length>1&&out.every(function(x){return x.l===""||parseFloat(x.l)===0;}))out.forEach(function(x){x.l="";x.s=null;});
+    return out;
   }
   function stepper(k,i,t,v){return '<div class="gs-st"><span>'+esc(t)+'</span><span class="gs-sb"><button type="button" class="chip" data-gs="cnt" data-k="'+k+'" data-i="'+i+'" data-d="-1" aria-label="'+esc(t)+' 하나 빼기">−</button><b>'+v+'</b><button type="button" class="chip" data-gs="cnt" data-k="'+k+'" data-i="'+i+'" data-d="1" aria-label="'+esc(t)+' 하나 더하기">+</button></span></div>';}
   function sNotice(c){
@@ -2787,7 +2793,7 @@ body{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
     if(!c.sentAt&&window.WQ){
       var ans={shot:c.shot,club:c.club,target:c.target,shape:c.shape,res:c.res,where:c.where,when:(c.when||[]).filter(function(x){return x!=="pain";}),change:(c.change||[]).filter(function(x){return x!=="hurt";}),
         dev:c.dev,indoor:c.indoor,inMode:c.inMode||"type",photoCode:c.photoCode||null,shots:noDev(c)?null:c.shots.filter(function(x){return num(x.c)!=null;}),dir:noDev(c)?c.dir:null,hit:noDev(c)?c.hit:null};
-      var res={type:R.type,grade:a.grade,bias:a.bias,n:a.n,mode:a.mode,carry_median:a.M||null,dist_pct:a.distPct||null,dir_deg:a.dirDeg||null,big:a.big||0,base:a.base||null,eq:R.eq,next:R.next||null,second:R.second||null,cfg:CFG};
+      var res={type:R.type,grade:a.grade,bias:a.bias,n:a.n,mode:a.mode,dist_kind:c.dk==="total"?"total":"carry",carry_median:a.M||null,dist_pct:a.distPct||null,dir_deg:a.dirDeg||null,big:a.big||0,base:a.base||null,eq:R.eq,next:R.next||null,second:R.second||null,cfg:CFG};
       window.WQ.save("GSAS",summaryOf(R,c),res,ans).then(function(x){if(x&&x.ok){c.sentAt=Date.now();save();}});
     }
   }
@@ -2854,7 +2860,8 @@ body{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
         .then(function(r){b.disabled=false;if(!r.ok){msg(PERR[r.error]||"보내지 못했어요. 잠시 뒤 다시 해 주세요.");return;}
           c.photoCode=r.code;PHOTOS=[];
           var sh=r.ai&&r.shots?parseBoss(r.shots):[];
-          if(sh.length){c.shots=sh.concat(blankShots(Math.max(0,10-sh.length)));c.photoState="done";c.inMode="type";save();keep();toast("사진에서 "+sh.length+"개를 읽었어요. 맞는지 보고 틀린 곳만 고쳐 주세요.");return;}
+          if(sh.length){c.shots=sh.concat(blankShots(Math.max(0,10-sh.length)));c.photoState="done";c.inMode="type";if(r.dist==="total"||r.dist==="carry")c.dk=r.dist;save();keep();
+            toast("사진에서 "+sh.length+"개를 읽었어요"+(r.dist==="total"?" (토탈 거리)":r.dist==="carry"?" (캐리 거리)":" (캐리인지 토탈인지 골라 주세요)")+". 맞는지 보고 틀린 곳만 고쳐 주세요.");return;}
           c.photoState="wait";save();keep();toast("보냈어요. 사진에서 숫자를 다 못 읽어서 확인 뒤 알려 드릴게요.");});return;}
     if(act==="pcheck"){b.disabled=true;
       papi({action:"status",code:c.photoCode}).then(function(r){b.disabled=false;
