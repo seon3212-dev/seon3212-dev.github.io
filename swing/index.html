@@ -1,0 +1,369 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>와이즈골프 스윙 분석</title>
+<style>
+/* 와이즈골프 스윙 웹앱 v0.1 — 브라우저 안에서 영상→관절 분석→신호등 결과(결과 규격 v0.1) */
+:root{
+  --bg:#0e1411; --panel:#18211c; --panel2:#1f2a24; --line:#2c3a32;
+  --fg:#f2f6f3; --muted:#9db0a5; --faint:#6f8278; --accent:#36d17e; --accent-dim:#1f3a2c;
+  --good:#45c86a; --good-d:#163a24; --warn:#f3b84a; --warn-d:#3c2f10; --bad:#ef5f5f; --bad-d:#3a1b1b;
+  --unk:#6b7a72; --unk-d:#222c27;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--fg);font-family:"Noto Sans KR",system-ui,-apple-system,sans-serif;
+  font-variant-numeric:tabular-nums;padding:18px max(16px,env(safe-area-inset-left)) 40px}
+.wrap{max-width:760px;margin:0 auto;display:flex;flex-direction:column;gap:14px}
+.disp{font-family:"Black Han Sans",sans-serif;font-weight:400}
+h1{font-size:26px;margin:0;line-height:1}
+.sub{color:var(--faint);font-size:13px;margin-top:6px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:18px}
+.drop{border:2px dashed var(--line);border-radius:16px;padding:26px 18px;text-align:center;background:var(--panel);cursor:pointer}
+.drop.hi{border-color:var(--accent);background:var(--panel2)}
+.drop b{display:block;font-size:16px;margin-bottom:6px}
+.drop small{color:var(--muted);font-size:13px;line-height:1.5}
+.btn{font-family:inherit;font-weight:800;font-size:15px;color:#06130c;background:var(--accent);border:none;border-radius:12px;padding:12px 18px;cursor:pointer}
+.btn:disabled{opacity:.5;cursor:default}
+.btn.sec{background:var(--panel2);color:var(--fg);border:1px solid var(--line)}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.status{color:var(--muted);font-size:14px;line-height:1.6}
+.bar{height:8px;background:var(--panel2);border-radius:999px;overflow:hidden;border:1px solid var(--line)}
+.bar>i{display:block;height:100%;width:0;background:var(--accent);transition:width .2s}
+video,canvas{max-width:100%;border-radius:12px;display:block}
+.hidden{display:none}
+
+.sum{display:flex;align-items:center;gap:14px;flex-wrap:wrap;background:linear-gradient(180deg,var(--panel),var(--panel2));border:1px solid var(--line);border-radius:14px;padding:13px 16px}
+.sum .b{font-family:"Black Han Sans",sans-serif;font-size:20px;color:var(--accent)}
+.sum .c{display:inline-flex;align-items:center;gap:6px;font-size:14px;font-weight:700;color:var(--muted)}
+.sum .sw{width:11px;height:11px;border-radius:3px}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+@media(max-width:560px){.grid{grid-template-columns:1fr 1fr}}
+.box{position:relative;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:13px 13px 11px 17px;display:flex;flex-direction:column;gap:6px;min-height:104px;overflow:hidden}
+.box::before{content:"";position:absolute;left:0;top:0;bottom:0;width:5px}
+.box.good::before{background:var(--good)} .box.warn::before{background:var(--warn)} .box.bad::before{background:var(--bad)} .box.unknown::before{background:var(--unk)}
+.box .bn{font-weight:800;font-size:15.5px;line-height:1.15}
+.box .bs{display:inline-flex;align-items:center;gap:5px;font-weight:800;font-size:12px;padding:3px 9px;border-radius:999px;align-self:flex-start}
+.box .bs.good{color:#bdf0cd;background:var(--good-d)} .box .bs.warn{color:#f6dca0;background:var(--warn-d)} .box .bs.bad{color:#f4c0c0;background:var(--bad-d)} .box .bs.unknown{color:#c2cdc7;background:var(--unk-d)}
+.box .bv{color:var(--muted);font-size:13px;line-height:1.35;margin-top:auto}
+.box .gd{position:absolute;top:11px;right:11px;font-size:10px;font-weight:800;color:var(--faint);border:1px solid var(--line);background:var(--panel2);padding:2px 7px;border-radius:6px}
+.box .bn{padding-right:52px}
+.coach{background:linear-gradient(160deg,var(--accent-dim),var(--panel));border:1px solid var(--accent-dim);border-radius:14px;padding:15px 18px}
+.coach .ch{font-weight:800;font-size:15.5px;color:var(--accent);margin-bottom:7px}
+.coach .cb{font-size:15.5px;line-height:1.6}
+.coach .cb b{color:var(--accent)}
+details{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:10px 14px}
+summary{cursor:pointer;color:var(--muted);font-weight:700;font-size:13px}
+pre{white-space:pre-wrap;word-break:break-word;font-size:11.5px;color:var(--muted);margin:8px 0 0}
+.foot{color:var(--faint);font-size:12px;line-height:1.6}
+label.inl{display:inline-flex;align-items:center;gap:7px;color:var(--muted);font-size:13.5px}
+select,input[type=number]{font-family:inherit;background:var(--panel2);color:var(--fg);border:1px solid var(--line);border-radius:9px;padding:7px 10px;font-size:14px}
+</style>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Noto+Sans+KR:wght@400;700;800&display=swap">
+</head>
+<body>
+<div class="wrap">
+  <div>
+    <h1 class="disp">스윙 분석</h1>
+    <div class="sub">WISE GOLF · 영상 올리면 브라우저에서 바로 분석 (v0.1)</div>
+  </div>
+
+  <div id="uploadCard" class="card" style="display:flex;flex-direction:column;gap:14px">
+    <div id="drop" class="drop">
+      <b>스윙 영상 올리기</b>
+      <small>어드레스~피니시가 다 보이게 찍은 영상을 올려주세요.<br>측면(옆) 또는 정면, 둘 중 하나여도 됩니다. 영상은 <b>이 브라우저 안에서만</b> 분석되고 서버로 올라가지 않습니다.</small>
+    </div>
+    <input id="file" type="file" accept="video/*" class="hidden">
+    <div class="row">
+      <label class="inl">촬영 방향
+        <select id="view"><option value="side">측면(옆)</option><option value="front">정면</option></select>
+      </label>
+      <label class="inl">슬로우모션?
+        <select id="slow"><option value="auto">자동</option><option value="yes">예</option><option value="no">아니오</option></select>
+      </label>
+    </div>
+    <div class="row">
+      <button id="go" class="btn" disabled>분석 시작</button>
+      <span id="fname" class="status"></span>
+    </div>
+    <div id="prog" class="hidden">
+      <div class="status" id="pmsg">준비 중…</div>
+      <div class="bar"><i id="pbar"></i></div>
+    </div>
+    <video id="vid" class="hidden" playsinline muted></video>
+    <canvas id="cv" class="hidden"></canvas>
+  </div>
+
+  <div id="result" class="hidden" style="display:flex;flex-direction:column;gap:14px">
+    <div class="sum" id="sum"></div>
+    <div class="grid" id="grid"></div>
+    <div class="coach"><div class="ch">AI 코칭 한마디</div><div class="cb" id="coach">—</div></div>
+    <div class="row">
+      <a class="btn sec" href="https://seon3212-dev.github.io/#gsas">← 슬기로운 골프 생활(GSAS)로</a>
+      <button id="again2" class="btn sec">다른 영상 분석</button>
+    </div>
+    <div class="foot" id="rfoot"></div>
+    <details><summary>개발용 — 결과 데이터(result.json) 보기</summary><pre id="json"></pre>
+      <div class="row" style="margin-top:8px"><button id="dl" class="btn sec">result.json 저장</button>
+      <button id="again" class="btn sec">다른 영상 분석</button></div></details>
+  </div>
+</div>
+
+<script type="module">
+import { PoseLandmarker, FilesetResolver } from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/vision_bundle.mjs";
+
+const ENGINE_VER="swing-web-0.1", MODEL="mediapipe pose_landmarker_full", RULESET="swing-rules-0.1";
+const GSAS_URL="https://seon3212-dev.github.io/#gsas";
+const $=id=>document.getElementById(id);
+// 슬기로운 골프 생활과 같은 주소 아래에 두면 같은 기기번호(wq_device_id)로 기록이 묶임
+function deviceId(){ try{ let d=localStorage.getItem("wq_device_id");
+  if(!d){ const a="0123456789abcdefghijklmnopqrstuvwxyz"; d=[...crypto.getRandomValues(new Uint8Array(20))].map(b=>a[b%36]).join(""); localStorage.setItem("wq_device_id",d); }
+  return d; }catch(e){ return "nodev"; } }
+let landmarker=null, chosenFile=null;
+
+// ---------- 파일 선택 ----------
+const drop=$("drop"), file=$("file");
+drop.onclick=()=>file.click();
+drop.ondragover=e=>{e.preventDefault();drop.classList.add("hi")};
+drop.ondragleave=()=>drop.classList.remove("hi");
+drop.ondrop=e=>{e.preventDefault();drop.classList.remove("hi");if(e.dataTransfer.files[0])pick(e.dataTransfer.files[0])};
+file.onchange=()=>{if(file.files[0])pick(file.files[0])};
+function pick(f){chosenFile=f;$("fname").textContent=f.name;$("go").disabled=false;}
+
+// ---------- 모델 로드 ----------
+async function ensureModel(){
+  if(landmarker) return;
+  $("pmsg").textContent="분석 엔진 불러오는 중… (처음 한 번)";
+  const vision=await FilesetResolver.forVisionTasks("https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/wasm");
+  landmarker=await PoseLandmarker.createFromOptions(vision,{
+    baseOptions:{modelAssetPath:"https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_full/float16/1/pose_landmarker_full.task"},
+    runningMode:"VIDEO", numPoses:1
+  });
+}
+
+// ---------- 분석 ----------
+$("go").onclick=async()=>{
+  if(!chosenFile) return;
+  $("go").disabled=true; $("prog").classList.remove("hidden");
+  try{
+    await ensureModel();
+    const frames=await runPose(chosenFile);
+    const res=analyze(frames, $("view").value, $("slow").value);
+    render(res);
+    $("uploadCard").style.display="none"; $("result").classList.remove("hidden");
+  }catch(err){
+    $("pmsg").textContent="오류: "+(err?.message||err)+" (인터넷 연결/영상 형식을 확인해 주세요)";
+    $("go").disabled=false;
+  }
+};
+
+function runPose(f){
+  return new Promise((resolve,reject)=>{
+    const vid=$("vid"), cv=$("cv"), ctx=cv.getContext("2d");
+    vid.src=URL.createObjectURL(f);
+    vid.onloadedmetadata=()=>{
+      const W=vid.videoWidth, H=vid.videoHeight, dur=vid.duration;
+      cv.width=W; cv.height=H;
+      const N=Math.min(300, Math.max(30, Math.round(dur*30))); // 최대 300샘플
+      const frames=[]; let i=0;
+      const step=()=>{
+        if(i>=N){resolve({frames,W,H,dur}); return;}
+        const t=dur*i/(N-1);
+        vid.currentTime=Math.min(t, Math.max(0,dur-0.001));
+        i++;
+      };
+      vid.onseeked=()=>{
+        ctx.drawImage(vid,0,0,W,H);
+        let lm=null;
+        try{
+          const r=landmarker.detectForVideo(cv, performance.now());
+          if(r.landmarks&&r.landmarks[0]) lm=r.landmarks[0].map(p=>({x:p.x*W,y:p.y*H}));
+        }catch(e){}
+        frames.push(lm);
+        const pct=Math.round(100*frames.length/N);
+        $("pbar").style.width=pct+"%"; $("pmsg").textContent=`분석 중… ${pct}%`;
+        step();
+      };
+      step();
+    };
+    vid.onerror=()=>reject(new Error("영상을 읽지 못했습니다"));
+  });
+}
+
+// ---------- 지표 계산 (결과 규격 v0.1) ----------
+const median=a=>{if(!a.length)return 0;const s=[...a].sort((x,y)=>x-y);const m=s.length>>1;return s.length%2?s[m]:(s[m-1]+s[m])/2;};
+// 손떨림 노이즈 완화용 중심 이동평균(null 유지)
+const smooth=(a,w)=>{const h=w>>1;return a.map((_,i)=>{let s=0,c=0;for(let j=i-h;j<=i+h;j++){if(a[j]!=null){s+=a[j];c++;}}return c?s/c:null;});};
+// 한글 조사: 받침 유무로 은/는·이/가
+function josa(w,t){ if(!w) return ""; const c=w.charCodeAt(w.length-1); const jong=(c>=0xAC00&&c<=0xD7A3)?((c-0xAC00)%28)!==0:false; return t==="은는"?(jong?"은":"는"):t==="이가"?(jong?"이":"가"):""; }
+
+function analyze(data, view, slowSel){
+  const F=data.frames, W=data.W, H=data.H;
+  const det=F.filter(Boolean).length, n=F.length;
+  const detRate=Math.round(100*det/Math.max(n,1));
+  const metrics=[];
+  const push=(key,name,value,unit,grade,status,reason,sv)=>metrics.push({key,name,value,unit,grade,status,reason_unknown:reason||null,source_view:sv});
+
+  // 인식 부실 → 전체 판단 불가
+  if(det<n*0.6){
+    ["스윙 템포","머리 움직임","중심 좌우 이동","척추각(어드레스)","하체 스웨이","어깨 회전"].forEach(nm=>
+      push(nm,nm,null,null,"estimated","unknown","관절 인식이 충분하지 않음(촬영 조건)",view));
+    return wrap(metrics, data, view, detRate, "이번 영상은 관절 인식이 부족해 판단을 보류했어요. 밝은 곳에서 스윙 전체가 보이게 다시 찍어 주세요.");
+  }
+
+  const wristY=F.map(p=>p?((p[15].y+p[16].y)/2):null);
+  const noseX=F.map(p=>p?p[0].x:null), noseY=F.map(p=>p?p[0].y:null);
+  const hipX=F.map(p=>p?((p[23].x+p[24].x)/2):null);
+  const shoulderW=(()=>{const p=F.find(Boolean);return Math.hypot(p[11].x-p[12].x,p[11].y-p[12].y)||1;})();
+
+  // 손떨림 노이즈 완화(위상 탐지용)
+  const smY=smooth(wristY,5);
+  // 어드레스 손높이 기준선: 앞부분 안정 구간 중앙값(y 큰 값=손 낮음)
+  const head0=smY.filter(v=>v!=null).slice(0,Math.max(3,Math.floor(n*0.12)));
+  const baseline=median(head0);
+  const rise=shoulderW*0.5;                       // 백스윙으로 인정할 상승량
+
+  // 탑·임팩트 상태기계: 어드레스 → 백스윙(탑) → 다운스윙(임팩트).
+  // 탑은 '첫 백스윙' 최고점에서 잠금 → 피니시(손이 탑보다 높음)를 탑으로 오인하지 않음.
+  // 임팩트는 다운스윙에서 손이 가장 낮아지는 지점 → 절대 임계값/스무딩에 둔감.
+  let top=-1, impact=-1, cross=-1, minY=Infinity, maxY=-Infinity, st=0;
+  const rev=rise*0.25;                            // 반전 인정량
+  for(let i=0;i<n;i++){
+    const y=smY[i]; if(y==null) continue;
+    if(st===0){ if(y < baseline-rise){ cross=i; top=i; minY=y; st=1; } }   // 급상승 시작
+    else if(st===1){ if(y<minY){ minY=y; top=i; } else if(y-minY>rev){ impact=i; maxY=y; st=2; } } // 탑 잠금→다운
+    else if(st===2){ if(y>maxY){ maxY=y; impact=i; } else if(maxY-y>rev){ break; } }  // 손 최저=임팩트, 이후 피니시 중단
+  }
+  // 피크 위치를 가벼운 신호(w3)로 재보정 → 과한 스무딩이 탑을 앞당기는 편향 제거
+  const sm3=smooth(wristY,3);
+  const refine=(c,dir)=>{ if(c<0) return c; let bi=c, bv=dir<0?Infinity:-Infinity;
+    for(let i=Math.max(0,c-5);i<=Math.min(n-1,c+5);i++){ const y=sm3[i]; if(y==null) continue; if(dir<0? y<bv : y>bv){ bv=y; bi=i; } } return bi; };
+  top=refine(top,-1); impact=refine(impact,1);
+  // 테이크어웨이: 급상승 구간(cross)에서 '뒤로' 걸어 어드레스 정지 지점으로.
+  // (탑이 아니라 급상승 지점에서 시작 → 탑 근처 감속에 걸려 멈추는 문제 회피)
+  let tk = top>0 ? top : 0;
+  if(cross>0){
+    const flat=shoulderW*0.02;                    // 스무딩 후 노이즈 바닥 위
+    tk=cross;
+    for(let i=cross;i>0;i--){
+      const a=smY[i-1], b=smY[i];
+      if(a==null){ tk=i; break; }
+      if(a-b>flat){ tk=i-1; }                      // 뒤로 갈수록 손이 내려가면(상승 슬로프) 계속 확장
+      else { tk=i; break; }                        // 평평해지면 멈춤 = 테이크어웨이
+    }
+  }
+  const addr=tk;
+  const okSeg = top>addr && impact>top;
+
+  // 1) 템포 (실측): 백=탑-테이크어웨이, 다운=임팩트-탑
+  if(okSeg && (top-tk)>1 && (impact-top)>0){
+    const ratio=(top-tk)/(impact-top);
+    // 밴드 A(느슨): 2D 테이크어웨이 측정 불확실성(~±0.4) 감안 — 확실히 벗어날 때만 '주의',
+    //            그 안은 '좋음'으로 거짓 경고 방지. 실데이터 쌓이면 밴드 보정.
+    const st = (ratio<2.0 || ratio>4.0) ? "caution" : "good";
+    push("tempo","스윙 템포", +ratio.toFixed(1), " : 1", "measured", st, null, view);
+  } else push("tempo","스윙 템포", null, null, "measured","unknown","스윙 구간(탑/임팩트) 탐지 실패",view);
+
+  // 세그먼트(테이크어웨이~임팩트)
+  const seg=(arr)=> okSeg ? arr.slice(addr,impact+1).filter(v=>v!=null) : [];
+
+  // 2) 머리 움직임 (실측 상대값)
+  const sx=seg(noseX), sy=seg(noseY);
+  if(sx.length>3){
+    const sway=(Math.max(...sx)-Math.min(...sx))/shoulderW*100;
+    const lift=(Math.max(...sy)-Math.min(...sy))/shoulderW*100;
+    const v=Math.max(sway,lift);
+    const st = v<35?"good":(v<60?"caution":"bad");
+    push("head","머리 움직임", +v.toFixed(0), "%", "measured", st, null, view);
+  } else push("head","머리 움직임",null,null,"measured","unknown","머리 추적 실패",view);
+
+  // 3) 중심 좌우 이동 (추정·참고값 — v0.1 판정 보류, 방향·임계값 보정 전)
+  const shx=seg(hipX);
+  if(view==="front" && shx.length>3){
+    const shift=(shx[shx.length-1]-shx[0])/shoulderW*100;   // 부호 유지(+/-): 양수=화면 오른쪽 이동
+    push("center","중심 좌우 이동", +shift.toFixed(0), "%", "estimated", "unknown", "기준 보정 전(참고값)", "front");
+  } else push("center","중심 좌우 이동", null, null, "estimated","unknown", view==="front"?"골반 추적 실패":"정면캠에서만 측정", "front");
+
+  // 4) 척추각(어드레스) (추정·참고값)
+  if(view==="side" && F[addr]){
+    const p=F[addr]; const sh={x:(p[11].x+p[12].x)/2,y:(p[11].y+p[12].y)/2}, hp={x:(p[23].x+p[24].x)/2,y:(p[23].y+p[24].y)/2};
+    const tilt=Math.atan2(Math.abs(sh.x-hp.x),Math.abs(sh.y-hp.y))*180/Math.PI;
+    push("spine","척추각(어드레스)", +tilt.toFixed(0), "°", "estimated","unknown","기준 보정 전(참고값)", "side");
+  } else push("spine","척추각(어드레스)", null,null,"estimated","unknown", view==="side"?"어드레스 프레임 불명":"측면캠에서만 측정","side");
+
+  // 5) 하체 스웨이 (추정·참고값)
+  if(okSeg){
+    const bkx=hipX.slice(addr,top+1).filter(v=>v!=null);
+    if(bkx.length>3){
+      const sway=(Math.max(...bkx)-Math.min(...bkx))/shoulderW*100;
+      push("sway","하체 스웨이", +sway.toFixed(0), "%","estimated","unknown","기준 보정 전(참고값)",view);
+    } else push("sway","하체 스웨이", null,null,"estimated","unknown","골반 추적 실패",view);
+  } else push("sway","하체 스웨이", null,null,"estimated","unknown","스윙 구간 탐지 실패",view);
+
+  // 6) 어깨 회전 (정면캠 필요 — v0.1 보류)
+  push("shoulder","어깨 회전", null,null,"estimated","unknown","정면·측면 2캠 필요(v0.1 보류)","-");
+
+  // 7) 체중 압력 (측정 불가)
+  push("pressure","체중 압력(kg)", null,null,"not_measurable","unknown","압력판 필요 — 영상으론 측정 안 함","-");
+
+  return wrap(metrics, data, view, detRate, null);
+}
+
+function wrap(metrics, data, view, detRate, forceCoach){
+  const good=metrics.filter(m=>m.status==="good").length;
+  const caution=metrics.filter(m=>m.status==="caution").length;
+  const bad=metrics.filter(m=>m.status==="bad").length;
+  const unknown=metrics.filter(m=>m.status==="unknown").length;
+  // 코칭(검증 전 — 교정 지시 금지, 관찰·재촬영 문구만)
+  let coach=forceCoach;
+  if(!coach){
+    const goodNames=metrics.filter(m=>m.status==="good").map(m=>m.name);
+    const flags=metrics.filter(m=>m.status==="caution"||m.status==="bad");
+    const gn=goodNames.join(", "), fn=flags.map(m=>m.name).join(", ");
+    coach = goodNames.length ? `${gn}${josa(gn,"은는")} 기준 안에 들어요. ` : "";
+    if(flags.length) coach += `이번 촬영에서 <b>${fn}</b>${josa(fn,"이가")} 기준에서 벗어나 보입니다. 촬영 위치의 영향을 확인하려면 같은 조건으로 다시 비교해 보세요.`;
+    else if(goodNames.length) coach += "전반적으로 안정적이에요. 같은 조건으로 몇 번 더 찍어 비교해 보세요.";
+    else coach = "이번 영상에서는 판정할 수 있는 지표가 부족했어요. 측면 또는 정면에서 스윙 전체가 보이게 다시 찍어 주세요.";
+  }
+  return {
+    schema_ver:"0.1", created_at:new Date().toISOString(),
+    subject:{ device_id:deviceId(), source:"swing_web" },
+    capture:{ views:[view], slowmo: $("slow").value, quality: detRate>=60?"ok":"low", detect_rate:detRate, time_base_ok:false },
+    metrics, overall:{good,caution,needs_work:bad,unknown},
+    coaching:{ text:coach, verified:false },
+    versions:{ engine:ENGINE_VER, model:MODEL, ruleset:RULESET },
+    privacy:{ video_kept:false, processed_at:"browser", consent:"result_only" }
+  };
+}
+
+// ---------- 렌더 ----------
+function render(res){
+  const o=res.overall;
+  const verdict = o.good===0 ? "분석 보류" : (o.needs_work+o.caution===0 ? "좋아요 👍" : "분석 완료");
+  $("sum").innerHTML=`<span class="b">${verdict}</span>`+
+    `<span class="c"><span class="sw" style="background:var(--good)"></span>좋음 ${o.good}</span>`+
+    `<span class="c"><span class="sw" style="background:var(--warn)"></span>주의 ${o.caution}</span>`+
+    `<span class="c"><span class="sw" style="background:var(--bad)"></span>보완 ${o.needs_work}</span>`+
+    `<span class="c"><span class="sw" style="background:var(--unk)"></span>판단보류 ${o.unknown}</span>`;
+  const gLabel={measured:"실측",estimated:"추정",not_measurable:"측정불가"};
+  const sLabel={good:"좋음",caution:"주의",bad:"보완",unknown:"판단 불가"};
+  $("grid").innerHTML=res.metrics.map(m=>{
+    const cls=m.status;
+    const badge=`<span class="bs ${cls}">${m.status==="good"?"✓ ":""}${sLabel[m.status]}</span>`;
+    const val = m.value!=null ? `${m.value}${m.unit||""}` : (m.reason_unknown||"");
+    return `<div class="box ${cls}"><span class="gd">${gLabel[m.grade]}</span><div class="bn">${m.name}</div>${badge}<div class="bv">${val}</div></div>`;
+  }).join("");
+  $("coach").innerHTML=res.coaching.text;
+  $("rfoot").textContent=`관절 인식률 ${res.capture.detect_rate}% · 엔진 ${res.versions.engine} · 코칭은 검증 전 참고용입니다(교정 지시 아님).`;
+  $("json").textContent=JSON.stringify(res,null,2);
+  $("dl").onclick=()=>{const b=new Blob([JSON.stringify(res,null,2)],{type:"application/json"});
+    const a=document.createElement("a");a.href=URL.createObjectURL(b);a.download="result.json";a.click();};
+  $("again").onclick=()=>location.reload();
+  const a2=$("again2"); if(a2) a2.onclick=()=>location.reload();
+}
+</script>
+</body>
+</html>
