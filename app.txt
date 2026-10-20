@@ -2544,7 +2544,7 @@ body{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
       if(r.hasL)r.facts.push("좌우: "+(Math.abs(r.mL)<1?"가운데쯤":"가운데에서 "+(r.mL>0?"오른쪽":"왼쪽")+"으로 "+Math.round(Math.abs(r.mL))+"m쯤")+"에 모이고, 절반 정도가 ±"+Math.max(1,Math.round(mad(ls,r.mL)))+"m 안이에요");
       else r.facts.push("좌우 거리가 적혀 있지 않아서 방향은 보지 않았어요");
       if(tg){var df=Math.round(M-tg);r.facts.push(Math.abs(df)<=2?"목표 "+Math.round(tg)+"m랑 거의 같게 가요":"목표 "+Math.round(tg)+"m보다 "+Math.abs(df)+"m "+(df>0?"더 가요":"덜 가요"));}
-      r.facts.push("크게 벗어난 공 "+big+"개");
+      r.facts.push((r.hasL?"크게 벗어난 공 ":"거리 기준 크게 짧은 공 ")+big+"개");
     }else{
       var d=c.dir,n=d.reduce(function(a,b){return a+b;},0);r.n=n;
       if(n<CFG.minShots)return r;
@@ -2615,6 +2615,8 @@ body{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
   var GN={stable:"잘 모여요",part:"조금 흩어져요",vary:"많이 흩어져요",hold:"아직 몰라요"};
   var EQN={high:"충분해요",mid:"보통이에요",low:"부족해요",none:"부족해요"};
   var BN={right:"오른쪽으로",left:"왼쪽으로",short:"목표보다 짧게"};
+  function noL(a){return a.mode==="dev"&&!a.hasL;}  /* 좌우 자료 없음 → 방향은 판단 안 함 */
+  function biasTxt(a){var t=a.bias.map(function(b){return BN[b];}).join(", ");if(noL(a))return t?t+" · 좌우는 판단 안 함":"좌우 자료 없어 판단 안 함";return t||"아니요";}
 
   /* ---- 화면 ---- */
   function chips(k,list,val,multi,max){
@@ -2761,8 +2763,8 @@ body{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
     h+='<div class="card gc-cad"><small>캐디 한마디</small><p>"'+esc(T.cad)+'"</p></div>';
     var bias=a.bias.length?a.bias.map(function(b){return BN[b];}).join(", ")+" 가요":"뚜렷하지 않아요";
     h+='<div class="card"><h2>한눈에</h2><ul class="gc-stat">'+
-      '<li><span>공이 모이는 정도</span>'+pill(a.grade==="stable"?"gp-good":a.grade==="part"?"gp-watch":a.grade==="vary"?"gp-pri":"gp-hold",GN[a.grade])+'</li>'+
-      '<li><span>한쪽으로 가는지</span>'+pill(a.bias.length?"gp-watch":"gp-good",a.bias.length?a.bias.map(function(b){return BN[b];}).join(", "):"아니요")+'</li>'+
+      '<li><span>공이 모이는 정도'+(noL(a)?' (거리만)':'')+'</span>'+pill(a.grade==="stable"?"gp-good":a.grade==="part"?"gp-watch":a.grade==="vary"?"gp-pri":"gp-hold",GN[a.grade])+'</li>'+
+      '<li><span>한쪽으로 가는지</span>'+pill(a.bias.length?"gp-watch":noL(a)?"gp-hold":"gp-good",biasTxt(a))+'</li>'+
       '<li><span>적어 주신 자료</span>'+pill(R.eq==="high"?"gp-good":R.eq==="mid"?"gp-watch":"gp-pri",EQN[R.eq])+'</li></ul>'+
       '<p class="gp-fine">'+esc(lab(SHOT,c.shot))+' · '+esc(CNAME[c.club]||"")+' · 공 '+a.n+'개'+(a.n<CFG.fullShots&&a.n>=CFG.minShots?' (10개보다 적어서 미리 보는 결과)':'')+' · '+(noDev(c)?"기기 없이 셈":esc(lab(DEV,c.dev))+(c.indoor==="in"?" 실내":c.indoor==="out"?" 실외":""))+(c.safe==="caution"?" · 몸이 조금 불편한 상태":"")+'</p></div>';
     h+='<div class="card"><h2>숫자로 본 것</h2><ul class="gc-facts">'+a.facts.map(function(f){return '<li>'+esc(f)+'</li>';}).join("")+'</ul>'+
@@ -2801,8 +2803,8 @@ body{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
     var c=cur(),R=judge(c);if(R.type==="STOP")return "[스윙 진단] 오늘은 쉬어요\n— WISE QUAD 스윙 진단(GSAS) · 슬기로운골프생활 · WISE GOLF";
     var a=R.a,L=["[스윙 진단 결과] "+summaryOf(R,c)];
     L.push("· "+lab(SHOT,c.shot)+" · "+(CNAME[c.club]||"")+" · 공 "+a.n+"개");
-    L.push("· 공이 모이는 정도: "+GN[a.grade]);
-    L.push("· 한쪽으로 가는지: "+(a.bias.length?a.bias.map(function(b){return BN[b];}).join(", "):"아니요"));
+    L.push("· 공이 모이는 정도"+(noL(a)?" (거리만)":"")+": "+GN[a.grade]);
+    L.push("· 한쪽으로 가는지: "+biasTxt(a));
     a.facts.forEach(function(f){L.push("· "+f);});
     if(R.next)L.push("· 다음에 먼저 볼 쪽: "+PART[R.next].n);
     L.push("— WISE QUAD 스윙 진단(GSAS) · 슬기로운골프생활 · WISE GOLF");
