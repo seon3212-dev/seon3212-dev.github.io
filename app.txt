@@ -2371,7 +2371,7 @@ body{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
     if(r.type==="D")nx.push("어떤 미스가 나는지, 옆 채는 어떤지 알아본 뒤 다시 해 보세요.");
     if(r.type==="F"){
       if(c.onset==="body")nx.push("신체 검사(GPAS)로 몸에서 먼저 확인할 곳을 찾아보세요.");
-      if(c.other==="most"||c.onset==="swing")nx.push("스윙 검사(GSAS)는 준비 중이에요. 그 전에는 레슨 프로에게 스윙을 먼저 봐 달라고 하세요.");
+      if(c.other==="most"||c.onset==="swing")nx.push("스윙 진단(GSAS)으로 같은 채 10구를 쳐서 스윙 쪽을 먼저 확인해 보세요.");
     }
     if(r.type!=="E")nx.push("측정 결과 나올 때까지는 채를 손대지 마세요. 바꿀 땐 한 번에 하나만, 바꾸기 전·후를 적어 두세요.");
     if(r.afterChg)nx.push("바꾼 뒤부터 이상하다면, 어디서 뭘 바꿨는지부터 챙겨 오세요.");
