@@ -167,7 +167,7 @@ input[type=time],input[type=number]{font-family:var(--font-display);font-size:22
 .step{display:flex;align-items:center;gap:6px}
 .step button{width:42px;height:42px;border-radius:50%;border:1px solid var(--line);background:var(--surface);color:var(--ink);font-size:20px;cursor:pointer}
 .step output{font-family:var(--font-display);font-size:30px;font-weight:700;min-width:40px;text-align:center;font-variant-numeric:tabular-nums}
-.more-rules{margin:6px 0 2px;border-top:1px solid var(--line,#dfe6e1);padding-top:10px}.more-rules>summary{cursor:pointer;padding:6px 0;list-style:revert}.more-rules[open]>summary{margin-bottom:8px}.more-rules>summary .note{margin-left:4px}.hd-avg{display:grid;gap:8px;margin:6px 0}.hd-arow{display:grid;grid-template-columns:72px 1fr;align-items:center;gap:10px}.hd-arow span{font-weight:700}.hd-arow input{max-width:140px}.settle.sh-list li{grid-template-columns:1fr auto auto;align-items:center}.settle.sh-list .amt{font-size:18px}.settle.sh-list .chip{min-height:32px;padding:2px 12px}
+.more-rules{margin:8px 0 2px}.more-rules>summary{cursor:pointer;list-style:none;display:block;padding:12px 14px;border:1.5px solid var(--ink,#1d2a22);border-radius:14px;background:var(--surface,#fff)}.more-rules>summary::-webkit-details-marker{display:none}.more-rules .mr-top{display:flex;justify-content:space-between;align-items:center;gap:8px}.more-rules .mr-act::after{content:"펼치기 ▾";font-size:13px;font-weight:700;padding:3px 10px;border-radius:999px;background:var(--chip,#e6ece8)}.more-rules[open] .mr-act::after{content:"접기 ▴"}.more-rules[open]>summary{margin-bottom:10px}.more-rules>summary .note{display:block;margin-top:4px}.hd-avg{display:grid;gap:8px;margin:6px 0}.hd-arow{display:grid;grid-template-columns:72px 1fr;align-items:center;gap:10px}.hd-arow span{font-weight:700}.hd-arow input{max-width:140px}.settle.sh-list li{grid-template-columns:1fr auto auto;align-items:center}.settle.sh-list .amt{font-size:18px}.settle.sh-list .chip{min-height:32px;padding:2px 12px}
 .sc-wrap{overflow-x:auto;margin-inline:-4px;padding-inline:4px}
 table.sc{border-collapse:collapse;font-variant-numeric:tabular-nums;font-size:14px;min-width:100%}
 .sc th,.sc td{text-align:center;padding:6px 4px;border-bottom:1px solid var(--line);min-width:30px}
@@ -504,7 +504,7 @@ body{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
       <div id="betBox" class="q" hidden>
         <div class="gdesc" id="gdesc"></div>
         <div id="amtBox" class="q"></div>
-        <details class="more-rules" id="moreRules"><summary><b>규칙 더 정하기</b><span class="note" id="moreSum"></span></summary>
+        <details class="more-rules" id="moreRules"><summary><span class="mr-top"><b>규칙 더 정하기</b><span class="mr-act"></span></span><span class="note" id="moreSum"></span></summary>
         <div class="q" id="skipRow"><span class="ql">첫 홀 · 마지막 홀</span><div class="quick" id="skipChips"></div><p class="note" id="skipNote">기본은 모든 홀 내기해요. 안 함을 고른 홀은 스코어만 적어요.</p></div>
         <div id="hdBox" class="q"></div>
         <div id="tadOpts" class="q">
@@ -1288,7 +1288,7 @@ body{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
       if(["tadang","scratch"].indexOf(G.id)>=0)mt.push(hc.when==="none"?"핸디 없음":lab2(HD_WHEN,hc.when).replace(/ \(.*\)/,""));
       if(G.id==="tadang"){var bpn=["tie3","tie4","triple","yangpa","par3dbl","birdie"].filter(function(k){return (S.bet.bp||{})[k];}).length;mt.push(bpn?"배판 조건 "+bpn+"개":"배판 없음");}
       var sk=[[0,"첫 홀"],[17,"마지막 홀"]].map(function(x){var m=holeMode(x[0]);return m==="off"?x[1]+" 안 함":(m==="birdie"?x[1]+" 버디피만":null);}).filter(Boolean);mt=mt.concat(sk);
-      msum.textContent=mt.length?" · "+mt.join(" · "):"";}
+      msum.textContent=(mt.length?mt.join(" · "):"기본 규칙")+" — 첫·마지막 홀, 핸디, 배판, 보너스";}
     if(G.id==="tadang"){var bpo=S.bet.bp||{};
       $("bpChips").innerHTML=[["tie3","3명 동타"],["tie4","4명 동타 시 다음 홀 배판"],["triple","트리플 이상"],["yangpa","양파(더블파) 이상"],["par3dbl","파3 더블 이상"],["birdie","버디 이상"]].map(function(x){return '<button type="button" class="chip" data-bp="'+x[0]+'" aria-pressed="'+(!!bpo[x[0]])+'">'+x[1]+'</button>';}).join("");
       var bpAny=["tie3","tie4","triple","yangpa","par3dbl","birdie"].some(function(k){return bpo[k];});$("bpWhenRow").hidden=!bpAny;var c4=S.bet.stack!=="cap2";$("bpWhenNote").textContent=(S.bet.bpWhen==="this"?"조건이 나온 그 홀이 2배예요.":"조건이 나온 다음 홀이 2배예요.")+" 조건이 두세 개 겹쳐도 2배예요."+(S.bet.bpWhen==="this"&&bpo.tie4?" 4명 동타는 당홀·다음 홀 설정과 상관없이 다음 홀이 배판이에요.":"")+(S.bet.stack!=="cap2"?" 땅·자배와 겹치면 4배예요.":" 땅·자배와 겹쳐도 2배예요.");
