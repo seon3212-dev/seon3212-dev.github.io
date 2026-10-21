@@ -868,7 +868,7 @@ body{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
     return {tab:"plan",course:"",courseId:null,nines:null,date:today(),tee:"",players:["","","",""],
       move:"self",pick:{},buffer:40,drive:50,traffic:0,first:false,pack:{},
       stops:{coffee:{on:false,where:"course"},gimbap:{on:false,where:"home"},store:{on:false,where:"home"},gas:{on:false,where:"home"},meal:{on:false,where:"course"}},
-      bet:{on:false,game:"tadang",amt:{},bp:{tie3:true,tie4:true,triple:true,yangpa:false,par3dbl:true,birdie:true},hd:{when:"pre",um:"base",uv:0,list:[]},hdDraft:{},bpWhen:"next",bonus:{birdie:{mode:"stroke",v:1},putt:{mode:"stroke",v:3},shot:{mode:"stroke",v:5},hio:{mode:"stroke",v:10}},eg:{},pk:{},dr:{},joker:"bogey",drawMode:"app",vtie:"carry",stack:"cap4",hrank:2,skip:{first:"on",last:"on"},nearMode:"carry",order:null,vg:{},hz:{},near:{},dc:{},ab:{},gal:[],uc:{}},age19:false,
+      bet:{on:false,game:"tadang",amt:{},bp:{tie3:true,tie4:true,triple:true,yangpa:false,par3dbl:true,birdie:true},hd:{when:"pre",list:[]},hdDraft:{},bpWhen:"next",bonus:{birdie:{mode:"stroke",v:1},putt:{mode:"stroke",v:3},shot:{mode:"stroke",v:5},hio:{mode:"stroke",v:10}},eg:{},pk:{},dr:{},joker:"bogey",drawMode:"app",vtie:"carry",stack:"cap4",hrank:2,skip:{first:"on",last:"on"},nearMode:"carry",order:null,vg:{},hz:{},near:{},dc:{},ab:{},gal:[],uc:{}},age19:false,
       par:DEFAULT_PAR.slice(),scores:[0,1,2,3].map(function(){return Array(18).fill(null);}),hole:0,sample:false};
   }
   function sample(){
@@ -1100,35 +1100,38 @@ body{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
   /* 핸디: 잘 치는 사람이 타수로 접어 주는 것. 돈 = 타수 × 민판 한 타 금액(배판 금액 아님).
      선핸디 = 라운드 전에 줌(처음부터 정산에 들어감) / 후핸디 = 전반 끝나고 또는 18홀 끝나고 줌(그때 정산에 들어감) */
   var HD_WHEN=[["pre","선핸디 (치기 전에)"],["turn","후핸디 (전반 끝나고)"],["end","후핸디 (18홀 끝나고)"]];
-  function hdCfg(){var h=S.bet.hd||{};return {when:h.when||"pre",um:h.um==="custom"?"custom":"base",uv:Math.max(0,Math.floor(+h.uv||0)),list:Array.isArray(h.list)?h.list:[]};}
+  function hdCfg(){var h=S.bet.hd||{};return {when:h.when||"pre",list:Array.isArray(h.list)?h.list:[]};}
   function hdDue(c,per){
     if(c.when==="pre")return true;
     var last=c.when==="turn"?9:18;for(var h=0;h<last;h++){var ph=per[h];if(!ph||ph.need)return false;}return true;}
+  /* 한 건 = 타수(n × 민판 한 타 금액) 또는 금액 직접(a원) */
   function hdApply(a,per,unit){
-    var c=hdCfg(),U={v:c.um==="custom"?c.uv:unit},due=hdDue(c,per),L=c.list.filter(function(x){return x&&a.indexOf(x.f)>=0&&a.indexOf(x.t)>=0&&x.f!==x.t&&x.n>0;});
-    var rows=L.map(function(x){return {f:x.f,t:x.t,n:x.n,won:x.n*U.v};});
-    return {on:due&&U.v>0?rows:[],wait:due?[]:rows,rows:rows,unitV:U.v,when:c.when,custom:c.um==="custom"};}
-  function hdText(R,list){return (list||R.rows).map(function(x){return nameOf(x.f)+" → "+nameOf(x.t)+" "+x.n+"타"+(R.unitV?"("+money(x.won)+")":"");}).join(", ");}
-  function hdNote(R){if(!R||!R.rows.length)return "";var w=lab2(HD_WHEN,R.when);
-    if(R.on.length)return " · "+w+" 포함: "+hdText(R,R.on)+" · 1타 "+money(R.unitV)+(R.custom?"(직접 정한 금액)":"(민판 한 타 금액)");
-    if(R.wait.length)return " · "+w+" "+hdText(R,R.wait)+"는 "+(R.when==="turn"?"전반 9홀":"18홀")+"이 끝나면 정산에 들어가요";
+    var c=hdCfg(),due=hdDue(c,per),L=c.list.filter(function(x){return x&&a.indexOf(x.f)>=0&&a.indexOf(x.t)>=0&&x.f!==x.t&&(x.n>0||x.a>0);});
+    var rows=L.map(function(x){return x.a>0?{f:x.f,t:x.t,a:x.a,won:x.a}:{f:x.f,t:x.t,n:x.n,won:x.n*unit};}).filter(function(x){return x.won>0;});
+    return {on:due?rows:[],wait:due?[]:rows,rows:rows,unitV:unit,when:c.when};}
+  function hdOne(x){return x.n?x.n+"타("+money(x.won)+")":money(x.won);}
+  function hdText(R,list){return (list||R.rows).map(function(x){return nameOf(x.f)+" → "+nameOf(x.t)+" "+hdOne(x);}).join(", ");}
+  function hdNote(R){if(!R||!R.rows.length)return "";var w=lab2(HD_WHEN,R.when),byN=R.rows.some(function(x){return x.n;});
+    if(R.on.length)return " · "+w+" 포함: "+hdText(R,R.on)+(byN?" · 1타 "+money(R.unitV)+"(민판 한 타 금액)":"");
+    if(R.wait.length)return " · "+w+" "+hdText(R,R.wait)+"은 "+(R.when==="turn"?"전반 9홀":"18홀")+"이 끝나면 정산에 들어가요";
     return "";}
   function lab2(list,v){for(var i=0;i<list.length;i++)if(list[i][0]===v)return list[i][1];return "";}
   function renderHd(){
     var box=$("hdBox");if(!box)return;var G=gameOf(S.bet.game);
     if(!S.bet.on||G.ready===false||["tadang","scratch"].indexOf(G.id)<0){box.innerHTML="";box.hidden=true;return;}
-    box.hidden=false;var a=act(),c=hdCfg(),dr=S.bet.hdDraft||{},unit=amt("unit");
+    box.hidden=false;var a=act(),c=hdCfg(),dr=S.bet.hdDraft||{},unit=amt("unit"),byA=dr.how==="amt";
     var chip=function(k,v,t,on){return '<button type="button" class="chip" data-hd="'+k+':'+v+'" aria-pressed="'+on+'">'+esc(t)+'</button>';};
-    var list=c.list.map(function(x,k){if(a.indexOf(x.f)<0||a.indexOf(x.t)<0)return "";return '<li><span class="nm">'+esc(nameOf(x.f))+' → '+esc(nameOf(x.t))+'</span><span class="amt">'+x.n+'타</span><button type="button" class="chip" data-hddel="'+k+'" aria-label="'+esc(nameOf(x.f))+' 핸디 지우기">✕</button></li>';}).join("");
+    var list=c.list.map(function(x,k){if(a.indexOf(x.f)<0||a.indexOf(x.t)<0)return "";return '<li><span class="nm">'+esc(nameOf(x.f))+' → '+esc(nameOf(x.t))+'</span><span class="amt">'+(x.a>0?money(x.a):x.n+'타')+'</span><button type="button" class="chip" data-hddel="'+k+'" aria-label="'+esc(nameOf(x.f))+' 핸디 지우기">✕</button></li>';}).join("");
     var pick=function(k){return '<div class="quick">'+a.map(function(i){return chip("d"+k,i,nameOf(i),dr[k]===i);}).join("")+'</div>';};
     box.innerHTML='<span class="ql">핸디</span>'+
       '<div class="quick">'+HD_WHEN.map(function(w){return chip("when",w[0],w[1],c.when===w[0]);}).join("")+'</div>'+
-      '<span class="ql" style="margin-top:10px">1타 금액</span><div class="quick">'+chip("um","base","한 타 금액"+(unit?" ("+money(unit)+")":""),c.um==="base")+chip("um","custom","직접 정하기",c.um==="custom")+'</div>'+
-      (c.um==="custom"?'<input type="number" id="hdUv" inputmode="numeric" min="0" step="100" value="'+(c.uv||"")+'" placeholder="1타에 얼마 (원)" aria-label="핸디 1타 금액 (원)" style="max-width:160px;margin-top:6px">':'')+
-      '<p class="note">'+(c.um==="custom"?'더 주고 싶을 때 1타에 얼마로 할지 넣어요.':'핸디 1타 = 민판 한 타 금액. 배판 금액으로는 주지 않아요.')+(c.when==="pre"?' 선핸디는 치기 전에 바로 줘요.':' 후핸디는 '+(c.when==="turn"?'전반 9홀':'18홀')+'이 끝나면 정산에 들어가요.')+'</p>'+
+      '<p class="note">'+(c.when==="pre"?'선핸디는 치기 전에 바로 줘요.':'후핸디는 '+(c.when==="turn"?'전반 9홀':'18홀')+'이 끝나면 정산에 들어가요.')+' 타수로 주면 1타 = 민판 한 타 금액'+(unit?'('+money(unit)+')':'')+'이에요. 배판 금액으로는 주지 않아요.</p>'+
       (list?'<ul class="settle sh-list">'+list+'</ul>':'')+
       '<div class="gctl"><span class="ql">주는 사람</span>'+pick("f")+'<span class="ql">받는 사람</span>'+pick("t")+
-      '<span class="ql">몇 타</span><div class="quick">'+[1,2,3,4,5,6,8,10].map(function(n){return chip("dn",n,n+"타",+dr.n===n);}).join("")+'</div>'+
+      '<span class="ql">어떻게 줘요?</span><div class="quick">'+chip("how","n","타수로",!byA)+chip("how","amt","금액 직접 정하기",byA)+'</div>'+
+      (byA?'<div class="quick">'+[10000,20000,30000,50000].map(function(v){return chip("da",v,(v/10000)+"만",+dr.a===v);}).join("")+
+        '<input type="number" id="hdAmt" inputmode="numeric" min="0" step="1000" value="'+(dr.a||"")+'" placeholder="금액 (원)" aria-label="핸디 금액 (원)" style="max-width:150px"></div>'
+       :'<div class="quick">'+[1,2,3,4,5,6,8,10].map(function(n){return chip("dn",n,n+"타",+dr.n===n);}).join("")+'</div>')+
       '<button type="button" class="btn btn-plain" data-act="hdAdd">핸디 넣기</button></div>';
   }
   function won(v){return (v>0?"+":(v<0?"−":""))+Math.abs(v).toLocaleString("ko-KR")+"원";}
@@ -1454,7 +1457,9 @@ body{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
       changed();return;}
     if(d.eg){var ep=d.eg.split(":");S.bet.eg[ep[0]]=ep[1];changed();return;}
     if(d.hd){var hp=d.hd.split(":"),k=hp[0],v=hp[1];S.bet.hd=Object.assign({},hdCfg());S.bet.hdDraft=Object.assign({},S.bet.hdDraft||{});
-      if(k==="when")S.bet.hd.when=v;else if(k==="um")S.bet.hd.um=v;
+      if(k==="when")S.bet.hd.when=v;
+      else if(k==="how")S.bet.hdDraft.how=v;
+      else if(k==="da")S.bet.hdDraft.a=+v;
       else if(k==="df"||k==="dt"){var kk=k.slice(1);S.bet.hdDraft[kk]=S.bet.hdDraft[kk]===+v?null:+v;}
       else if(k==="dn")S.bet.hdDraft.n=+v;
       changed();return;}
@@ -1501,8 +1506,11 @@ body{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
       case "hdAdd":{var dr=S.bet.hdDraft||{};
         if(dr.f==null||dr.t==null){toast("주는 사람과 받는 사람을 골라 주세요.");return;}
         if(dr.f===dr.t){toast("주는 사람과 받는 사람이 같아요.");return;}
-        if(!(dr.n>0)){toast("몇 타인지 골라 주세요.");return;}
-        S.bet.hd=Object.assign({},hdCfg());S.bet.hd.list=S.bet.hd.list.concat([{f:dr.f,t:dr.t,n:dr.n}]);S.bet.hdDraft={};changed();toast(nameOf(dr.f)+" → "+nameOf(dr.t)+" "+dr.n+"타 넣었어요.");return;}
+        var byA=dr.how==="amt",av=Math.max(0,Math.floor(+dr.a||0));
+        if(byA&&!(av>0)){toast("금액을 넣어 주세요.");return;}
+        if(!byA&&!(dr.n>0)){toast("몇 타인지 골라 주세요.");return;}
+        var it=byA?{f:dr.f,t:dr.t,a:av}:{f:dr.f,t:dr.t,n:dr.n};
+        S.bet.hd=Object.assign({},hdCfg());S.bet.hd.list=S.bet.hd.list.concat([it]);S.bet.hdDraft={how:dr.how};changed();toast(nameOf(dr.f)+" → "+nameOf(dr.t)+" "+(byA?money(av):dr.n+"타")+" 넣었어요.");return;}
       case "askNew":$("resetArea").innerHTML='<div class="confirm"><span>지금 라운드 기록이 지워져요.</span><button class="btn btn-plain" type="button" data-act="new">지우고 새로 시작</button><button class="btn btn-plain" type="button" data-act="cancelNew">취소</button></div>';return;
       case "cancelNew":$("resetArea").innerHTML='<button class="btn btn-plain" type="button" data-act="askNew">새 라운드 시작</button>';return;
       case "new":
@@ -1517,7 +1525,7 @@ body{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
     if(t.id==="course"){S.course=t.value;S.courseId=null;S.nines=null;changed();return;}
     if(t.id==="cq"){renderSearch();return;}
     if(t.id==="date"){S.date=t.value;changed();return;}
-    if(t.id==="hdUv"){S.bet.hd=Object.assign({},hdCfg(),{uv:Math.max(0,Math.floor(+t.value||0))});save();renderScore();return;}
+    if(t.id==="hdAmt"){S.bet.hdDraft=Object.assign({},S.bet.hdDraft||{},{a:Math.max(0,Math.floor(+t.value||0))});save();return;}
     if(t.id==="tee"){if(t.value){S.tee=t.value;changed();}return;}
     if(d.pn!=null){S.players[+d.pn]=t.value;changed();return;}
     if(d.bv){S.bet.bonus=JSON.parse(JSON.stringify(S.bet.bonus||{}));var nv2=Math.max(0,Math.floor(+t.value||0)),ob3=S.bet.bonus[d.bv]||{};
