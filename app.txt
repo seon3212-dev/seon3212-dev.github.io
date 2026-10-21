@@ -1002,7 +1002,7 @@ body{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
     if(G.min&&a.length<G.min)return {bad:G.name+"는 "+G.min+"명 이상이어야 해요.",act:a};
     if(G.id==="vegas"&&g.drawMode==="off")return {bad:"뽑기는 오프라인으로 해요. 앱은 스코어만 적고 정산하지 않아요.",act:a};
     var unit=G.id==="happy"?happyUnit():amt("unit"),tot=zero(a),per={},played=0,skipped=[],need=[],doubled=[],extra={},offH=[];
-    var mSum=0,mCnt=0,carry=1,win=zero(a),last=zero(a),seed=amt("seed"),pot=seed*a.length,np=nearPrize(a.length),bank=0,fund=0,nearNeed=[],dq=0;
+    var carry=1,win=zero(a),last=zero(a),seed=amt("seed"),pot=seed*a.length,np=nearPrize(a.length),bank=0,fund=0,nearNeed=[],dq=0;
     for(var h=0;h<18;h++){
       if(offHole(h)){offH.push(h+1);per[h]={off:true};continue;}
       var st=fullHole(h,a);
@@ -1026,7 +1026,6 @@ body{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
         var capN=g.stack==="cap2"?2:4,cm=Math.max(carry,thisH&&trig.length?2:1),m=Math.min(cm*(dn?2:1),capN),fromPrev=carry>1;carry=1;if(gm){m=gm;fromPrev=false;}
         for(var x=0;x<a.length;x++)for(var y=x+1;y<a.length;y++){var p=a[x],q=a[y],BP=bonusOf(bk[p]),BQ=bonusOf(bk[q]),df=st[q]-st[p]+BP.st-BQ.st;
           var v=df*m*uH+BP.cash-BQ.cash;d[p]+=v;d[q]-=v;}
-        mSum+=m*uH;mCnt++;
         if((g.uc||{})[h]!=null)tg.push("한 타 "+money(uH)+"으로 변경");
         if(m>1){var why=[].concat(fromPrev?[thisH?"앞 홀 4명 동타":"앞 홀 배판"]:[],thisH?trig:[],dn?[dn]:[]);if(gm)why=["갈배"];tg.push("배판 ×"+m+(why.length?"("+why.join("·")+")":""));doubled.push((h+1)+"번 ×"+m);}
         a.forEach(function(i){if(!bk[i])return;var B=bonusOf(bk[i]);tg.push(nameOf(i)+" "+bkName(bk[i])+(B.st?" +"+B.st+"타":"")+(B.cash?" +"+money(B.cash):""));});
@@ -1095,29 +1094,23 @@ body{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
     }
     if(G.id==="jopok"||(G.id==="hussein"&&g.hzMode==="pot")){var share=Math.floor(pot/a.length);a.forEach(function(i){tot[i]=win[i]+share-seed;});extra={pot:pot,share:share,rest:pot-share*a.length,seed:seed};}
     if(G.id==="happy"||G.id==="vegas"){var paid=0;a.forEach(function(i){tot[i]=win[i]-seed;paid+=win[i];});extra={seed:seed,left:seed*a.length-paid,fund:fund,bank:bank,np:np,nearNeed:nearNeed};}
-    var hdR=hdApply(a,per,unit,mSum,mCnt);hdR.on.forEach(function(x){tot[x.f]-=x.won;tot[x.t]+=x.won;});
+    var hdR=hdApply(a,per,unit);hdR.on.forEach(function(x){tot[x.f]-=x.won;tot[x.t]+=x.won;});
     return {tot:tot,unit:unit,played:played,skipped:skipped,need:need,doubled:doubled,act:a,per:per,game:G,extra:extra,offH:offH,hd:hdR};
   }
-  /* 핸디: 잘 치는 사람이 타수로 접어 주는 것. 돈 = 타수 × 1타 금액.
+  /* 핸디: 잘 치는 사람이 타수로 접어 주는 것. 돈 = 타수 × 민판 한 타 금액(배판 금액 아님).
      선핸디 = 라운드 전에 줌(처음부터 정산에 들어감) / 후핸디 = 전반 끝나고 또는 18홀 끝나고 줌(그때 정산에 들어감) */
   var HD_WHEN=[["pre","선핸디 (치기 전에)"],["turn","후핸디 (전반 끝나고)"],["end","후핸디 (18홀 끝나고)"]];
-  var HD_UM=[["base","한 타 금액"],["double","배판 금액 (×2)"],["avg","그날 평균 판값"],["custom","직접 정하기"]];
-  function hdCfg(){var h=S.bet.hd||{};return {when:h.when||"pre",um:h.um||"base",uv:Math.max(0,Math.floor(+h.uv||0)),list:Array.isArray(h.list)?h.list:[]};}
-  function hdUnitOf(c,unit,mSum,mCnt){
-    if(c.um==="custom")return {v:c.uv,why:"직접 정한 금액"};
-    if(c.um==="double")return {v:unit*2,why:"배판 금액"};
-    if(c.um==="avg"&&c.when!=="pre"){if(!mCnt)return {v:0,why:"아직 친 홀이 없어요"};var v=Math.round(mSum/mCnt/100)*100;return {v:v,why:"그날 평균 판값 ("+mCnt+"홀)"};}
-    return {v:unit,why:"한 타 금액"};}
+  function hdCfg(){var h=S.bet.hd||{};return {when:h.when||"pre",um:h.um==="custom"?"custom":"base",uv:Math.max(0,Math.floor(+h.uv||0)),list:Array.isArray(h.list)?h.list:[]};}
   function hdDue(c,per){
     if(c.when==="pre")return true;
     var last=c.when==="turn"?9:18;for(var h=0;h<last;h++){var ph=per[h];if(!ph||ph.need)return false;}return true;}
-  function hdApply(a,per,unit,mSum,mCnt){
-    var c=hdCfg(),U=hdUnitOf(c,unit,mSum,mCnt),due=hdDue(c,per),L=c.list.filter(function(x){return x&&a.indexOf(x.f)>=0&&a.indexOf(x.t)>=0&&x.f!==x.t&&x.n>0;});
+  function hdApply(a,per,unit){
+    var c=hdCfg(),U={v:c.um==="custom"?c.uv:unit},due=hdDue(c,per),L=c.list.filter(function(x){return x&&a.indexOf(x.f)>=0&&a.indexOf(x.t)>=0&&x.f!==x.t&&x.n>0;});
     var rows=L.map(function(x){return {f:x.f,t:x.t,n:x.n,won:x.n*U.v};});
-    return {on:due&&U.v>0?rows:[],wait:due?[]:rows,rows:rows,unitV:U.v,why:U.why,when:c.when};}
+    return {on:due&&U.v>0?rows:[],wait:due?[]:rows,rows:rows,unitV:U.v,when:c.when,custom:c.um==="custom"};}
   function hdText(R,list){return (list||R.rows).map(function(x){return nameOf(x.f)+" → "+nameOf(x.t)+" "+x.n+"타"+(R.unitV?"("+money(x.won)+")":"");}).join(", ");}
   function hdNote(R){if(!R||!R.rows.length)return "";var w=lab2(HD_WHEN,R.when);
-    if(R.on.length)return " · "+w+" 포함: "+hdText(R,R.on)+" · 1타 "+money(R.unitV)+"("+R.why+")";
+    if(R.on.length)return " · "+w+" 포함: "+hdText(R,R.on)+" · 1타 "+money(R.unitV)+(R.custom?"(직접 정한 금액)":"(민판 한 타 금액)");
     if(R.wait.length)return " · "+w+" "+hdText(R,R.wait)+"는 "+(R.when==="turn"?"전반 9홀":"18홀")+"이 끝나면 정산에 들어가요";
     return "";}
   function lab2(list,v){for(var i=0;i<list.length;i++)if(list[i][0]===v)return list[i][1];return "";}
@@ -1126,16 +1119,13 @@ body{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
     if(!S.bet.on||G.ready===false||["tadang","scratch"].indexOf(G.id)<0){box.innerHTML="";box.hidden=true;return;}
     box.hidden=false;var a=act(),c=hdCfg(),dr=S.bet.hdDraft||{},unit=amt("unit");
     var chip=function(k,v,t,on){return '<button type="button" class="chip" data-hd="'+k+':'+v+'" aria-pressed="'+on+'">'+esc(t)+'</button>';};
-    var ums=HD_UM.filter(function(u){return !(u[0]==="avg"&&(c.when==="pre"||G.id!=="tadang"));});
-    if(c.um==="avg"&&(c.when==="pre"||G.id!=="tadang"))c.um="base";
-    var uTxt=c.um==="base"?(unit?money(unit):"금액 미정"):c.um==="double"?(unit?money(unit*2):"금액 미정"):c.um==="avg"?"배판이 많이 나오면 커지고, 적게 나오면 작아져요":"1타에 얼마로 할지 넣어 주세요";
     var list=c.list.map(function(x,k){if(a.indexOf(x.f)<0||a.indexOf(x.t)<0)return "";return '<li><span class="nm">'+esc(nameOf(x.f))+' → '+esc(nameOf(x.t))+'</span><span class="amt">'+x.n+'타</span><button type="button" class="chip" data-hddel="'+k+'" aria-label="'+esc(nameOf(x.f))+' 핸디 지우기">✕</button></li>';}).join("");
     var pick=function(k){return '<div class="quick">'+a.map(function(i){return chip("d"+k,i,nameOf(i),dr[k]===i);}).join("")+'</div>';};
     box.innerHTML='<span class="ql">핸디</span>'+
       '<div class="quick">'+HD_WHEN.map(function(w){return chip("when",w[0],w[1],c.when===w[0]);}).join("")+'</div>'+
-      '<span class="ql" style="margin-top:10px">1타 금액</span><div class="quick">'+ums.map(function(u){return chip("um",u[0],u[1],c.um===u[0]);}).join("")+'</div>'+
-      (c.um==="custom"?'<input type="number" id="hdUv" inputmode="numeric" min="0" step="100" value="'+(c.uv||"")+'" placeholder="1타 금액 (원)" aria-label="핸디 1타 금액 (원)" style="max-width:160px;margin-top:6px">':'')+
-      '<p class="note">'+esc(uTxt)+(c.when==="pre"?" · 선핸디는 치기 전에 주니까 금액이 미리 정해져요.":"")+'</p>'+
+      '<span class="ql" style="margin-top:10px">1타 금액</span><div class="quick">'+chip("um","base","한 타 금액"+(unit?" ("+money(unit)+")":""),c.um==="base")+chip("um","custom","직접 정하기",c.um==="custom")+'</div>'+
+      (c.um==="custom"?'<input type="number" id="hdUv" inputmode="numeric" min="0" step="100" value="'+(c.uv||"")+'" placeholder="1타에 얼마 (원)" aria-label="핸디 1타 금액 (원)" style="max-width:160px;margin-top:6px">':'')+
+      '<p class="note">'+(c.um==="custom"?'더 주고 싶을 때 1타에 얼마로 할지 넣어요.':'핸디 1타 = 민판 한 타 금액. 배판 금액으로는 주지 않아요.')+(c.when==="pre"?' 선핸디는 치기 전에 바로 줘요.':' 후핸디는 '+(c.when==="turn"?'전반 9홀':'18홀')+'이 끝나면 정산에 들어가요.')+'</p>'+
       (list?'<ul class="settle sh-list">'+list+'</ul>':'')+
       '<div class="gctl"><span class="ql">주는 사람</span>'+pick("f")+'<span class="ql">받는 사람</span>'+pick("t")+
       '<span class="ql">몇 타</span><div class="quick">'+[1,2,3,4,5,6,8,10].map(function(n){return chip("dn",n,n+"타",+dr.n===n);}).join("")+'</div>'+
