@@ -135,7 +135,7 @@ select,input[type=number]{font-family:inherit;background:var(--panel2);color:var
 <script type="module">
 import { PoseLandmarker, FilesetResolver } from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/vision_bundle.mjs";
 
-const ENGINE_VER="swing-web-0.3", MODEL="mediapipe pose_landmarker_full", RULESET="swing-rules-0.3";
+const ENGINE_VER="swing-web-0.4", MODEL="mediapipe pose_landmarker_full", RULESET="swing-rules-0.4";
 const GSAS_URL="https://seon3212-dev.github.io/#gsas";
 const WASM_URL="https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/wasm";
 const MODEL_URL="https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_full/float16/1/pose_landmarker_full.task";
@@ -173,6 +173,7 @@ async function runAnalysis(source){
   try{
     await ensureModel();
     const frames=await runPose(chosenFile);
+    await refineTakeaway(frames, $("view").value);
     const res=analyze(frames, $("view").value, $("slow").value);
     res.capture.source=source;
     render(res);
@@ -476,12 +477,77 @@ class SwingTrigger {
   }
 }
 
+// ---------- v0.4 테이크어웨이 보정: 공 주변 '헤드 움직임'으로 백스윙 시작 찾기 ----------
+// 손목 높이만 보면 헤드가 낮고 천천히 빠지는 느린 스윙에서 시작이 5~7프레임 늦게 잡힘(사장님 영상 9개 판독).
+// 측면 영상에서 발끝 앞 바닥 띠(공·헤드 자리)를 1/60초 간격으로 잘라, 앞 프레임과의 밝기 차이를 본다.
+// 백스윙 중(손목 기준 시작 + 8프레임)에서 거꾸로 걸어가며 '움직임'이 끊기는 프레임 = 헤드가 움직이기 직전.
+// 움직임 기준 = 그 구간 프레임 차이 중앙값 × 3.5(30fps는 ×7). 정면 영상은 아직 검증 전이라 손목 기준 그대로.
+// 사장님 측면 9개(60fps·30fps) 대조: 눈 판독(헤드 움직이기 직전) 대비 60fps 평균 1.3·최대 3프레임, 30fps 평균 0.8·최대 2프레임(60분의1초 단위).
+async function refineTakeaway(data, view){
+  data.tkInfo={source:"wrist"};
+  try{
+    if(view!=="side" || !data.segments) return;
+    const segs=data.segments, wyOf=fr=>fr.map(p=>p?((p[15].y+p[16].y)/2):null);
+    const sw=pickSwing(segs.map((s,i)=>{ const r=detectSwing(s.times, wyOf(s.frames), 60); return r?{...r, seg:i}:null; })).best;
+    if(!sw) return;
+    const seg=segs[sw.seg], tA=sw.t_tk-0.4;
+    let bi=-1; seg.times.forEach((t,i)=>{ if(seg.frames[i] && (bi<0 || Math.abs(t-tA)<Math.abs(seg.times[bi]-tA))) bi=i; });
+    if(bi<0) return;
+    const p=seg.frames[bi], W=data.W, H=data.H, mid=(a,b)=>({x:(a.x+b.x)/2,y:(a.y+b.y)/2});
+    const sh=mid(p[11],p[12]), hp=mid(p[23],p[24]), bl=Math.hypot(sh.x-hp.x, sh.y-hp.y);
+    if(!(bl>10)) return;
+    const dir = p[0].x>hp.x ? 1 : -1;                       // 몸이 바라보는 쪽(공 있는 쪽)
+    const feet=[29,30,31,32].map(i=>p[i]), fy=Math.max(...feet.map(q=>q.y));
+    const toe = dir>0 ? Math.max(...feet.map(q=>q.x)) : Math.min(...feet.map(q=>q.x));
+    let xa=toe+dir*0.15*bl, xb=toe+dir*1.8*bl; if(xa>xb) [xa,xb]=[xb,xa];
+    const x0=Math.max(0,Math.round(xa)), x1=Math.min(W,Math.round(xb)), y0=Math.max(0,Math.round(fy-0.6*bl)), y1=Math.min(H,Math.round(fy+0.25*bl));
+    if(x1-x0<20 || y1-y0<20) return;
+    const rw=Math.max(8,Math.round((x1-x0)/2)), rh=Math.max(8,Math.round((y1-y0)/2));
+    const c=document.createElement("canvas"); c.width=rw; c.height=rh; const cx=c.getContext("2d",{willReadFrequently:true});
+    const vid=$("vid"), dur=data.dur, step=1/60;
+    const seek=t=>new Promise(res=>{ const tt=Math.min(Math.max(0,t),Math.max(0,dur-0.001));
+      if(Math.abs(vid.currentTime-tt)<1e-4){ res(); return; } vid.onseeked=()=>res(); vid.currentTime=tt; });
+    const blur=g=>{ const o=new Float32Array(g.length);
+      for(let y=0;y<rh;y++) for(let x=0;x<rw;x++){ let s=0,n=0; for(let dy=-1;dy<=1;dy++){ const yy=y+dy; if(yy<0||yy>=rh) continue;
+        for(let dx=-1;dx<=1;dx++){ const xx=x+dx; if(xx<0||xx>=rw) continue; s+=g[yy*rw+xx]; n++; } } o[y*rw+x]=s/n; } return o; };
+    const mad=(a,b)=>{ let s=0; for(let i=0;i<a.length;i++) s+=Math.abs(a[i]-b[i]); return s/a.length; };
+    $("pmsg").textContent="백스윙 시작(헤드 움직임) 확인 중…";
+    const t0=Math.max(0,sw.t_tk-1.0), tEnd=sw.t_tk+8*step, kept=[];
+    for(let t=t0; t<=tEnd+1e-6; t+=step){
+      await seek(t); cx.drawImage(vid, x0,y0,x1-x0,y1-y0, 0,0,rw,rh);
+      const px=cx.getImageData(0,0,rw,rh).data, g=new Float32Array(rw*rh);
+      for(let i=0,j=0;j<g.length;i+=4,j++) g[j]=0.299*px[i]+0.587*px[i+1]+0.114*px[i+2];
+      const gb=blur(blur(g)), last=kept[kept.length-1];
+      if(last && mad(gb,last.g)<0.02) continue;            // 같은 프레임(30fps 등) 건너뜀
+      kept.push({t:vid.currentTime, g:gb});
+    }
+    if(kept.length<15) return;
+    const d=[0]; for(let i=1;i<kept.length;i++) d.push(mad(kept[i].g,kept[i-1].g));
+    data.tkDebug={t:kept.map(k=>k.t), d, t_wrist:sw.t_tk, t_top:sw.t_top};
+    // 기준 = 프레임 차이 중앙값 × 3.5 × (프레임 간격/60분의1초): 30fps면 한 프레임에 움직임이 두 배로 쌓이므로 기준도 두 배
+    const dts=[]; for(let i=1;i<kept.length;i++) dts.push(kept[i].t-kept[i-1].t);
+    const th=median(d.slice(1))*3.5*Math.max(1, median(dts)*60);
+    let i=kept.length-1; while(i>1 && d[i]>th) i--;
+    if(i<=1) return;                                         // 계속 움직임 → 손목 기준 그대로
+    const tNew=kept[i].t;
+    if(!(tNew>sw.t_tk-1.0 && tNew<sw.t_top-0.1)) return;
+    // 헤드가 손목보다 2프레임 넘게 늦게 잡히면 믿지 않음(어둡거나 하얗게 날아간 영상에서 헤드가 안 보일 때) → 손목 기준
+    if(tNew>sw.t_tk+2/60){ data.tkInfo={source:"wrist", reason:"head_later", t_wrist:+sw.t_tk.toFixed(3), t_head:+tNew.toFixed(3)}; return; }
+    data.tkOverride=tNew;
+    data.tkInfo={source:"head_pixels", t_wrist:+sw.t_tk.toFixed(3), t_head:+tNew.toFixed(3)};
+  }catch(e){ data.tkInfo={source:"wrist", err:String(e&&e.message||e)}; }
+}
+
 function analyze(data, view, slowSel){
   // 후보 구간마다 탐지 → '공을 친 스윙'(다운스윙 짧고 빠른 것) 하나를 골라 그 구간으로 모든 지표 계산
   const segs=data.segments || [{frames:data.frames, times:data.times||data.frames.map((_,i)=>i/30)}];
   const wyOf=fr=>fr.map(p=>p?((p[15].y+p[16].y)/2):null);
   const cands=segs.map((s,i)=>{ const r=detectSwing(s.times, wyOf(s.frames), 60); return r?{...r, seg:i}:null; });
   const pk=pickSwing(cands);
+  if(pk.best && data.tkOverride!=null && data.tkOverride<pk.best.t_top){   // v0.4: 헤드 움직임으로 찾은 백스윙 시작
+    const b=pk.best, back=b.t_top-data.tkOverride;
+    pk.best={...b, t_tk:data.tkOverride, back_s:back, ratio:back/b.down_s};
+  }
   const segIdx = pk.best ? pk.best.seg : segs.reduce((bi,s,i)=>s.frames.length>segs[bi].frames.length?i:bi, 0);
   data.frames=segs[segIdx].frames; data.times=segs[segIdx].times;
   data.swing=pk.best; data.swingInfo={count:pk.count, window:segs[segIdx].win||null};
@@ -526,7 +592,8 @@ function analyze(data, view, slowSel){
     const st = (ratio<2.0 || ratio>4.0) ? "caution" : "good";
     push("tempo","스윙 템포", +ratio.toFixed(1), " : 1", "measured", st, null, view);
     metrics[metrics.length-1].detail={back_s:+sw.back_s.toFixed(2), down_s:+sw.down_s.toFixed(2), total_s:+total.toFixed(2),
-      rhythm, ratio_approx: Math.round(ratio*2)/2, ratio_note:"비율은 ±0.5 오차(60fps 기준) — 시간 값을 우선 사용"};
+      rhythm, ratio_approx: Math.round(ratio*2)/2, ratio_note:"비율은 ±0.5 오차(60fps 기준) — 시간 값을 우선 사용",
+      tk_source:(data.tkInfo||{}).source||"wrist"};
   } else push("tempo","스윙 템포", null, null, "measured","unknown","스윙 구간(탑/임팩트) 탐지 실패",view);
 
   // 세그먼트(테이크어웨이~임팩트)
