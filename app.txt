@@ -95,6 +95,7 @@ input[type=time],input[type=number]{font-family:var(--font-display);font-size:22
 .go span{font-size:13px;font-weight:600}
 .recap{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:4px;font-size:14px}
 .recap li{display:grid;grid-template-columns:64px 1fr;gap:8px}
+.go-wait{display:block;margin-top:6px;font-size:13px;color:var(--muted)}.go-wait .btn{margin-left:6px;padding:4px 10px;font-size:13px}
 .recap li span:first-child{color:var(--muted);font-size:13px}
 .pickbtn{appearance:none;text-align:left;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:10px;padding:10px 12px;font:600 16px var(--font-body);cursor:pointer;display:flex;justify-content:space-between;gap:8px;align-items:center}
 .pickbtn span{font-weight:500;font-size:13px;color:var(--muted)}
@@ -1036,7 +1037,7 @@ body{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
     if(!rpt(S.from)){if(!quiet)toast("출발 장소를 먼저 찾아 주세요");return;}
     if(!S.course){if(!quiet)toast("골프장을 먼저 골라 주세요");return;}
     if(!S.tee){if(!quiet)toast("티오프 시간을 먼저 넣어 주세요");return;}
-    rtBusy="calc";rtMsg="";renderGo();
+    rtTried=routeSig();rtBusy="calc";rtMsg="";renderGo();
     ensureCourse().then(function(ok){
       if(!ok){rtBusy="";rtMsg="골프장 위치를 못 찾았어요.";renderGo();return;}
       var res=seqItems().filter(function(i){return i.pt;}).map(function(i){return i.pt;});
@@ -1045,10 +1046,10 @@ body{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
       var dd=S.date||"",dm=bp.depart,day=dd;
       if(dm<0&&dd){var dt=new Date(dd+"T00:00:00");dt.setDate(dt.getDate()-1);day=dt.getFullYear()+"-"+String(dt.getMonth()+1).padStart(2,"0")+"-"+String(dt.getDate()).padStart(2,"0");dm+=1440;}
       var dep=day?day.replace(/-/g,"")+String(Math.floor(dm/60)).padStart(2,"0")+String(dm%60).padStart(2,"0"):"";
-      var pts=[rpt(S.from)].concat(res).concat([rpt(S.courseLoc)]);
+      var pts=[rpt(S.from)].concat(res).concat([rpt(S.courseLoc)]);rtTried=routeSig();
       rapi({action:"route",pts:pts,depart:dep}).then(function(r){
         rtBusy="";
-        if(!r.ok){rtMsg="실제 시간을 못 가져왔어요"+(r.error?" ("+r.error+")":"")+". 어림 시간("+S.drive+"분)으로 계산해요.";renderGo();return;}
+        if(!r.ok){rtMsg="실제 시간을 못 가져왔어요"+(r.error?" ("+r.error+")":"")+". 잠시 뒤 '다시 계산'을 눌러 주세요.";renderGo();return;}
         S.route={sig:routeSig(),legs:r.legs,total:r.total,km:r.km,basis:r.basis,at:Date.now()};if(r.total>0)S.drive=Math.max(5,Math.min(300,r.total));rtMsg="";changed();
       });
     });
@@ -1069,6 +1070,19 @@ body{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
     h+='<button type="button" class="btn btn-flag" data-act="rtCalc"'+(f?'':' disabled')+'>'+(ok?'다시 계산':'실제 운전 시간 계산')+'</button>';
     return h;
   }
+  var rtTried="",rtTimer=0;
+  function autoRoute(){ /* 출발 장소·골프장·티오프가 있고 바뀐 게 있으면 저절로 다시 계산 (같은 조건은 한 번만) */
+    if(S.move==="ride"||rtBusy||routeOk()||!rpt(S.from)||!S.course||!S.tee)return;
+    if(routeSig()===rtTried)return;
+    clearTimeout(rtTimer);rtTimer=setTimeout(function(){if(S.move==="ride"||rtBusy||routeOk()||!rpt(S.from)||!S.course||!S.tee||routeSig()===rtTried)return;rtCalc(true);},700);
+  }
+  function goWait(){ /* 실제 길 계산 전: 출발·기상 시간은 비워 둔다 */
+    if(S.move==="ride")return '태워 주는 사람이 보낸 링크에서 픽업·기상 시간을 확인하세요.';
+    if(rtBusy==="calc")return '실제 길로 계산하는 중…';
+    if(!rpt(S.from))return '출발 장소를 넣으면 실제 길로 출발·기상 시간을 계산해요. <button type="button" class="btn btn-plain" data-act="goFrom">출발 장소 넣기</button>';
+    if(rtMsg)return esc(rtMsg)+' <button type="button" class="btn btn-plain" data-act="rtCalc">다시 계산</button>';
+    return '실제 길로 계산하는 중…';
+  }
   function kv(id,v){var el=$(id);if(el&&document.activeElement!==el)el.value=v;}
   function prepMin(){var v=+S.prep;return isFinite(v)&&S.prep!==""&&S.prep!=null?Math.max(0,Math.min(240,Math.round(v))):40;}
   function prepCustom(){return !!S.prepCustom||[30,60].indexOf(prepMin())<0;}
@@ -1085,7 +1099,7 @@ body{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
     var a=home.length?Math.max(3,Math.round(D*.12)):0,c=near.length?Math.max(3,Math.round(D*.12)):0,b=D-a-c;
     var prep=prepMin(),wake=depart-prep;
     var ev=[{t:wake,k:"wake",title:"일어나기",note:"출발 전 준비 "+prep+"분"}],t=depart;
-    ev.push({t:t,k:"start",title:S.move==="ride"?"태워 줄 차에 타기":"집에서 출발",note:(S.move==="ride"?"골프장까지 "+D+"분":"골프장까지 약 "+D+"분 (어림 · 실제 길 계산 전)")+(pk.length?" · 픽업 "+pk.length+"명 +"+pickTime+"분":"")});
+    ev.push({t:t,k:"start",title:S.move==="ride"?"태워 줄 차에 타기":"집에서 출발",note:"골프장까지 "+D+"분"+(pk.length?" · 픽업 "+pk.length+"명 +"+pickTime+"분":"")});
     pk.forEach(function(x){t+=x.extra;ev.push({t:t,k:"pick",x:x,title:nameOf(x.i)+" 픽업",note:(x.place?x.place+" · ":"")+"백 싣기 "+LOAD+"분"});t+=LOAD;});
     t+=a;home.forEach(function(d){t+=DETOUR;ev.push({t:t,k:"stop",d:d,title:d.name+" 들르기",note:d.stay+"분 · 집 근처"});t+=d.stay;});
     t+=b;near.forEach(function(d){t+=DETOUR;ev.push({t:t,k:"stop",d:d,title:d.name+" 들르기",note:d.stay+"분 · 골프장 근처"});t+=d.stay;});
@@ -1482,7 +1496,7 @@ body{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
     var who=act().map(nameOf).join(", ");
     var mv=S.move==="drive"?"내가 운전"+(pk.length?" · "+pk.join(", ")+" 픽업":""):(S.move==="ride"?"얻어 타요":"각자 가요");
     $("recap").innerHTML=[["골프장",(S.course||"아직 안 정함")+(S.date?" · "+S.date.slice(5).replace("-","/"):"")+" · "+fmt(p.tee)],["사람",who],["이동",mv],["내기",ruleText()+(S.bet.on&&!S.age19?" (19세·동의 확인 전)":"")]].map(function(r){return '<li><span>'+r[0]+'</span><span>'+esc(r[1])+'</span></li>';}).join("");
-    $("goDepart").textContent=fmt(p.depart);
+    $("goDepart").textContent=S.tee&&!p.real?"--:--":fmt(p.depart);
     var maxThru=Math.max.apply(null,act().map(function(i){return stats(i).thru;}));
     var r=betReady()?calc():null,me=r&&r.played?won(r.tot[0]):null;
     $("goScore").textContent=maxThru?(maxThru+"홀"):"시작 전";
@@ -1492,14 +1506,15 @@ body{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
   /* ---------- 그리기: 가는 길 ---------- */
   function renderGo(){
     var p=plan();
-    $("depart").firstChild.nodeValue=fmt(p.depart);$("dayTag").textContent=p.prev?"전날":"";
+    var wait=!!S.tee&&!p.real;
+    $("depart").firstChild.nodeValue=wait?"--:--":fmt(p.depart);$("dayTag").textContent=!wait&&p.prev?"전날":"";
     $("goLbl").textContent=S.move==="ride"?"이 시간에 차에 타세요 (운전자 기준)":"이 시간에 출발하세요";
     var so=p.ev.filter(function(e){return e.k==="stop";}).map(function(e){return e.d.name;});
-    $("goSum").innerHTML="<b>"+fmt(p.tee)+"</b> 티오프 · <b>"+fmt(p.arrive)+"</b> 도착"+(p.pk.length?" · 픽업 "+p.pk.length+"명":"")+(so.length?" · "+esc(so.join(", "))+" 들름":"")+(p.real?" · 실제 길 기준":(S.move==="ride"?"":" · 어림 시간 (자세히에서 실제 길 계산)"));
+    $("goSum").innerHTML="<b>"+fmt(p.tee)+"</b> 티오프 · <b>"+fmt(p.arrive)+"</b> 도착"+(p.pk.length?" · 픽업 "+p.pk.length+"명":"")+(so.length?" · "+esc(so.join(", "))+" 들름":"")+(p.real?" · 실제 길 기준":"")+(wait?'<span class="go-wait">'+goWait()+'</span>':"");
     $("navNaver").href=naver(S.course||"골프장");
-    $("goWake").innerHTML=S.tee?"기상 <b>"+fmt(p.wake)+"</b> · 준비 "+p.prep+"분":"";
+    $("goWake").innerHTML=S.tee&&!wait?"기상 <b>"+fmt(p.wake)+"</b> · 준비 "+p.prep+"분":"";
     var pc=prepCustom();$("prepChips").innerHTML='<button type="button" class="chip" data-prep="custom" aria-pressed="'+pc+'">직접 입력</button>'+[30,60].map(function(v){return '<button type="button" class="chip" data-prep="'+v+'" aria-pressed="'+(!pc&&p.prep===v)+'">'+v+'분</button>';}).join("");$("prepInRow").hidden=!pc;kv("prepIn",p.prep);
-    var pe=p.ev.filter(function(e){return e.k==="pick";});$("rideCard").hidden=!(S.move==="drive"&&pe.length&&S.tee);
+    var pe=p.ev.filter(function(e){return e.k==="pick";});$("rideCard").hidden=wait||!(S.move==="drive"&&pe.length&&S.tee);
     $("rideLinks").innerHTML=pe.map(function(e,k){return '<button type="button" class="chip" data-ridei="'+k+'">'+esc(nameOf(e.x.i))+'에게 보내기 · '+fmt(e.t)+'</button>';}).join("");
     
     $("timeline").innerHTML=p.ev.map(function(e){
@@ -1507,7 +1522,8 @@ body{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
       if(e.k==="stop"){var q=S.stops[e.d.id].where==="course"?(S.course+" 근처 "+e.d.q):e.d.q;link=' · <a href="'+kakao(q)+'" target="_blank" rel="noopener">'+e.d.name+' 찾기</a>';}
       if(e.k==="pick"&&e.x.place)link=' · <a href="'+kakao(e.x.place)+'" target="_blank" rel="noopener">위치 보기</a>';
       if(e.k==="arrive"&&S.course)link=' · <a href="'+kakao(S.course)+'" target="_blank" rel="noopener">위치 보기</a>';
-      return '<li class="'+e.k+'"><div class="t">'+fmt(e.t)+'</div><div class="dot"><i></i></div><div class="what"><b>'+esc(e.title)+'</b><span>'+esc(e.note)+'</span>'+link+'</div></li>';
+      var pre=wait&&(e.k==="wake"||e.k==="start"||e.k==="pick"||e.k==="stop"),nt=pre&&(e.k==="start"||e.k==="wake")?(e.k==="wake"?"출발 전 준비 "+p.prep+"분":"실제 길 계산 후 나와요"):e.note;
+      return '<li class="'+e.k+'"><div class="t">'+(pre?"--:--":fmt(e.t))+'</div><div class="dot"><i></i></div><div class="what"><b>'+esc(e.title)+'</b><span>'+esc(nt)+'</span>'+link+'</div></li>';
     }).join("");
     if(!S.tee){$("depart").firstChild.nodeValue="--:--";$("dayTag").textContent="";$("goSum").textContent="티오프 시간을 넣으면 출발 시간이 나와요.";$("timeline").innerHTML="";}
     var lv=getLevel();$("packCard").hidden=false;
@@ -1515,11 +1531,11 @@ body{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
     $("packNote").textContent=lv?"수준에 맞춘 준비물이에요.":"수준을 고르면 준비물이 맞춰져요. 지금은 백돌이 기준이에요.";
     $("pack").innerHTML=PACK().map(function(n,i){return '<li><label><input type="checkbox" data-pack="'+i+'"'+(S.pack[n]?" checked":"")+'><span>'+n+'</span></label></li>';}).join("");
     var bc=bufCustom();$("bufferChips").innerHTML='<button type="button" class="chip" data-buf="custom" aria-pressed="'+bc+'">직접 입력</button>'+[30,40].map(function(v){return '<button type="button" class="chip" data-buf="'+v+'" aria-pressed="'+(!bc&&+S.buffer===v)+'">'+v+'분 전</button>';}).join("");$("bufInRow").hidden=!bc;kv("bufIn",S.buffer);
-    $("rtBox").innerHTML=rtBoxHtml();
+    $("rtBox").innerHTML=rtBoxHtml();autoRoute();
     
     $("pickBox").hidden=S.move!=="drive";
     $("pickups").innerHTML=p.pk.length?p.pk.map(function(x){
-      return '<div class="pk"><b>'+esc(nameOf(x.i))+'</b><div class="rt-row"><input type="text" data-place="'+x.i+'" id="place'+x.i+'" placeholder="만날 곳 (아파트 정문 등)" value="'+esc(x.place)+'"><button type="button" class="btn btn-plain" data-pfind="'+x.i+'">찾기</button></div>'+((S.pick[x.i]||{}).pt?'<span class="rt-ok">위치 찾음 <small>'+esc(S.pick[x.i].pt.addr||"")+'</small></span>':'')+(rtBusy==="pick:"+x.i||(rtRes&&rtRes.target==="pick:"+x.i)?rtList("pick:"+x.i):'')+'<span class="note">'+((S.pick[x.i]||{}).pt&&routeOk()?'실제 길로 계산돼요 · 백 싣기 3분은 자동':'위치를 안 찾으면 아래 어림값으로 · 백 싣기 3분은 자동')+'</span><div class="quick">'+EXTRAS.map(function(v){return '<button type="button" class="chip" data-ex="'+x.i+':'+v+'" aria-pressed="'+(x.extra===v)+'">+'+v+'분</button>';}).join("")+'</div></div>';
+      return '<div class="pk"><b>'+esc(nameOf(x.i))+'</b><div class="rt-row"><input type="text" data-place="'+x.i+'" id="place'+x.i+'" placeholder="만날 곳 (아파트 정문 등)" value="'+esc(x.place)+'"><button type="button" class="btn btn-plain" data-pfind="'+x.i+'">찾기</button></div>'+((S.pick[x.i]||{}).pt?'<span class="rt-ok">위치 찾음 <small>'+esc(S.pick[x.i].pt.addr||"")+'</small></span>':'')+(rtBusy==="pick:"+x.i||(rtRes&&rtRes.target==="pick:"+x.i)?rtList("pick:"+x.i):'')+'<span class="note">'+((S.pick[x.i]||{}).pt&&routeOk()?'실제 길로 계산돼요 · 백 싣기 3분은 자동':'위치를 안 찾으면 아래 고른 시간만큼 더해요 · 백 싣기 3분은 자동')+'</span><div class="quick">'+EXTRAS.map(function(v){return '<button type="button" class="chip" data-ex="'+x.i+':'+v+'" aria-pressed="'+(x.extra===v)+'">+'+v+'분</button>';}).join("")+'</div></div>';
     }).join("")+(p.pk.length>=3?'<p class="note">4명이 한 차면 골프백 4개가 트렁크에 다 안 들어갈 수 있어요.</p>':''):'<p class="note">"다음 라운드"에서 태울 사람을 고르세요.</p>';
     $("stops").innerHTML=STOPS.map(function(d){var st=S.stops[d.id];return '<div class="item"><input type="checkbox" id="st-'+d.id+'" data-stop="'+d.id+'"'+(st.on?" checked":"")+'><label class="nm" for="st-'+d.id+'">'+d.name+'<span>'+(d.sub?d.sub+" · ":"")+d.stay+'분</span></label><select data-where="'+d.id+'" aria-label="'+d.name+' 위치"'+(st.on?"":" disabled")+'>'+(d.id==="meal"?[["inside","골프장 안"],["course","골프장 근처 맛집"]]:[["home","집 근처"],["course","골프장 근처"]]).map(function(o){return '<option value="'+o[0]+'"'+(st.where===o[0]?" selected":"")+'>'+o[1]+'</option>';}).join("")+'</select>'+(st.on&&d.id!=="meal"||st.on&&d.id==="meal"&&st.where!=="inside"?'<div style="grid-column:1/-1;display:flex;flex-direction:column;gap:6px">'+(st.pt?'<span class="rt-ok">'+esc(st.pt.name)+' <small>'+esc(st.pt.addr||"")+'</small></span>':'')+'<button type="button" class="btn btn-plain" data-sfind="'+d.id+'" style="align-self:flex-start">'+(st.pt?'다른 가게 고르기':'근처 가게 고르기')+'</button>'+(rtBusy==="stop:"+d.id||(rtRes&&rtRes.target==="stop:"+d.id)?rtList("stop:"+d.id):'')+'</div>':'')+'</div>';}).join("");
   }
@@ -1741,8 +1757,9 @@ body{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
       case "fillPar":act().forEach(function(i){if(S.scores[i][S.hole]==null)S.scores[i][S.hole]=S.par[S.hole];});changed();return;
       case "rtFrom":rtFind("from",($("rtFrom")||{}).value);return;
       case "rtCalc":rtCalc(false);return;
-      case "copyGo":copy(goText(),"goCopy","문구를 복사했어요. 단톡방에 붙여넣으세요.");return;
-      case "goIcs":if(!S.tee||!S.date){toast("날짜와 티오프 시간을 먼저 넣어 주세요");return;}var pi=plan();if(!(window.WG_ICS&&window.WG_ICS({date:S.date,wake:pi.wake,title:"골프 라운드 기상 ("+(S.course||"골프장")+" "+fmt(pi.tee)+")",desc:fmt(pi.depart)+" 출발 → "+fmt(pi.arrive)+" 도착 · "+fmt(pi.tee)+" 티오프"})))toast("캘린더 파일을 만들지 못했어요.");return;
+      case "goFrom":$("goMore").open=true;setTimeout(function(){var f=$("rtFrom");if(f){f.scrollIntoView({block:"center"});f.focus();}},50);return;
+      case "copyGo":if(S.tee&&!plan().real){toast(S.move==="ride"?"태워 주는 사람이 보낸 링크의 시간을 따라요":"출발 장소를 넣고 실제 길을 먼저 계산해 주세요");return;}copy(goText(),"goCopy","문구를 복사했어요. 단톡방에 붙여넣으세요.");return;
+      case "goIcs":if(!S.tee||!S.date){toast("날짜와 티오프 시간을 먼저 넣어 주세요");return;}var pi=plan();if(!pi.real){toast(S.move==="ride"?"태워 주는 사람이 보낸 링크에서 캘린더 알림을 넣어 주세요":"출발 장소를 넣고 실제 길을 먼저 계산해 주세요");return;}if(!(window.WG_ICS&&window.WG_ICS({date:S.date,wake:pi.wake,title:"골프 라운드 기상 ("+(S.course||"골프장")+" "+fmt(pi.tee)+")",desc:fmt(pi.depart)+" 출발 → "+fmt(pi.arrive)+" 도착 · "+fmt(pi.tee)+" 티오프"})))toast("캘린더 파일을 만들지 못했어요.");return;
       case "copyScore":copy(scoreText(),"scoreCopy","결과를 복사했어요. 단톡방에 붙여넣으세요.");return;
       case "hdAdd":{var dr=S.bet.hdDraft||{};
         if(dr.f==null||dr.t==null){toast("주는 사람과 받는 사람을 골라 주세요.");return;}
