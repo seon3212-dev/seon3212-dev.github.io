@@ -126,6 +126,7 @@ select,input[type=number]{font-family:inherit;background:var(--panel2);color:var
       <button id="again2" class="btn sec">다른 영상 분석</button>
     </div>
     <div class="foot" id="rfoot"></div>
+    <button id="tclear" class="btn sec" type="button" hidden style="align-self:flex-start"></button>
     <details><summary>개발용 — 결과 데이터(result.json) 보기</summary><pre id="json"></pre>
       <div class="row" style="margin-top:8px"><button id="dl" class="btn sec">result.json 저장</button>
       <button id="again" class="btn sec">다른 영상 분석</button></div></details>
@@ -176,6 +177,7 @@ async function runAnalysis(source){
     await refineTakeaway(frames, $("view").value);
     const res=analyze(frames, $("view").value, $("slow").value);
     res.capture.source=source;
+    personalTempo(res, $("view").value);
     render(res);
     $("uploadCard").style.display="none"; $("result").hidden=false;
   }catch(err){
@@ -477,6 +479,25 @@ class SwingTrigger {
   }
 }
 
+// ---------- v0.4 내 평소 템포와 비교 (사장님 결정 2026-10-23: E안) ----------
+// 프로도 빠르기는 제각각(투어 템포: 21/7·24/8·27/9) — 같은 건 '매번 같은 템포'. 그래서 빠르다/느리다를 남과 비교하지 않고
+// 이 폰에 쌓인 내 기록(같은 촬영 방향, 최근 10개 중앙값)과 비교. 기록 3개부터 비교. 결과 숫자만 저장(영상·관절 저장 안 함).
+// 같다/다르다 기준 0.07초 = 측정 오차 최대(9개 검증 0.065초)보다 조금 크게.
+const TEMPO_KEY="wq_tempo_hist_v1", TEMPO_NEED=3, TEMPO_KEEP=30, TEMPO_SAME=0.07;
+function tempoHist(){ try{ const a=JSON.parse(localStorage.getItem(TEMPO_KEY)||"[]"); return Array.isArray(a)?a:[]; }catch(e){ return []; } }
+function personalTempo(res, view){
+  const m=res.metrics.find(x=>x.key==="tempo"); if(!m || !m.detail || m.detail.total_s==null) return;
+  const d=m.detail, hist=tempoHist(), same=hist.filter(h=>h.view===view).slice(-10);
+  d.history_n=same.length;
+  if(same.length>=TEMPO_NEED){
+    const base=median(same.map(h=>h.total_s)), diff=d.total_s-base;
+    d.baseline_s=+base.toFixed(2); d.diff_s=+diff.toFixed(2);
+    d.rhythm = Math.abs(diff)<TEMPO_SAME ? "평소와 같음" : (diff<0 ? "평소보다 빠름" : "평소보다 느림");
+  } else d.rhythm="기록 쌓는 중";
+  try{ hist.push({at:new Date().toISOString(), view, total_s:d.total_s, back_s:d.back_s, down_s:d.down_s, tk:d.tk_source||"wrist"});
+       localStorage.setItem(TEMPO_KEY, JSON.stringify(hist.slice(-TEMPO_KEEP))); d.saved=true; }catch(e){ d.saved=false; }
+}
+
 // ---------- v0.4 테이크어웨이 보정: 공 주변 '헤드 움직임'으로 백스윙 시작 찾기 ----------
 // 손목 높이만 보면 헤드가 낮고 천천히 빠지는 느린 스윙에서 시작이 5~7프레임 늦게 잡힘(사장님 영상 9개 판독).
 // 측면 영상에서 발끝 앞 바닥 띠(공·헤드 자리)를 1/60초 간격으로 잘라, 앞 프레임과의 밝기 차이를 본다.
@@ -586,8 +607,8 @@ function analyze(data, view, slowSel){
   //       value(비율)는 결과 규격 호환을 위해 그대로 둠.
   if(okSeg){
     const ratio=sw.ratio, total=sw.back_s+sw.down_s;
-    // 리듬(전체 스윙 시간) — 기준 보정 전(1명 실측 기반 임시값)
-    const rhythm = total<0.85 ? "빠른 편" : (total>1.15 ? "느린 편" : "보통");
+    // 리듬: 고정 기준(빠른/느린) 없음 — 사람마다 빠르기가 달라서, '내 평소 템포'와 비교(personalTempo)해서 채움
+    const rhythm = null;
     // 밴드 A(느슨): 확실히 벗어날 때만 '주의'. 실데이터 쌓이면 보정.
     const st = (ratio<2.0 || ratio>4.0) ? "caution" : "good";
     push("tempo","스윙 템포", +ratio.toFixed(1), " : 1", "measured", st, null, view);
@@ -689,9 +710,14 @@ function render(res){
     let val = m.value!=null ? `${m.value}${m.unit||""}` : (m.reason_unknown||"");
     if(m.key==="tempo" && m.detail && m.detail.total_s!=null){
       const d=m.detail, r=d.ratio_approx, rs=Number.isInteger(r)?String(r):r.toFixed(1);
+      const cmp = d.baseline_s!=null
+        ? (d.rhythm==="평소와 같음" ? `<b>평소와 같은 템포</b> (평소 ${d.baseline_s.toFixed(2)}초)`
+            : `평소(${d.baseline_s.toFixed(2)}초)보다 <b>${Math.abs(d.diff_s).toFixed(2)}초 ${d.diff_s<0?"빨라요":"느려요"}</b>`)
+        : ((d.history_n||0)+1>=TEMPO_NEED ? `평소 템포 기록 ${TEMPO_NEED}개 완료 — 다음 스윙부터 평소와 비교해요`
+            : `평소 템포 기록 쌓는 중 (${(d.history_n||0)+1}/${TEMPO_NEED})`);
       val = `<span class="tv">전체 ${d.total_s.toFixed(2)}초</span>`+
             `백스윙 ${d.back_s.toFixed(2)}초 · 다운스윙 ${d.down_s.toFixed(2)}초<br>`+
-            `리듬 <b>${d.rhythm}</b> · 비율 약 ${rs} : 1`;
+            `${cmp} · 비율 약 ${rs} : 1`;
     }
     return `<div class="box ${cls}"><span class="gd">${gLabel[m.grade]}</span><div class="bn">${m.name}</div>${badge}<div class="bv">${val}</div></div>`;
   }).join("");
@@ -701,6 +727,10 @@ function render(res){
   $("dl").onclick=()=>{const b=new Blob([JSON.stringify(res,null,2)],{type:"application/json"});
     const a=document.createElement("a");a.href=URL.createObjectURL(b);a.download="result.json";a.click();};
   $("again").onclick=()=>location.reload();
+  const th=$("tclear"), hn=tempoHist().length;
+  if(th){ th.hidden=!hn; th.textContent=`이 폰의 템포 기록 지우기 (${hn}개)`;
+    th.onclick=()=>{ if(th.dataset.ok!=="1"){ th.dataset.ok="1"; th.textContent="한 번 더 누르면 지워져요 (다른 사람이 이 폰으로 칠 때)"; return; }
+      try{ localStorage.removeItem(TEMPO_KEY); }catch(e){} th.hidden=true; }; }
   const a2=$("again2"); if(a2) a2.onclick=()=>location.reload();
 }
 </script>
