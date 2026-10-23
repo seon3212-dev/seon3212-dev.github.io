@@ -591,7 +591,6 @@ body{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
     <section class="card" id="rideCard" hidden><h2>태울 사람에게 보내기</h2><p class="note">사람마다 링크를 보내면, 받은 사람 폰에 픽업 시간·장소와 자기 기상 시간이 떠요. 링크 내용은 서버로 보내지 않아요.</p><div class="quick" id="rideLinks"></div></section>
 
     <details class="more-rules" id="goMore"><summary><span class="mr-top"><b>자세히</b><span class="mr-act"></span></span><span class="note">동선표 · 준비 시간 · 픽업 · 들를 곳 · 준비물</span></summary>
-    <label class="toggle" for="first"><div><b>처음 가는 골프장이에요</b><span>도착 여유를 넉넉히 잡아요(50분 이상).</span></div><input type="checkbox" id="first"></label>
 
     <section class="card"><h2>아침 동선</h2><ol class="tl" id="timeline"></ol></section>
 
@@ -599,12 +598,8 @@ body{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
 
     <section class="card">
       <div class="q"><span class="ql">실제 길로 계산하기</span><div class="rt-box" id="rtBox"></div><p class="note">장소 이름으로 찾아요(폰 위치는 쓰지 않아요). 찾은 장소와 경로는 길찾기에만 쓰고 서버에 저장하지 않아요.</p></div>
-      <div class="q"><span class="ql">출발 전 준비 시간 (기상 시간 계산)</span><div class="quick" id="prepChips"></div></div>
-      <div class="q"><span class="ql">티오프 몇 분 전에 도착할까요</span><div class="quick" id="bufferChips"></div></div>
-      <div class="q"><span class="ql">집에서 골프장까지</span>
-        <div class="stepper"><button type="button" data-act="driveMinus" aria-label="5분 줄이기">−</button><output id="driveOut">50분</output><button type="button" data-act="drivePlus" aria-label="5분 늘리기">+</button></div>
-        <div class="quick"><a class="chip" id="trafKakao" target="_blank" rel="noopener" style="text-decoration:none">카카오맵에서 지금 교통 보기</a><a class="chip" id="trafNaver" target="_blank" rel="noopener" style="text-decoration:none">네이버지도에서 보기</a></div>
-        <p class="note">지도에서 출발 시간 기준 예상 시간을 보고 위에 넣어 주세요. 막힘은 그 시간에 이미 들어 있어요. 시험판이라 아직 자동으로 가져오지는 못해요.</p></div>
+      <div class="q"><span class="ql">출발 전 준비 시간 (기상 시간 계산)</span><div class="quick" id="prepChips"></div><div class="hd-arow" id="prepInRow" hidden><span>직접 (분)</span><input type="number" id="prepIn" data-num="prep" inputmode="numeric" min="0" max="240" step="5" aria-label="출발 전 준비 시간 분"></div></div>
+      <div class="q"><span class="ql">티오프 몇 분 전에 도착할까요</span><div class="quick" id="bufferChips"></div><div class="hd-arow" id="bufInRow" hidden><span>직접 (분)</span><input type="number" id="bufIn" data-num="buffer" inputmode="numeric" min="0" max="180" step="5" aria-label="티오프 몇 분 전 도착"></div></div>
       <div class="q" id="pickBox"><span class="ql">픽업</span><div class="list" id="pickups"></div></div>
       <div class="q"><span class="ql">가는 길에 들를 곳</span><div class="list" id="stops"></div><p class="note">들를 곳마다 길에서 벗어났다 돌아오는 3분을 더해요.</p></div>
     </section>
@@ -941,7 +936,7 @@ body{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
   function sample(){
     var s=blank();
     s.course="장수CC";s.sample=true;s.players=["나","민수","지훈","현우"];s.move="drive";
-    s.pick={"1":{on:true,place:"래미안 정문",extra:10}};s.first=true;s.buffer=50;
+    s.pick={"1":{on:true,place:"래미안 정문",extra:10}};s.buffer=40;
     s.stops.coffee.on=true;s.bet=Object.assign(s.bet,{on:true,game:"tadang",amt:{tadang:{unit:1000}}});s.age19=true;
     var rows=[[5,4,3,6,5,4,4],[4,5,4,5,4,5,3],[6,4,4,7,5,4,3],[4,4,2,5,4,4,4]];
     rows.forEach(function(r,i){r.forEach(function(v,h){s.scores[i][h]=v;});});
@@ -950,7 +945,7 @@ body{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
   function load(){
     try{var t=localStorage.getItem(KEY);if(t){var o=JSON.parse(t),b=blank();
       Object.keys(b).forEach(function(k){if(o[k]===undefined)o[k]=b[k];});
-      o.stops=Object.assign({},b.stops,o.stops||{});o.traffic=0;if(o.stops&&o.stops.meal&&o.stops.meal.where==="home")o.stops.meal.where="course";var ob=o.bet||{};o.bet=Object.assign({},b.bet,ob);o.bet.vg=o.bet.vg||{};if(ob.bp&&ob.bp.tie4===undefined)o.bet.bp=Object.assign({},ob.bp,{tie4:!!ob.bp.tie3});o.bet.hz=o.bet.hz||{};var sk0=o.bet.skip||{};o.bet.skip={first:sk0.first===true?"off":(sk0.first||"on"),last:sk0.last===true?"off":(sk0.last||"on")};if([2,"turn","manual"].indexOf(o.bet.hrank)<0)o.bet.hrank=2;o.bet.near=o.bet.near||{};o.bet.tn=o.bet.tn||{};if(!ob.bp){o.bet.bp={tie3:ob.tie!==false,tie4:ob.tie!==false,triple:true,par3dbl:true,birdie:ob.birdie!=="none"};}
+      o.stops=Object.assign({},b.stops,o.stops||{});o.traffic=0;if(o.first){if(o.buffer===50)o.buffer=40;o.first=false;}if(o.stops&&o.stops.meal&&o.stops.meal.where==="home")o.stops.meal.where="course";var ob=o.bet||{};o.bet=Object.assign({},b.bet,ob);o.bet.vg=o.bet.vg||{};if(ob.bp&&ob.bp.tie4===undefined)o.bet.bp=Object.assign({},ob.bp,{tie4:!!ob.bp.tie3});o.bet.hz=o.bet.hz||{};var sk0=o.bet.skip||{};o.bet.skip={first:sk0.first===true?"off":(sk0.first||"on"),last:sk0.last===true?"off":(sk0.last||"on")};if([2,"turn","manual"].indexOf(o.bet.hrank)<0)o.bet.hrank=2;o.bet.near=o.bet.near||{};o.bet.tn=o.bet.tn||{};if(!ob.bp){o.bet.bp={tie3:ob.tie!==false,tie4:ob.tie!==false,triple:true,par3dbl:true,birdie:ob.birdie!=="none"};}
       if(!ob.bonus){o.bet.bonus=JSON.parse(JSON.stringify(b.bet.bonus));var ob2=ob.bbonus||(ob.birdie==="cash"||ob.birdie==="extra"?ob.birdie:null);if(ob2==="cash")o.bet.bonus.birdie={mode:"cash",v:((ob.amt||{}).tadang||{}).bonus||0};else if(ob2==="none")o.bet.bonus.birdie={mode:"none",v:1};}
       o.bet.eg=o.bet.eg||{};o.bet.pk=o.bet.pk||{};o.bet.dr=o.bet.dr||{};if(o.bet.stack!=="cap2")o.bet.stack="cap4";
       if(!ob.amt){o.bet.amt={};o.bet.amt[o.bet.game||"tadang"]={unit:o.bet.unit||0,seed:o.bet.seed||0};}return o;}}catch(e){}
@@ -998,7 +993,7 @@ body{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
     var inMeal=S.stops.meal.on&&S.stops.meal.where==="inside",mealT=inMeal?STOPS.filter(function(d){return d.id==="meal";})[0].stay:0;
     var tee=toMin(S.tee),arrive=tee-S.buffer-mealT,it=seqItems(),legs=S.route.legs.slice(),k=0,dur=0,pk=pickers();
     it.forEach(function(i){if(i.pt){dur+=(legs[k++]||0);}else{dur+=i.k==="pick"?i.x.extra:DETOUR;}dur+=i.k==="pick"?LOAD:i.d.stay;});dur+=(legs[k]||0);
-    var depart=arrive-dur,prep=[20,30,40,60].indexOf(S.prep)>=0?S.prep:40,wake=depart-prep;
+    var depart=arrive-dur,prep=prepMin(),wake=depart-prep;
     var ev=[{t:wake,k:"wake",title:"일어나기",note:"출발 전 준비 "+prep+"분"}],t=depart;k=0;
     ev.push({t:t,k:"start",title:"집에서 출발",note:"실제 길 기준 "+S.route.total+"분 · "+S.route.km+"km"+(S.route.basis==="future"?" (출발 시각 예상)":" (지금 교통 기준)")+(pk.length?" · 픽업 "+pk.length+"명":"")});
     it.forEach(function(i){
@@ -1053,8 +1048,8 @@ body{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
       var pts=[rpt(S.from)].concat(res).concat([rpt(S.courseLoc)]);
       rapi({action:"route",pts:pts,depart:dep}).then(function(r){
         rtBusy="";
-        if(!r.ok){rtMsg="실제 시간을 못 가져왔어요"+(r.error?" ("+r.error+")":"")+". 아래 직접 넣은 시간으로 계산해요.";renderGo();return;}
-        S.route={sig:routeSig(),legs:r.legs,total:r.total,km:r.km,basis:r.basis,at:Date.now()};rtMsg="";changed();
+        if(!r.ok){rtMsg="실제 시간을 못 가져왔어요"+(r.error?" ("+r.error+")":"")+". 어림 시간("+S.drive+"분)으로 계산해요.";renderGo();return;}
+        S.route={sig:routeSig(),legs:r.legs,total:r.total,km:r.km,basis:r.basis,at:Date.now()};if(r.total>0)S.drive=Math.max(5,Math.min(300,r.total));rtMsg="";changed();
       });
     });
   }
@@ -1074,6 +1069,10 @@ body{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
     h+='<button type="button" class="btn btn-flag" data-act="rtCalc"'+(f?'':' disabled')+'>'+(ok?'다시 계산':'실제 운전 시간 계산')+'</button>';
     return h;
   }
+  function kv(id,v){var el=$(id);if(el&&document.activeElement!==el)el.value=v;}
+  function prepMin(){var v=+S.prep;return isFinite(v)&&S.prep!==""&&S.prep!=null?Math.max(0,Math.min(240,Math.round(v))):40;}
+  function prepCustom(){return !!S.prepCustom||[30,60].indexOf(prepMin())<0;}
+  function bufCustom(){return !!S.bufCustom||[30,40].indexOf(+S.buffer)<0;}
   function plan(){
     if(routeOk())return planRoute();
     var inMeal=S.stops.meal.on&&S.stops.meal.where==="inside",mealT=inMeal?STOPS.filter(function(d){return d.id==="meal";})[0].stay:0;
@@ -1084,9 +1083,9 @@ body{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
     var pk=pickers(),pickTime=pk.reduce(function(a,x){return a+x.extra+LOAD;},0);
     var depart=arrive-D-stopTime-pickTime;
     var a=home.length?Math.max(3,Math.round(D*.12)):0,c=near.length?Math.max(3,Math.round(D*.12)):0,b=D-a-c;
-    var prep=[20,30,40,60].indexOf(S.prep)>=0?S.prep:40,wake=depart-prep;
+    var prep=prepMin(),wake=depart-prep;
     var ev=[{t:wake,k:"wake",title:"일어나기",note:"출발 전 준비 "+prep+"분"}],t=depart;
-    ev.push({t:t,k:"start",title:S.move==="ride"?"태워 줄 차에 타기":"집에서 출발",note:"골프장까지 "+D+"분"+(S.traffic?" (막힘 여유 포함)":"")+(pk.length?" · 픽업 "+pk.length+"명 +"+pickTime+"분":"")});
+    ev.push({t:t,k:"start",title:S.move==="ride"?"태워 줄 차에 타기":"집에서 출발",note:(S.move==="ride"?"골프장까지 "+D+"분":"골프장까지 약 "+D+"분 (어림 · 실제 길 계산 전)")+(pk.length?" · 픽업 "+pk.length+"명 +"+pickTime+"분":"")});
     pk.forEach(function(x){t+=x.extra;ev.push({t:t,k:"pick",x:x,title:nameOf(x.i)+" 픽업",note:(x.place?x.place+" · ":"")+"백 싣기 "+LOAD+"분"});t+=LOAD;});
     t+=a;home.forEach(function(d){t+=DETOUR;ev.push({t:t,k:"stop",d:d,title:d.name+" 들르기",note:d.stay+"분 · 집 근처"});t+=d.stay;});
     t+=b;near.forEach(function(d){t+=DETOUR;ev.push({t:t,k:"stop",d:d,title:d.name+" 들르기",note:d.stay+"분 · 골프장 근처"});t+=d.stay;});
@@ -1496,13 +1495,13 @@ body{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
     $("depart").firstChild.nodeValue=fmt(p.depart);$("dayTag").textContent=p.prev?"전날":"";
     $("goLbl").textContent=S.move==="ride"?"이 시간에 차에 타세요 (운전자 기준)":"이 시간에 출발하세요";
     var so=p.ev.filter(function(e){return e.k==="stop";}).map(function(e){return e.d.name;});
-    $("goSum").innerHTML="<b>"+fmt(p.tee)+"</b> 티오프 · <b>"+fmt(p.arrive)+"</b> 도착"+(p.pk.length?" · 픽업 "+p.pk.length+"명":"")+(so.length?" · "+esc(so.join(", "))+" 들름":"")+(p.real?" · 실제 길 기준":"");
+    $("goSum").innerHTML="<b>"+fmt(p.tee)+"</b> 티오프 · <b>"+fmt(p.arrive)+"</b> 도착"+(p.pk.length?" · 픽업 "+p.pk.length+"명":"")+(so.length?" · "+esc(so.join(", "))+" 들름":"")+(p.real?" · 실제 길 기준":(S.move==="ride"?"":" · 어림 시간 (자세히에서 실제 길 계산)"));
     $("navNaver").href=naver(S.course||"골프장");
     $("goWake").innerHTML=S.tee?"기상 <b>"+fmt(p.wake)+"</b> · 준비 "+p.prep+"분":"";
-    $("prepChips").innerHTML=[20,30,40,60].map(function(v){return '<button type="button" class="chip" data-prep="'+v+'" aria-pressed="'+(p.prep===v)+'">'+v+'분</button>';}).join("");
+    var pc=prepCustom();$("prepChips").innerHTML='<button type="button" class="chip" data-prep="custom" aria-pressed="'+pc+'">직접 입력</button>'+[30,60].map(function(v){return '<button type="button" class="chip" data-prep="'+v+'" aria-pressed="'+(!pc&&p.prep===v)+'">'+v+'분</button>';}).join("");$("prepInRow").hidden=!pc;kv("prepIn",p.prep);
     var pe=p.ev.filter(function(e){return e.k==="pick";});$("rideCard").hidden=!(S.move==="drive"&&pe.length&&S.tee);
     $("rideLinks").innerHTML=pe.map(function(e,k){return '<button type="button" class="chip" data-ridei="'+k+'">'+esc(nameOf(e.x.i))+'에게 보내기 · '+fmt(e.t)+'</button>';}).join("");
-    $("first").checked=!!S.first;
+    
     $("timeline").innerHTML=p.ev.map(function(e){
       var link="";
       if(e.k==="stop"){var q=S.stops[e.d.id].where==="course"?(S.course+" 근처 "+e.d.q):e.d.q;link=' · <a href="'+kakao(q)+'" target="_blank" rel="noopener">'+e.d.name+' 찾기</a>';}
@@ -1515,10 +1514,9 @@ body{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
     $("packLevel").innerHTML='<span class="note" style="align-self:center">내 수준</span>'+LEVELS.map(function(l){return '<button type="button" class="chip" data-level="'+l[0]+'" aria-pressed="'+(lv===l[0])+'">'+l[1]+'</button>';}).join("");
     $("packNote").textContent=lv?"수준에 맞춘 준비물이에요.":"수준을 고르면 준비물이 맞춰져요. 지금은 백돌이 기준이에요.";
     $("pack").innerHTML=PACK().map(function(n,i){return '<li><label><input type="checkbox" data-pack="'+i+'"'+(S.pack[n]?" checked":"")+'><span>'+n+'</span></label></li>';}).join("");
-    var bufs=[40,50,60];if(bufs.indexOf(S.buffer)<0){S.buffer=S.buffer<45?40:(S.buffer<55?50:60);save();}
-    $("bufferChips").innerHTML=bufs.map(function(v){return '<button type="button" class="chip" data-buf="'+v+'" aria-pressed="'+(S.buffer===v)+'">'+v+'분 전</button>';}).join("");
-    $("driveOut").textContent=S.drive+"분";$("rtBox").innerHTML=rtBoxHtml();
-    $("trafKakao").href=kakao(S.course||"골프장");$("trafNaver").href=naver(S.course||"골프장");
+    var bc=bufCustom();$("bufferChips").innerHTML='<button type="button" class="chip" data-buf="custom" aria-pressed="'+bc+'">직접 입력</button>'+[30,40].map(function(v){return '<button type="button" class="chip" data-buf="'+v+'" aria-pressed="'+(!bc&&+S.buffer===v)+'">'+v+'분 전</button>';}).join("");$("bufInRow").hidden=!bc;kv("bufIn",S.buffer);
+    $("rtBox").innerHTML=rtBoxHtml();
+    
     $("pickBox").hidden=S.move!=="drive";
     $("pickups").innerHTML=p.pk.length?p.pk.map(function(x){
       return '<div class="pk"><b>'+esc(nameOf(x.i))+'</b><div class="rt-row"><input type="text" data-place="'+x.i+'" id="place'+x.i+'" placeholder="만날 곳 (아파트 정문 등)" value="'+esc(x.place)+'"><button type="button" class="btn btn-plain" data-pfind="'+x.i+'">찾기</button></div>'+((S.pick[x.i]||{}).pt?'<span class="rt-ok">위치 찾음 <small>'+esc(S.pick[x.i].pt.addr||"")+'</small></span>':'')+(rtBusy==="pick:"+x.i||(rtRes&&rtRes.target==="pick:"+x.i)?rtList("pick:"+x.i):'')+'<span class="note">'+((S.pick[x.i]||{}).pt&&routeOk()?'실제 길로 계산돼요 · 백 싣기 3분은 자동':'위치를 안 찾으면 아래 어림값으로 · 백 싣기 3분은 자동')+'</span><div class="quick">'+EXTRAS.map(function(v){return '<button type="button" class="chip" data-ex="'+x.i+':'+v+'" aria-pressed="'+(x.extra===v)+'">+'+v+'분</button>';}).join("")+'</div></div>';
@@ -1719,8 +1717,8 @@ body{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
     if(d.ab!=null&&d.ab!==""){S.bet.ab=Object.assign({},S.bet.ab||{});S.bet.ab[d.ab]=togIv(S.bet.ab[d.ab],S.hole);changed();return;}
     if(d.dc){var dq2=d.dc.split(":");S.bet.dc=Object.assign({},S.bet.dc||{});if(S.bet.dc[dq2[0]]!=null&&+S.bet.dc[dq2[0]]===+dq2[1])delete S.bet.dc[dq2[0]];else S.bet.dc[dq2[0]]=+dq2[1];changed();return;}
     if(d.hz){var hp=d.hz.split(":");S.bet.hz[hp[0]]=+hp[1];changed();return;}
-    if(d.buf){S.buffer=+d.buf;changed();return;}
-    if(d.prep){S.prep=+d.prep;changed();return;}
+    if(d.buf){if(d.buf==="custom"){S.bufCustom=true;changed();var bi=$("bufIn");if(bi)bi.focus();return;}S.bufCustom=false;S.buffer=+d.buf;changed();return;}
+    if(d.prep){if(d.prep==="custom"){S.prepCustom=true;changed();var pi=$("prepIn");if(pi)pi.focus();return;}S.prepCustom=false;S.prep=+d.prep;changed();return;}
     if(d.rtpick!=null){rtPick(+d.rtpick);return;}
     if(d.pfind!=null){var pin=$("place"+d.pfind);rtFind("pick:"+d.pfind,pin?pin.value:"");return;}
     if(d.sfind){rtNear(d.sfind);return;}
@@ -1743,8 +1741,6 @@ body{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
       case "fillPar":act().forEach(function(i){if(S.scores[i][S.hole]==null)S.scores[i][S.hole]=S.par[S.hole];});changed();return;
       case "rtFrom":rtFind("from",($("rtFrom")||{}).value);return;
       case "rtCalc":rtCalc(false);return;
-      case "driveMinus":S.drive=Math.max(5,S.drive-5);changed();return;
-      case "drivePlus":S.drive=Math.min(300,S.drive+5);changed();return;
       case "copyGo":copy(goText(),"goCopy","문구를 복사했어요. 단톡방에 붙여넣으세요.");return;
       case "goIcs":if(!S.tee||!S.date){toast("날짜와 티오프 시간을 먼저 넣어 주세요");return;}var pi=plan();if(!(window.WG_ICS&&window.WG_ICS({date:S.date,wake:pi.wake,title:"골프 라운드 기상 ("+(S.course||"골프장")+" "+fmt(pi.tee)+")",desc:fmt(pi.depart)+" 출발 → "+fmt(pi.arrive)+" 도착 · "+fmt(pi.tee)+" 티오프"})))toast("캘린더 파일을 만들지 못했어요.");return;
       case "copyScore":copy(scoreText(),"scoreCopy","결과를 복사했어요. 단톡방에 붙여넣으세요.");return;
@@ -1778,6 +1774,8 @@ body{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
       if(d.bv==="birdie"&&ob3.mode==="cash"){var M2={putt:3,shot:5,hio:10},old=+ob3.v||0;Object.keys(M2).forEach(function(k){var r=S.bet.bonus[k];if(r&&r.mode==="cash"&&(+r.v===old*M2[k]||!(+r.v)))r.v=nv2*M2[k];});}
       S.bet.bonus[d.bv]=Object.assign({mode:"stroke"},ob3,{v:nv2});changed();return;}
     if(d.tnv){S.bet[d.tnv]=Math.max(0,Math.floor(+t.value||0));changed();return;}
+    if(d.num==="prep"){if(t.value==="")return;S.prep=Math.max(0,Math.min(240,Math.floor(+t.value||0)));S.prepCustom=true;changed();return;}
+    if(d.num==="buffer"){if(t.value==="")return;S.buffer=Math.max(0,Math.min(180,Math.floor(+t.value||0)));S.bufCustom=true;changed();return;}
     if(d.amt){var gid=S.bet.game;S.bet.amt[gid]=Object.assign({},S.bet.amt[gid]||{});S.bet.amt[gid][d.amt]=Math.max(0,Math.floor(+t.value||0));changed();return;}
     if(d.place!=null){S.pick[d.place]=Object.assign({on:true,extra:10},S.pick[d.place]||{},{place:t.value});if(S.pick[d.place].pt&&S.pick[d.place].pt.name!==t.value)delete S.pick[d.place].pt;S.sample=false;save();renderPlan();return;}
   });
@@ -1785,7 +1783,6 @@ body{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
   document.addEventListener("change",function(e){
     var t=e.target,d=t.dataset||{};
     if(t.id==="age19"){S.age19=t.checked;changed();return;}
-    if(t.id==="first"){S.first=t.checked;if(S.first&&S.buffer<50)S.buffer=50;changed();return;}
     if(d.pick!=null){S.pick[d.pick]=Object.assign({extra:10,place:""},S.pick[d.pick]||{},{on:t.checked});changed();return;}
     if(d.stop){S.stops[d.stop].on=t.checked;changed();return;}
     if(d.where){S.stops[d.where].where=t.value;delete S.stops[d.where].pt;rtRes=null;changed();return;}
@@ -3467,7 +3464,7 @@ body{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
 <script>
 /* ---------- 기상 캘린더(.ics) · 태워 주는 링크(#ride=) 받기 — 링크 내용은 이 폰에만, 서버로 보내지 않는다 ---------- */
 (function(){
-  var KEY="wise_ride_v1",PREPS=[20,30,40,60];
+  var KEY="wise_ride_v1",PREPS=[30,60];
   function $(id){return document.getElementById(id);}
   function esc(x){return String(x==null?"":x).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];});}
   function toast(msg){var t=document.querySelector(".toast");if(!t){t=document.createElement("div");t.className="toast";t.setAttribute("role","status");document.body.appendChild(t);}t.textContent=msg;t.hidden=false;clearTimeout(toast.t);toast.t=setTimeout(function(){t.hidden=true;},2400);}
@@ -3511,21 +3508,22 @@ body{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
   function render(){
     var box=$("rideBox");if(!box)return;
     if(!cur||cur.d<today()){box.innerHTML="";return;}
-    var prep=PREPS.indexOf(cur.prep)>=0?cur.prep:40,pm=toMin(cur.p),wake=pm-prep;
+    var prep=isFinite(+cur.prep)&&cur.prep!=null?Math.max(0,Math.min(240,+cur.prep)):40,pm=toMin(cur.p),wake=pm-prep,cus=!!cur.prepCustom||PREPS.indexOf(prep)<0;
     box.innerHTML='<div class="hm-round ride-card"><small>'+esc(cur.w||"동반자")+'님이 태워 줘요</small>'+
       '<b class="ride-big">'+hm(pm)+(cur.l?' · '+esc(cur.l):'')+'</b>'+
       '<span class="sub">'+esc(dayLabel(cur.d))+' · '+esc(cur.c||"골프장")+' '+esc(cur.t)+' 티오프</span>'+
       '<span class="ride-wake">기상 <b>'+hm(wake)+'</b> · 준비 '+prep+'분</span>'+
-      '<div class="quick ride-prep">'+PREPS.map(function(v){return '<button type="button" class="chip" data-rprep="'+v+'" aria-pressed="'+(v===prep)+'">준비 '+v+'분</button>';}).join("")+'</div>'+
+      '<div class="quick ride-prep"><button type="button" class="chip" data-rprep="custom" aria-pressed="'+cus+'">직접 입력</button>'+PREPS.map(function(v){return '<button type="button" class="chip" data-rprep="'+v+'" aria-pressed="'+(!cus&&v===prep)+'">준비 '+v+'분</button>';}).join("")+'</div>'+(cus?'<div class="hd-arow"><span>준비 (분)</span><input type="number" id="rideIn" inputmode="numeric" min="0" max="240" step="5" value="'+prep+'" aria-label="출발 전 준비 시간 분"></div>':'')+
       '<div class="yd-btns"><button type="button" class="btn btn-flag" data-ride-act="ics">캘린더에 기상 알림 넣기</button><button type="button" class="btn btn-plain yd-cancel" data-ride-act="close">닫기</button></div></div>';
   }
   document.addEventListener("click",function(e){
     var b=e.target.closest("button");if(!b)return;
-    if(b.dataset.rprep){cur.prep=+b.dataset.rprep;store(cur);render();return;}
+    if(b.dataset.rprep){if(b.dataset.rprep==="custom"){cur.prepCustom=true;store(cur);render();var ri=$("rideIn");if(ri)ri.focus();return;}cur.prepCustom=false;cur.prep=+b.dataset.rprep;store(cur);render();return;}
     var a=b.dataset.rideAct;if(!a)return;
     if(a==="close"){cur=null;store(null);render();return;}
     if(a==="ics"){var prep=cur.prep||40;if(!ics({date:cur.d,wake:toMin(cur.p)-prep,title:"골프 라운드 기상 ("+(cur.c||"골프장")+" "+cur.t+")",desc:(cur.w||"동반자")+"님 픽업 "+cur.p+(cur.l?" "+cur.l:"")}))toast("캘린더 파일을 만들지 못했어요.");}
   });
+  document.addEventListener("change",function(e){if(e.target&&e.target.id==="rideIn"&&cur){var v=Math.max(0,Math.min(240,Math.floor(+e.target.value||0)));cur.prep=v;cur.prepCustom=true;store(cur);render();}});
   window.RIDE_PARSE=parse;window.RIDE_RENDER=function(){cur=load();render();}; // 테스트용
   cur=load();
   var h=window.START_TAB||"";
