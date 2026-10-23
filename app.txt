@@ -974,7 +974,9 @@ body{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
   /* ---------- 가는 길 계산 ---------- */
   function pickers(){ // 내가 태우는 사람들(이름이 있는 동반자만)
     if(S.move!=="drive")return [];
-    return act().filter(function(i){return i>0&&S.pick[i]&&S.pick[i].on;}).map(function(i){return {i:i,place:S.pick[i].place||"",extra:S.pick[i].extra||10};});
+    var l=act().filter(function(i){return i>0&&S.pick[i]&&S.pick[i].on;}).map(function(i){return {i:i,place:S.pick[i].place||"",extra:S.pick[i].extra||10};});
+    var po=S.pickOrder;if(po&&po.sig===orderSig(l)&&po.ids&&po.ids.length===l.length)l.sort(function(a,b){return po.ids.indexOf(a.i)-po.ids.indexOf(b.i);});
+    return l;
   }
   /* ---------- 실제 길찾기 (와이즈골프 길찾기 서버 — 카카오) ---------- */
   var ROUTE_API="https://script.google.com/macros/s/AKfycbzQatv-s5nuuwFGxORcuFm_laqiYt4o-QC5CLwcQk0gKcXTFfApH4cmwZhPoBOcJ_-Ozg/exec"; /* 길찾기 서버 (와이즈쿼드·규칙 질문 서버와 별개) */
@@ -989,6 +991,14 @@ body{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
     sv.sort(function(a,b){return a.after-b.after||a.prog-b.prog;});
     for(var g=0;g<=pk.length;g++){sv.forEach(function(v){if(v.after===g)it.push(v);});if(g<pk.length)it.push({k:"pick",x:pk[g],pt:rpt((S.pick[pk[g].i]||{}).pt)});}
     return it; /* 들를 곳은 가는 길에서 놓인 자리(몇 번째 픽업 뒤·얼마나 갔을 때)대로 끼운다 */
+  }
+  function orderSig(l){var f=rpt(S.from),c=S.courseLoc&&S.courseLoc.for===S.course?rpt(S.courseLoc):null;return JSON.stringify([f&&[f.x,f.y],c&&[c.x,c.y],l.map(function(x){var q=rpt((S.pick[x.i]||{}).pt);return [x.i,q&&q.x,q&&q.y];}).sort(function(a,b){return a[0]-b[0];})]);}
+  function ensureOrder(){ /* 픽업 2~3명이면 태우는 순서를 가장 빠르게 (모든 순서를 실제 길로 계산) */
+    var l=act().filter(function(i){return i>0&&S.pick[i]&&S.pick[i].on;}).map(function(i){return {i:i};}),sg=orderSig(l);
+    if(l.length<2||l.length>3||!rpt(S.from)||!(S.courseLoc&&S.courseLoc.for===S.course)||l.some(function(x){return !rpt((S.pick[x.i]||{}).pt);}))return Promise.resolve();
+    if(S.pickOrder&&S.pickOrder.sig===sg)return Promise.resolve();
+    var pts=[rpt(S.from)].concat(l.map(function(x){return rpt(S.pick[x.i].pt);})).concat([rpt(S.courseLoc)]);
+    return rapi({action:"order",pts:pts}).then(function(r){if(r.ok&&r.order)S.pickOrder={sig:sg,ids:r.order.map(function(k){return l[k].i;}),min:r.min,given:r.given};save();});
   }
   function pickSig(){return pickers().map(function(x){var q=rpt((S.pick[x.i]||{}).pt);return x.i+":"+(q?q.x+","+q.y:"");}).join("|");}
   function routeSig(){var f=rpt(S.from),c=S.courseLoc&&S.courseLoc.for===S.course?rpt(S.courseLoc):null;return JSON.stringify([f&&[f.x,f.y],c&&[c.x,c.y],seqItems().map(function(i){return i.pt?[i.pt.x,i.pt.y]:0;}),S.date,S.tee,S.move]);}
@@ -1035,15 +1045,17 @@ body{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
     rtBusy="stop:"+id;rtRes=null;renderGo();
     ensureCourse().then(function(ok){
       if(!ok){rtBusy="";renderGo();toast("골프장 위치를 못 찾았어요. 골프장을 먼저 골라 주세요");return;}
-      var pts=[rpt(S.from)].concat(pk.map(function(x){return rpt(S.pick[x.i].pt);})).concat([rpt(S.courseLoc)]),ps=pickSig();
+      ensureOrder().then(function(){
+      pk=pickers();var pts=[rpt(S.from)].concat(pk.map(function(x){return rpt(S.pick[x.i].pt);})).concat([rpt(S.courseLoc)]),ps=pickSig();
       rapi({action:"along",kind:id,side:st.where==="home"?"home":"course",pts:pts}).then(function(r){if(!r.ok&&r.error==="BAD_REQUEST")return rapi({action:"nearby",kind:id,at:st.where==="home"?pts[0]:pts[pts.length-1],radius:3000}).then(function(x){if(x.ok)x.old=true;return x;});return r;}).then(function(r){rtBusy="";rtRes=r.ok?{target:"stop:"+id,list:(r.list||[]).map(function(c){c.base=ps;return c;})}:{target:"stop:"+id,list:[],err:r.error};renderGo();});
+      });
     });
   }
   function rtPick(n){
-    if(!rtRes||!rtRes.list[n])return;var c=rtRes.list[n],v={name:c.name,addr:c.addr,x:c.x,y:c.y},tg=rtRes.target;rtRes=null;
+    if(!rtRes||!rtRes.list[n])return;var c=rtRes.list[n];if(c.rest==="opposite"){toast("반대 방향 휴게소라 들를 수 없어요");return;}var v={name:c.name,addr:c.addr,x:c.x,y:c.y},tg=rtRes.target;rtRes=null;
     if(tg==="from")S.from=v;
     else if(tg.indexOf("pick:")===0){var i=+tg.slice(5);S.pick[i]=Object.assign({on:true,extra:10},S.pick[i]||{},{place:c.name,pt:v});}
-    else if(tg.indexOf("stop:")===0){var so=S.stops[tg.slice(5)];so.pt=v;if(c.after!=null){so.after=c.after;so.prog=c.prog;so.base=c.base;}else{delete so.after;delete so.prog;delete so.base;}}
+    else if(tg.indexOf("stop:")===0){var so=S.stops[tg.slice(5)];if(c.rest==="mine"&&isFinite(+c.wx)){v.x=+c.wx;v.y=+c.wy;v.rest=1;}so.pt=v;if(c.after!=null){so.after=c.after;so.prog=c.prog;so.base=c.base;}else{delete so.after;delete so.prog;delete so.base;}}
     changed();if(rpt(S.from)&&S.tee)rtCalc(true);
   }
   function rtCalc(quiet){
@@ -1054,6 +1066,7 @@ body{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
     ensureCourse().then(function(ok){
       if(!ok){rtBusy="";rtMsg="골프장 위치를 못 찾았어요.";renderGo();return;}
       var miss=rtMissing();if(miss.length){rtBusy="";rtMsg="먼저 찾아 주세요: "+miss.join(", ");renderGo();return;}
+      ensureOrder().then(function(){
       var res=seqItems().map(function(i){return i.pt;});
       if(res.length>5){rtBusy="";rtMsg="픽업·들를 곳은 합쳐서 5곳까지만 계산돼요. 몇 곳을 빼 주세요.";renderGo();return;}
       var base=S.route;S.route=null;var bp=plan();S.route=base;
@@ -1066,9 +1079,10 @@ body{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
         if(!r.ok){rtMsg="실제 시간을 못 가져왔어요"+(r.error?" ("+r.error+")":"")+". 잠시 뒤 '다시 계산'을 눌러 주세요.";renderGo();return;}
         S.route={sig:routeSig(),legs:r.legs,total:r.total,km:r.km,basis:r.basis,at:Date.now()};if(r.total>0)S.drive=Math.max(5,Math.min(300,r.total));rtMsg="";changed();
       });
+      });
     });
   }
-  function rtList(tg){if(rtBusy===tg)return '<span class="note">찾는 중…</span>';if(!rtRes||rtRes.target!==tg)return "";if(rtRes.err)return '<span class="note">찾지 못했어요 ('+esc(rtRes.err)+')</span>';if(!rtRes.list.length)return '<span class="note">결과가 없어요. 다른 이름으로 찾아 보세요.</span>';return '<div class="rt-res">'+rtRes.list.map(function(c,n){return '<button type="button" data-rtpick="'+n+'">'+esc(c.name)+(c.extra!=null?' · <b class="'+(c.extra>=10?'rt-far':'rt-near')+'">'+(c.extra>=10?'돌아가요 ':c.extra<=2?'가는 길 ':'')+'+'+c.extra+'분</b>':(c.dist!=null?' · '+(c.dist>=1000?(c.dist/1000).toFixed(1)+"km":c.dist+"m"):""))+'<small>'+esc(c.addr||"")+'</small></button>';}).join("")+(tg.indexOf("stop:")===0&&rtRes.list.length&&rtRes.list[0].extra==null?'<span class="note">길찾기 서버를 새 버전으로 바꾸기 전이라 가까운 순이에요. 가는 방향인지는 아직 못 따져요.</span>':'')+(tg.indexOf("stop:")===0&&rtRes.list.length&&rtRes.list[0].extra!=null?'<span class="note">+분 = 그 가게에 들렀다 가면 더 걸리는 운전 시간이에요(머무는 시간 빼고). 적게 걸리는 순이에요. 반대 방향 휴게소처럼 돌아가야 하는 곳은 뒤로 밀려요.</span>':'')+'</div>';}
+  function rtList(tg){if(rtBusy===tg)return '<span class="note">찾는 중…</span>';if(!rtRes||rtRes.target!==tg)return "";if(rtRes.err)return '<span class="note">찾지 못했어요 ('+esc(rtRes.err)+')</span>';if(!rtRes.list.length)return '<span class="note">결과가 없어요. 다른 이름으로 찾아 보세요.</span>';return '<div class="rt-res">'+rtRes.list.map(function(c,n){return '<button type="button" data-rtpick="'+n+'">'+esc(c.name)+(c.rest==="opposite"?' · <b class="rt-far">반대 방향 휴게소 · 못 들러요</b>':c.extra!=null?' · <b class="'+(c.extra>=10?'rt-far':'rt-near')+'">'+(c.rest==="mine"?'내 방향 휴게소 ':c.extra>=10?'돌아가요 ':c.extra<=2?'가는 길 ':'')+'+'+c.extra+'분</b>':(c.dist!=null?' · '+(c.dist>=1000?(c.dist/1000).toFixed(1)+"km":c.dist+"m"):""))+'<small>'+esc(c.addr||"")+'</small></button>';}).join("")+(tg.indexOf("stop:")===0&&rtRes.list.length&&rtRes.list[0].extra==null?'<span class="note">길찾기 서버를 새 버전으로 바꾸기 전이라 가까운 순이에요. 가는 방향인지는 아직 못 따져요.</span>':'')+(tg.indexOf("stop:")===0&&rtRes.list.length&&rtRes.list[0].extra!=null?'<span class="note">+분 = 그 가게에 들렀다 가면 더 걸리는 운전 시간이에요(머무는 시간 빼고). 적게 걸리는 순이에요. 반대 방향 휴게소처럼 돌아가야 하는 곳은 뒤로 밀려요.</span>':'')+'</div>';}
   function rtBoxHtml(){
     if(S.move==="ride")return '<span class="note">얻어 타는 경우는 태워 주는 사람이 보낸 링크의 시간을 따라요.</span>';
     var f=S.from,h="",list=function(tg){if(rtBusy===tg)return '<span class="note">찾는 중…</span>';if(!rtRes||rtRes.target!==tg)return "";if(rtRes.err)return '<span class="note">찾지 못했어요 ('+esc(rtRes.err)+')</span>';if(!rtRes.list.length)return '<span class="note">결과가 없어요. 다른 이름으로 찾아 보세요.</span>';return '<div class="rt-res">'+rtRes.list.map(function(c,n){return '<button type="button" data-rtpick="'+n+'">'+esc(c.name)+(c.dist!=null?' · '+(c.dist>=1000?(c.dist/1000).toFixed(1)+'km':c.dist+'m'):'')+'<small>'+esc(c.addr||"")+'</small></button>';}).join("")+'</div>';};
@@ -1549,9 +1563,10 @@ body{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
     $("rtBox").innerHTML=rtBoxHtml();autoRoute();
     
     $("pickBox").hidden=S.move!=="drive";
-    $("pickups").innerHTML=p.pk.length?p.pk.map(function(x){
+    var po=S.pickOrder,poOk=po&&p.pk.length>=2&&po.sig===orderSig(p.pk);
+    $("pickups").innerHTML=(poOk?'<p class="note">태우는 순서: <b>'+esc(p.pk.map(function(x){return nameOf(x.i);}).join(" → "))+'</b> (실제 길로 모든 순서를 계산해 가장 빠른 순서'+(po.given!=null&&po.given>po.min?' · 고른 순서보다 '+(po.given-po.min)+'분 빨라요':'')+')</p>':(p.pk.length>=2?'<p class="note">모두 \'찾기\'로 찾으면 태우는 순서를 가장 빠르게 정해요.</p>':''))+(p.pk.length?p.pk.map(function(x){
       return '<div class="pk"><b>'+esc(nameOf(x.i))+'</b><div class="rt-row"><input type="text" data-place="'+x.i+'" id="place'+x.i+'" placeholder="만날 곳 (아파트 정문 등)" value="'+esc(x.place)+'"><button type="button" class="btn btn-plain" data-pfind="'+x.i+'">찾기</button></div>'+((S.pick[x.i]||{}).pt?'<span class="rt-ok">위치 찾음 <small>'+esc(S.pick[x.i].pt.addr||"")+'</small></span>':'')+(rtBusy==="pick:"+x.i||(rtRes&&rtRes.target==="pick:"+x.i)?rtList("pick:"+x.i):'')+'<span class="note">'+((S.pick[x.i]||{}).pt?'실제 길로 계산돼요 · 백 싣기 3분은 자동':'\'찾기\'로 만날 곳을 찾아야 시간이 계산돼요')+'</span></div>';
-    }).join("")+(p.pk.length>=3?'<p class="note">4명이 한 차면 골프백 4개가 트렁크에 다 안 들어갈 수 있어요.</p>':''):'<p class="note">"다음 라운드"에서 태울 사람을 고르세요.</p>';
+    }).join("")+(p.pk.length>=3?'<p class="note">4명이 한 차면 골프백 4개가 트렁크에 다 안 들어갈 수 있어요.</p>':''):'<p class="note">"다음 라운드"에서 태울 사람을 고르세요.</p>');
     $("stops").innerHTML=STOPS.map(function(d){var st=S.stops[d.id];return '<div class="item"><input type="checkbox" id="st-'+d.id+'" data-stop="'+d.id+'"'+(st.on?" checked":"")+'><label class="nm" for="st-'+d.id+'">'+d.name+'<span>'+(d.sub?d.sub+" · ":"")+d.stay+'분</span></label><select data-where="'+d.id+'" aria-label="'+d.name+' 위치"'+(st.on?"":" disabled")+'>'+(d.id==="meal"?[["inside","골프장 안"],["course","골프장 근처 맛집"]]:[["home","가는 길 앞쪽"],["course","가는 길 뒤쪽"]]).map(function(o){return '<option value="'+o[0]+'"'+(st.where===o[0]?" selected":"")+'>'+o[1]+'</option>';}).join("")+'</select>'+(st.on&&d.id!=="meal"||st.on&&d.id==="meal"&&st.where!=="inside"?'<div style="grid-column:1/-1;display:flex;flex-direction:column;gap:6px">'+(st.pt?'<span class="rt-ok">'+esc(st.pt.name)+' <small>'+esc(st.pt.addr||"")+'</small></span>':'')+'<button type="button" class="btn btn-plain" data-sfind="'+d.id+'" style="align-self:flex-start">'+(st.pt?'다른 가게 고르기':'가는 길 가게 고르기')+'</button>'+(rtBusy==="stop:"+d.id||(rtRes&&rtRes.target==="stop:"+d.id)?rtList("stop:"+d.id):'')+'</div>':'')+'</div>';}).join("");
   }
   function goText(){
