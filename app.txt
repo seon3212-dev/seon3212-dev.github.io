@@ -441,7 +441,7 @@ body{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
 /* 내 거리표 */
 .yd-prev{list-style:none;margin:4px 0 0;padding:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:4px 12px;font-size:14px}.yd-prev li{display:flex;justify-content:space-between;gap:6px}.yd-prev b{font-size:14px}
 .yd-meta{font-size:12px;color:var(--board-muted)}
-.yd-btns{display:flex;gap:8px}.yd-btns .btn{flex:1;justify-content:center;min-height:44px}.yd-ask .yd-cancel,.ride-card .yd-cancel{background:transparent;color:var(--board-ink);border:1px solid var(--board-muted)}
+.yd-btns{display:flex;gap:8px}.bk-btns{margin-top:10px}.bk-btns label.btn{display:inline-flex;align-items:center;cursor:pointer}.yd-btns .btn{flex:1;justify-content:center;min-height:44px}.yd-ask .yd-cancel,.ride-card .yd-cancel{background:transparent;color:var(--board-ink);border:1px solid var(--board-muted)}
 .yd-card{gap:8px}.yd-date{font-size:12px;color:var(--muted)}
 .yd-over{font-size:13px;font-weight:700;color:var(--flag-ink);background:var(--flag);border-radius:10px;padding:6px 10px}
 .yd-tbl{display:flex;flex-direction:column;font-size:14px;font-variant-numeric:tabular-nums}
@@ -495,6 +495,12 @@ body{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
       <div class="k"><small>골프장 다반사</small><span class="soon">공개 예정</span></div>
       <b>골프장에서 흔히 있을 법한 이야기</b>
       <span class="note">웹툰으로 곧 찾아올게요.</span>
+    </div>
+    <div class="hm-card" id="bkCard">
+      <div class="k"><small>내 기록 백업</small></div>
+      <b>폰을 바꿔도 기록을 옮길 수 있어요</b>
+      <span class="note">라운드·내기·진단 기록을 파일 하나로 받아 두고, 새 폰에서 불러오면 그대로 돌아와요. 파일은 이 폰에서만 만들어지고 서버로 보내지 않아요. 동반자 이름도 들어 있으니 다른 사람에게 보내지 마세요.</span>
+      <div class="yd-btns bk-btns"><button type="button" class="btn btn-flag" data-bk="save">백업 파일 받기</button><label class="btn btn-plain" for="bkFile">백업 불러오기</label><input type="file" id="bkFile" accept=".json,application/json" hidden></div>
     </div>
   </section>
 
@@ -3581,6 +3587,48 @@ body{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
   var h=window.START_TAB||"";
   if(h.indexOf("ride=")===0){var r=parse(h.slice(5));if(r){r.prep=40;cur=r;store(r);if(window.SHOW_TAB)window.SHOW_TAB("home");}else{toast("픽업 링크를 읽지 못했어요. 다시 받아 주세요.");}}
   render();
+})();
+</script>
+<script>
+/* ---------- 내 기록 백업: 이 폰 브라우저에 저장된 앱 기록을 파일 하나로 받기 / 불러오기 — 서버로 보내지 않는다 ---------- */
+(function(){
+  var KEYS=["golfround.v1","golfround.profile.v1","golfround.recent.v1","gpas_app_v1","gcas_app_v1","gsas_app_v1","gras_app_v1","wise_ride_v1","wise_wdt_v1","wq_device_id"];
+  var APP="wisegolf-golf-life";
+  function $(id){return document.getElementById(id);}
+  function toast(msg){var t=document.querySelector(".toast");if(!t){t=document.createElement("div");t.className="toast";t.setAttribute("role","status");document.body.appendChild(t);}t.textContent=msg;t.hidden=false;clearTimeout(toast.t);toast.t=setTimeout(function(){t.hidden=true;},3000);}
+  function p2(n){return String(n).padStart(2,"0");}
+  function collect(){var d={},n=0;KEYS.forEach(function(k){var v=null;try{v=localStorage.getItem(k);}catch(e){}if(v!=null){d[k]=v;n++;}});return {n:n,data:d};}
+  function save(){
+    var c=collect();if(!c.n){toast("아직 이 폰에 저장된 기록이 없어요.");return;}
+    var now=new Date(),name="wisegolf-backup-"+now.getFullYear()+p2(now.getMonth()+1)+p2(now.getDate())+".json";
+    var txt=JSON.stringify({app:APP,v:1,at:now.toISOString(),data:c.data});
+    var file=null;try{file=new File([txt],name,{type:"application/json"});}catch(e){}
+    if(file&&navigator.canShare&&navigator.share){try{if(navigator.canShare({files:[file]})){navigator.share({files:[file],title:"슬기로운골프생활 기록 백업"}).then(function(){toast("백업 파일을 보냈어요. '파일에 저장'이나 '나에게 보내기'로 보관하세요.");},function(e){if(e&&e.name!=="AbortError")download(txt,name);});return;}}catch(e){}}
+    download(txt,name);
+  }
+  function download(txt,name){
+    try{var bl=new Blob([txt],{type:"application/json"}),a=document.createElement("a");a.href=URL.createObjectURL(bl);a.download=name;document.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(a.href);a.remove();},2000);toast("백업 파일을 받았어요 ("+name+"). 잘 보관하세요.");}
+    catch(e){toast("파일을 만들지 못했어요. 다른 브라우저(사파리·크롬)에서 해 보세요.");}
+  }
+  function parse(txt){
+    var o;try{o=JSON.parse(txt);}catch(e){return null;}
+    if(!o||o.app!==APP||o.v!==1||!o.data||typeof o.data!=="object")return null;
+    var d={},n=0;KEYS.forEach(function(k){if(typeof o.data[k]==="string"){d[k]=o.data[k];n++;}});
+    return n?{at:o.at,data:d,n:n}:null;
+  }
+  function restore(f){
+    if(!f)return;if(f.size>5*1024*1024){toast("파일이 너무 커요. 슬기로운골프생활 백업 파일이 맞는지 봐 주세요.");return;}
+    var rd=new FileReader();rd.onload=function(){
+      var b=parse(String(rd.result||""));if(!b){toast("슬기로운골프생활 백업 파일이 아니에요.");return;}
+      var when="";try{var d=new Date(b.at);if(!isNaN(d))when=d.getFullYear()+"."+(d.getMonth()+1)+"."+d.getDate()+" ";}catch(e){}
+      if(!window.confirm(when+"백업으로 이 폰의 기록을 바꿀까요?\n지금 이 폰에 있는 기록은 백업 내용으로 바뀌어요."))return;
+      try{KEYS.forEach(function(k){if(k in b.data)localStorage.setItem(k,b.data[k]);else localStorage.removeItem(k);});}catch(e){toast("불러오지 못했어요. 브라우저 저장공간이 꺼져 있는지 확인해 주세요.");return;}
+      location.hash="home";location.reload();
+    };rd.onerror=function(){toast("파일을 읽지 못했어요.");};rd.readAsText(f);
+  }
+  document.addEventListener("click",function(e){var b=e.target.closest("[data-bk]");if(b&&b.dataset.bk==="save")save();});
+  document.addEventListener("change",function(e){if(e.target&&e.target.id==="bkFile"){var f=e.target.files&&e.target.files[0];e.target.value="";restore(f);}});
+  window.WG_BACKUP={collect:collect,parse:parse}; /* 테스트용 */
 })();
 </script>
 <script>
