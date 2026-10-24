@@ -441,7 +441,7 @@ body{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
 /* 내 거리표 */
 .yd-prev{list-style:none;margin:4px 0 0;padding:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:4px 12px;font-size:14px}.yd-prev li{display:flex;justify-content:space-between;gap:6px}.yd-prev b{font-size:14px}
 .yd-meta{font-size:12px;color:var(--board-muted)}
-.yd-btns{display:flex;gap:8px}.bk-btns{margin-top:10px}.bk-btns label.btn{display:inline-flex;align-items:center;cursor:pointer}.yd-btns .btn{flex:1;justify-content:center;min-height:44px}.yd-ask .yd-cancel,.ride-card .yd-cancel{background:transparent;color:var(--board-ink);border:1px solid var(--board-muted)}
+.yd-btns{display:flex;gap:8px}.bk-btns{margin-top:10px}.sw-v{font-size:14px;margin:12px 0 4px;color:var(--muted)}.sw-list li{display:grid;grid-template-columns:1fr auto;gap:2px 8px;align-items:center;text-align:left}.sw-list li>.sw-k{grid-column:1/-1;font-size:12.5px;color:var(--muted)}.sw-list li b{font-size:17px;font-variant-numeric:tabular-nums}.sw-list li small{grid-column:1/-1;font-size:12px;color:var(--muted)}.bk-btns label.btn{display:inline-flex;align-items:center;cursor:pointer}.yd-btns .btn{flex:1;justify-content:center;min-height:44px}.yd-ask .yd-cancel,.ride-card .yd-cancel{background:transparent;color:var(--board-ink);border:1px solid var(--board-muted)}
 .yd-card{gap:8px}.yd-date{font-size:12px;color:var(--muted)}
 .yd-over{font-size:13px;font-weight:700;color:var(--flag-ink);background:var(--flag);border-radius:10px;padding:6px 10px}
 .yd-tbl{display:flex;flex-direction:column;font-size:14px;font-variant-numeric:tabular-nums}
@@ -2995,11 +2995,45 @@ body{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
     if(c.step==="result"){renderResult();return;}
     root.innerHTML=prog(c)+'<div class="card">'+({intro:sIntro,safety:sSafety,shot:sShot,ask:sAsk,device:sDevice,guide:sGuide,shots:sShots,notice:sNotice}[c.step])(c)+'</div>';
   }
+  /* ---------- 내 스윙 (스윙 영상 분석이 이 폰에 남긴 기록을 읽어 보여 줌 — 서버로 보내지 않음) ---------- */
+  var SW_URL="https://seon3212-dev.github.io/swing/",SW_TEMPO="wq_tempo_hist_v1",SW_RES="wq_swing_results_v1",SW_SAME=0.07;
+  var SW_NAME={tempo:"스윙 템포",head:"머리 움직임",center:"중심 좌우 이동",spine:"척추각(어드레스)",sway:"하체 스웨이",shoulder:"어깨 회전",pressure:"체중 압력"};
+  var SW_UNIT={head:"몸통 길이 대비 ",sway:"몸통 길이 대비 ",center:"몸통 길이 대비 "};
+  var SW_ST={good:["좋음","gp-good"],caution:["주의","gp-watch"],bad:["보완","gp-pri"]};
+  function swRead(k){try{var a=JSON.parse(localStorage.getItem(k)||"[]");return Array.isArray(a)?a:[];}catch(e){return [];}}
+  function swMed(a){var b=a.slice().sort(function(x,y){return x-y;}),m=b.length>>1;return b.length%2?b[m]:(b[m-1]+b[m])/2;}
+  function swSd(a){var m=a.reduce(function(x,y){return x+y;},0)/a.length;return Math.sqrt(a.reduce(function(x,y){return x+(y-m)*(y-m);},0)/a.length);}
+  function swDay(t){var d=new Date(t);return isNaN(d)?"":(d.getMonth()+1)+"/"+d.getDate();}
+  function swView(view,hist,res){
+    var th=hist.filter(function(h){return h&&h.view===view&&typeof h.total_s==="number";}),last=th[th.length-1],h="";
+    if(last){
+      var prev=th.slice(0,-1).slice(-10).map(function(x){return x.total_s;}),recent=th.slice(-10).map(function(x){return x.total_s;});
+      h+='<li><span class="sw-k">템포 · 최근 '+esc(swDay(last.at))+'</span><b>전체 '+last.total_s.toFixed(2)+'초</b>'+(typeof last.back_s==="number"&&typeof last.down_s==="number"?'<small>백스윙 '+last.back_s.toFixed(2)+'초 · 다운스윙 '+last.down_s.toFixed(2)+'초</small>':'')+'</li>';
+      if(prev.length>=3){var base=swMed(prev),diff=last.total_s-base,lb=Math.abs(diff)<SW_SAME?"평소와 같음":(diff<0?"평소보다 빠름":"평소보다 느림");
+        h+='<li><span class="sw-k">평소 템포 (최근 '+prev.length+'개 가운데값)</span><b>'+base.toFixed(2)+'초</b><small>평소 대비 '+(diff>=0?"+":"−")+Math.abs(diff).toFixed(2)+'초 · '+lb+'</small></li>';}
+      else h+='<li><span class="sw-k">평소 템포</span><b>기록 쌓는 중</b><small>같은 방향으로 '+(3-prev.length)+'번 더 찍으면 평소와 비교해요</small></li>';
+      if(recent.length>=3)h+='<li><span class="sw-k">흩어짐 (최근 '+recent.length+'개)</span><b>±'+swSd(recent).toFixed(2)+'초</b><small>작을수록 매번 같은 템포예요</small></li>';
+    }
+    var lr=null;for(var i=res.length-1;i>=0;i--)if(res[i]&&res[i].view===view){lr=res[i];break;}
+    if(lr)(lr.metrics||[]).forEach(function(m){
+      if(!m||m.key==="tempo"||m.grade!=="measured"||m.status==="unknown"||!SW_ST[m.status]||m.value==null)return;
+      h+='<li><span class="sw-k">'+esc(SW_NAME[m.key]||m.key)+' · '+esc(swDay(lr.at))+'</span><b>'+esc((SW_UNIT[m.key]||"")+m.value+(m.unit||""))+'</b>'+pill(SW_ST[m.status][1],SW_ST[m.status][0])+'</li>';});
+    return h?'<h3 class="sw-v">'+(view==="side"?"측면":"정면")+'</h3><ul class="gc-stat sw-list">'+h+'</ul>':'';
+  }
+  function mySwing(where){
+    var hist=swRead(SW_TEMPO),res=swRead(SW_RES),body=swView("side",hist,res)+swView("front",hist,res);
+    var h='<div class="card" id="mySwing"><h2>내 스윙 <small class="note">영상 분석</small></h2>';
+    if(body)h+=body+'<p class="gp-fine">실측 지표 중 판단이 나온 것만 보여요. 기록은 이 폰에만 있어요.'+(where==="result"?' 위 10샷 결과와 같이 보세요. 둘을 묶은 진단 문장은 준비 중이에요.':'')+'</p>';
+    else h+='<p class="note">아직 스윙 영상 분석 기록이 없어요. 폰으로 <b>정면 한 번, 측면 한 번</b> 따로 찍어 분석하면 여기에 템포와 머리 움직임이 나와요.</p>';
+    h+='<a class="btn btn-flag gc-fill" href="'+SW_URL+'">스윙 영상 분석하기</a>';
+    if(body)h+='<button type="button" class="btn btn-plain wq-forget" data-gs="swDel">이 폰의 스윙 영상 기록 지우기</button>';
+    return h+'</div>';
+  }
   function renderHome(){
     root=$("gsRoot");if(!root)return;
     var h='<div class="card"><h2>스윙 진단이란</h2><p class="note">스윙을 고치기 전에, <b>정말 스윙부터 봐야 하는지</b> 먼저 알려 드려요. 같은 채로 같은 곳을 보고 10개 친 결과가 얼마나 모이는지 보고, 다음에 먼저 볼 쪽(스윙·몸·채·라운드 운영)을 골라 드려요.</p>'+
       '<ul class="gx-list"><li>연습장이나 스크린에서 같은 채로 10개 치면 돼요</li><li>측정기기가 없어도 공이 간 쪽만 세면 돼요</li><li>어떤 동작이 원인인지 정하거나 레슨을 대신하지는 않아요</li></ul>'+
-      '<button type="button" class="btn btn-flag" data-gs="new">진단 시작</button></div>';
+      '<button type="button" class="btn btn-flag" data-gs="new">진단 시작</button></div>'+mySwing("home");
     if(P.last)h='<div class="card"><h2>지난 결과</h2><p class="note">'+esc(P.last.date)+' · '+esc(P.last.summary)+'</p><button type="button" class="btn btn-plain" data-gs="showLast">결과 다시 보기</button></div>'+h;
     if(P.cur&&P.cur.step!=="result")h='<div class="card"><h2>하던 진단</h2><p class="note">'+(P.cur.photoCode&&P.cur.photoState!=="done"?'사진을 보냈어요 (접수 번호 '+esc(P.cur.photoCode)+'). 이어 하기 → 결과 확인을 눌러 주세요.':esc(STEPN[P.cur.step]||"")+' 단계까지 했어요.')+'</p><button type="button" class="btn btn-flag" data-gs="resume">이어 하기</button></div>'+h;
     root.innerHTML=h;
@@ -3130,7 +3164,7 @@ body{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
       '<li><span>적어 주신 자료</span>'+pill(R.eq==="high"?"gp-good":R.eq==="mid"?"gp-watch":"gp-pri",EQN[R.eq])+'</li></ul>'+
       '<p class="gp-fine">'+esc(lab(SHOT,c.shot))+' · '+esc(CNAME[c.club]||"")+' · 공 '+a.n+'개'+(a.n<CFG.fullShots&&a.n>=CFG.minShots?' (10개보다 적어서 미리 보는 결과)':'')+' · '+(noDev(c)?"기기 없이 셈":esc(lab(DEV,c.dev))+(c.indoor==="in"?" 실내":c.indoor==="out"?" 실외":""))+(c.safe==="caution"?" · 몸이 조금 불편한 상태":"")+'</p></div>';
     h+='<div class="card"><h2>숫자로 본 것</h2><ul class="gc-facts">'+a.facts.map(function(f){return '<li>'+esc(f)+'</li>';}).join("")+'</ul>'+
-      (a.base?'<p class="note">이 채 기준 거리(가장 멀리·가장 짧게 간 것 뺀 평균): <b>약 '+Math.round(a.base)+'m</b>. 클럽 진단 거리 칸에 써도 돼요.</p>':'')+'</div>';
+      (a.base?'<p class="note">이 채 기준 거리(가장 멀리·가장 짧게 간 것 뺀 평균): <b>약 '+Math.round(a.base)+'m</b>. 클럽 진단 거리 칸에 써도 돼요.</p>':'')+'</div>'+mySwing("result");
     if(R.type!=="D"){
       var nx=R.next,why=nx?R.W[nx]:[];
       h+='<div class="card"><h2>다음에 먼저 볼 쪽</h2>';
@@ -3207,6 +3241,7 @@ body{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
     if(act==="resume"){render();window.scrollTo(0,0);return;}
     if(act==="showLast"){if(P.lastC){P.cur=P.lastC;P.cur.step="result";save();render();window.scrollTo(0,0);}return;}
     if(act==="quit"){P.cur=null;save();render();return;}
+    if(act==="swDel"){if(window.confirm("이 폰에 저장된 스윙 영상 분석 기록(템포·결과)을 지울까요?")){try{localStorage.removeItem(SW_TEMPO);localStorage.removeItem(SW_RES);}catch(x){}render();toast("스윙 영상 기록을 지웠어요.");}return;}
     if(!c)return;
     if(act==="pick"){var k=d.k,v=d.v;
       if(d.m){var arr=(c[k]||[]).slice(),i=arr.indexOf(v),ex=EXCL[k]||[];
@@ -3592,7 +3627,7 @@ body{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
 <script>
 /* ---------- 내 기록 백업: 이 폰 브라우저에 저장된 앱 기록을 파일 하나로 받기 / 불러오기 — 서버로 보내지 않는다 ---------- */
 (function(){
-  var KEYS=["golfround.v1","golfround.profile.v1","golfround.recent.v1","gpas_app_v1","gcas_app_v1","gsas_app_v1","gras_app_v1","wise_ride_v1","wise_wdt_v1","wq_device_id"];
+  var KEYS=["golfround.v1","golfround.profile.v1","golfround.recent.v1","gpas_app_v1","gcas_app_v1","gsas_app_v1","gras_app_v1","wise_ride_v1","wise_wdt_v1","wq_device_id","wq_tempo_hist_v1","wq_swing_results_v1"];
   var APP="wisegolf-golf-life";
   function $(id){return document.getElementById(id);}
   function toast(msg){var t=document.querySelector(".toast");if(!t){t=document.createElement("div");t.className="toast";t.setAttribute("role","status");document.body.appendChild(t);}t.textContent=msg;t.hidden=false;clearTimeout(toast.t);toast.t=setTimeout(function(){t.hidden=true;},3000);}
