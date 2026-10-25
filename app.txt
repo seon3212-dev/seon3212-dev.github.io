@@ -3117,7 +3117,7 @@ body{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
       '<div class="gs-thumbs">'+PHOTOS.map(function(p,i){return '<span class="gs-thumb"><img src="'+p.data+'" alt="'+(i+1)+'번 사진"><button type="button" class="chip" data-gs="pdel" data-i="'+i+'" aria-label="'+(i+1)+'번 사진 빼기">✕</button></span>';}).join("")+'</div>'+
 
       '<div class="q"><span class="ql">나이</span>'+chips("age18",[["y","만 18세 이상"],["n","만 18세 미만"]],c.age18)+(c.age18==="n"?'<p class="note">만 18세 미만은 AI 대신 운영자가 사진을 직접 보고 숫자를 넣어 드려요. 조금 늦어요.</p>':'')+'</div>'+
-      '<label class="agree"><input type="checkbox" id="gsPConsent"'+(c.photoConsent?" checked":"")+'><span>사진을 숫자 읽기에 쓰도록 보내요<br><small class="note">'+(c.age18==="n"?'사진은 운영자가 직접 보고 숫자를 읽어요. AI로 보내지 않아요.':'사진은 숫자를 읽기 위해 Google AI(Gemini)로 보내요. Google이 이 사진을 자기 서비스 개선에 쓸 수 있어요.')+' 숫자를 다 읽고 30일 뒤 지워요.</small></span></label>'+
+      '<label class="agree"><input type="checkbox" id="gsPConsent"'+(c.photoConsent?" checked":"")+'><span>사진을 숫자 읽기에 쓰도록 보내요<br><small class="note">'+(c.age18==="n"?'사진은 운영자가 직접 보고 숫자를 읽어요. AI로 보내지 않아요.':'사진은 숫자를 읽기 위해 Google AI(Gemini)로 보내요. Google이 이 사진을 자기 서비스 개선에 쓸 수 있어요.')+' 숫자를 다 읽으면 바로 지워요(휴지통에서 30일 뒤 완전히 사라져요).</small></span></label>'+
       '<button type="button" class="btn btn-flag gc-fill" data-gs="psend">사진 보내기</button>';
     return h;
   }
@@ -3260,7 +3260,7 @@ body{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
     if(act==="psend"){
       if(!PHOTOS.length){msg("사진을 골라 주세요.");return;}if(c.age18!=="y"&&c.age18!=="n"){msg("나이를 골라 주세요.");return;}if(!c.photoConsent){msg("사진 보내기에 체크해 주세요.");return;}
       b.disabled=true;msg(c.age18==="n"?"보내는 중이에요…":"보내는 중이에요… AI가 숫자를 읽는 데 10~20초쯤 걸려요.");
-      papi({action:"upload",passcode:"239319",consent:true,adult:!!c.adult,adult18:c.age18==="y",shot:lab(SHOT,c.shot),club:CNAME[c.club]||"",device:lab(DEV,c.dev),indoor:c.indoor==="in"?"실내":c.indoor==="out"?"실외":"",app_version:"round-v74",images:PHOTOS})
+      papi({action:"upload",passcode:"239319",consent:true,adult:!!c.adult,adult18:c.age18==="y",device_id:(window.WQ&&WQ.deviceId?WQ.deviceId():undefined),shot:lab(SHOT,c.shot),club:CNAME[c.club]||"",device:lab(DEV,c.dev),indoor:c.indoor==="in"?"실내":c.indoor==="out"?"실외":"",app_version:"round-v74",images:PHOTOS})
         .then(function(r){b.disabled=false;if(!r.ok){msg(PERR[r.error]||"보내지 못했어요. 잠시 뒤 다시 해 주세요.");return;}
           c.photoCode=r.code;PHOTOS=[];
           var sh=r.ai&&r.shots?parseBoss(r.shots):[];
