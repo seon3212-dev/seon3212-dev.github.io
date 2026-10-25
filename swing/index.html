@@ -94,7 +94,7 @@ select,input[type=number]{font-family:inherit;background:var(--panel2);color:var
     <div id="upPane" class="col">
     <div id="drop" class="drop">
       <b>스윙 영상 올리기</b>
-      <small>어드레스~피니시가 다 보이게 찍은 영상을 올려주세요. 한 영상에 <b>한 번만</b> 치면 가장 정확해요.<br>📱 <b>일반 비디오 60fps</b>로 찍어 주세요. (슬로모션은 공유될 때 시간이 늘어나 템포가 틀어져요)<br>측면(옆) 또는 정면, 둘 중 하나여도 됩니다. 영상은 <b>이 브라우저 안에서만</b> 분석되고 서버로 올라가지 않습니다.</small>
+      <small>어드레스~피니시가 다 보이게 찍은 영상을 올려주세요. 한 영상에 <b>한 번만</b> 치면 가장 정확해요.<br>📱 <b>일반 비디오 60fps</b>로 찍어 주세요. <b>슬로모는 안 돼요</b> — 아이폰이 올릴 때 30fps로 바꾸고 시간을 늘려서 템포가 틀어져요.<br>측면(옆) 또는 정면, 둘 중 하나여도 됩니다. 영상은 <b>이 브라우저 안에서만</b> 분석되고 서버로 올라가지 않습니다.</small>
     </div>
     <input id="file" type="file" accept="video/*" class="hidden">
     <div class="row">
@@ -119,6 +119,8 @@ select,input[type=number]{font-family:inherit;background:var(--panel2);color:var
 
   <div id="result" hidden style="display:flex;flex-direction:column;gap:14px">
     <div class="sum" id="sum"></div>
+    <div id="slowWarn" class="coach" hidden style="border-color:#5a4a1c;background:#2a2412"><div class="ch" style="color:#ffcf66">⚠️ 슬로모로 찍은 영상 같아요</div>
+      <div class="cb">아이폰은 슬로모 영상을 올릴 때 <b>30fps로 바꾸고 느린 구간의 시간을 늘려서</b> 보내요. 그래서 스윙 템포를 정확히 잴 수 없어요.<br>카메라에서 <b>'비디오'(일반 촬영, 가능하면 60fps)</b>로 다시 찍어 올려 주세요.</div></div>
     <div class="grid" id="grid"></div>
     <div class="coach"><div class="ch">AI 코칭 한마디</div><div class="cb" id="coach">—</div></div>
     <div class="row">
@@ -582,6 +584,9 @@ function analyze(data, view, slowSel){
   const wyOf=fr=>fr.map(p=>p?((p[15].y+p[16].y)/2):null);
   const cands=segs.map((s,i)=>{ const r=detectSwing(s.times, wyOf(s.frames), 60); return r?{...r, seg:i}:null; });
   const pk=pickSwing(cands);
+  // 슬로모 의심: 쓸 만한 스윙이 없는데 '다운스윙이 0.6초보다 긴' 움직임만 있으면 = 시간이 늘어난 영상
+  // (아이폰 슬로모는 올릴 때 30fps로 바뀌고 느린 구간이 늘어남 — 14 프로 슬로모 시험 영상에서 다운스윙 0.72초로 잡혀 탐지 실패 확인)
+  data.slowSuspect = !pk.best && cands.some(r=>r && r.down_s>0.6);
   if(pk.best && data.tkOverride!=null && data.tkOverride<pk.best.t_top){   // v0.4: 헤드 움직임으로 찾은 백스윙 시작
     const b=pk.best, back=b.t_top-data.tkOverride;
     pk.best={...b, t_tk:data.tkOverride, back_s:back, ratio:back/b.down_s};
@@ -599,7 +604,7 @@ function analyze(data, view, slowSel){
   if(det<n*0.6){
     ["스윙 템포","머리 움직임","중심 좌우 이동","척추각(어드레스)","하체 스웨이","어깨 회전"].forEach(nm=>
       push(nm,nm,null,null,"estimated","unknown","관절 인식이 충분하지 않음(촬영 조건)",view));
-    return wrap(metrics, data, view, detRate, "이번 영상은 관절 인식이 부족해 판단을 보류했어요. 밝은 곳에서 스윙 전체가 보이게 다시 찍어 주세요.");
+    return wrap(metrics, data, view, detRate, data.slowSuspect ? "슬로모로 찍은 영상으로 보여서 판단을 보류했어요. 카메라 '비디오'(일반 촬영)로 다시 찍어 올려 주세요." : "이번 영상은 관절 인식이 부족해 판단을 보류했어요. 밝은 곳에서 스윙 전체가 보이게 다시 찍어 주세요.");
   }
 
   const wristY=F.map(p=>p?((p[15].y+p[16].y)/2):null);
@@ -632,7 +637,7 @@ function analyze(data, view, slowSel){
     metrics[metrics.length-1].detail={back_s:+sw.back_s.toFixed(2), down_s:+sw.down_s.toFixed(2), total_s:+total.toFixed(2),
       rhythm, ratio_approx: Math.round(ratio*2)/2, ratio_note:"비율은 ±0.5 오차(60fps 기준) — 시간 값을 우선 사용",
       tk_source:(data.tkInfo||{}).source||"wrist"};
-  } else push("tempo","스윙 템포", null, null, "measured","unknown","스윙 구간(탑/임팩트) 탐지 실패",view);
+  } else push("tempo","스윙 템포", null, null, "measured","unknown", data.slowSuspect ? "슬로모 영상으로 보여 템포를 잴 수 없음" : "스윙 구간(탑/임팩트) 탐지 실패",view);
 
   // 세그먼트(테이크어웨이~임팩트)
   const seg=(arr)=> okSeg ? arr.slice(addr,impact+1).filter(v=>v!=null) : [];
@@ -701,7 +706,7 @@ function wrap(metrics, data, view, detRate, forceCoach){
   return {
     schema_ver:"0.1", created_at:new Date().toISOString(),
     subject:{ device_id:deviceId(), source:"swing_web" },
-    capture:{ views:[view], slowmo: $("slow").value, quality: detRate>=60?"ok":"low", detect_rate:detRate, time_base_ok:false,
+    capture:{ views:[view], slowmo: $("slow").value, slowmo_suspect: !!data.slowSuspect, quality: detRate>=60?"ok":"low", detect_rate:detRate, time_base_ok:false,
               swings_detected: si.count??null, analyzed_impact_s: data.swing? +data.swing.t_imp.toFixed(2) : null },
     metrics, overall:{good,caution,needs_work:bad,unknown},
     coaching:{ text:coach, verified:false },
@@ -713,6 +718,7 @@ function wrap(metrics, data, view, detRate, forceCoach){
 // ---------- 렌더 ----------
 function render(res){
   const o=res.overall;
+  const sw=$("slowWarn"); if(sw) sw.hidden=!(res.capture&&res.capture.slowmo_suspect);
   const verdict = o.good===0 ? "분석 보류" : (o.needs_work+o.caution===0 ? "좋아요 👍" : "분석 완료");
   $("sum").innerHTML=`<span class="b">${verdict}</span>`+
     `<span class="c"><span class="sw" style="background:var(--good)"></span>좋음 ${o.good}</span>`+
