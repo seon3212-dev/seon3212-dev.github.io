@@ -3471,16 +3471,22 @@ window.AGE18={k:"wise_age18_v1",
     if(c==="DR")return 0;var m=/^(\d)W$/.exec(c);if(m)return 10+(+m[1]);m=/^(\d)H$/.exec(c);if(m)return 20+(+m[1]);
     m=/^(\d)I$/.exec(c);if(m)return 30+(+m[1]);if(c==="PW")return 40;m=/^W(\d\d)$/.exec(c);if(m)return 50+(+m[1]);return 99;
   }
-  /* 바람 민감도 (사장님 확정 2026-10-22): pk 15m 미만 덜 탐 / 15~24m 보통 / 24m 이상 많이 탐, sp가 투어 평균 이상이면 한 단계 위 */
-  function tourSpin(c){
-    if(c==="DR")return 2545;if(c==="3W"||c==="4W")return 3663;if(c==="5W"||c==="7W")return 4322;if(/H$/.test(c))return 4587;
-    var t={"1I":4404,"2I":4404,"3I":4404,"4I":4782,"5I":5280,"6I":6204,"7I":7124,"8I":8078,"9I":8793};if(t[c])return t[c];
-    if(c==="PW"||/^W\d\d$/.test(c))return 9316;return null;
+  /* 바람 민감도 (사장님 확정 2026-10-26, TrackMan 2023 투어 평균): 성별(M=PGA, F=LPGA) 투어 평균 최고 높이 대비
+     80% 미만 덜 탐 / 80~100% 보통 / 100% 이상 많이 탐, 백스핀이 투어 평균 이상이면 한 단계 위. 값 = [최고 높이 m, 백스핀 rpm] */
+  var TOUR={
+    M:{DR:[32,2545],"3W":[29,3663],"5W":[30,4322],UT:[28,4587],"3I":[27,4404],"4I":[28,4782],"5I":[30,5280],"6I":[29,6204],"7I":[31,7124],"8I":[30,8078],"9I":[29,8793],PW:[29,9316]},
+    F:{DR:[24,2506],"3W":[23,2595],"5W":[23,4320],UT:[23,4504],"4I":[23,4608],"5I":[23,4966],"6I":[23,5904],"7I":[24,6630],"8I":[25,7413],"9I":[25,7605],PW:[25,8465]}
+  };
+  function tourOf(c,g){
+    var t=TOUR[g==="F"?"F":"M"],k=c;
+    if(c==="4W")k="3W";else if(/^[5-9]W$/.test(c))k="5W";else if(/H$/.test(c))k="UT";
+    else if(/^[123]I$/.test(c))k=g==="F"?"4I":"3I";else if(/^W\d\d$/.test(c))k="PW";
+    return t[k]||null;
   }
   var WIND=["덜 탐","보통","많이 탐"];
-  function windGrade(k){
-    if(k.pk==null)return null;var g=k.pk<15?0:k.pk<24?1:2;
-    var ts=tourSpin(k.c);if(k.sp!=null&&ts!=null&&k.sp>=ts)g=Math.min(2,g+1);return g;
+  function windGrade(k,g){
+    var tv=tourOf(k.c,g);if(k.pk==null||!tv)return null;var r=k.pk/tv[0];
+    var gr=r<0.8?0:r<1?1:2;if(k.sp!=null&&k.sp>=tv[1])gr=Math.min(2,gr+1);return gr;
   }
 
   /* 주소 형식 → 저장 형식(2번 JSON) */
@@ -3493,6 +3499,7 @@ window.AGE18={k:"wise_age18_v1",
     if(h[0]!=="1")return {err:"버전"};
     if(h.length<7)return {err:"머리"};
     var kind=h[1]==="s"?"set":h[1]==="p"?"part":null,id=h[2],shop=h[3],issued=ymd(h[4]),from=ymd(h[5]),to=ymd(h[6]),next=h[7]?ymd(h[7]):null;
+    var sex=h[8]==="F"?"F":"M";
     if(!kind||!/^[A-Za-z0-9]{4,32}$/.test(id||"")||!/^[A-Z0-9]{2,8}$/.test(shop||"")||!issued||!from||!to||(h[7]&&!next))return {err:"머리"};
     var clubs=[],seen={};
     for(var i=1;i<parts.length;i++){
@@ -3503,7 +3510,7 @@ window.AGE18={k:"wise_age18_v1",
       seen[c]=1;clubs.push(k);
     }
     if(!clubs.length)return {err:"클럽 없음"};
-    return {t:{wdt:1,kind:kind,id:id,shop:shop,issued:issued,from:from,to:to,next:next,clubs:clubs}};
+    return {t:{wdt:1,kind:kind,id:id,shop:shop,issued:issued,from:from,to:to,next:next,g:sex,clubs:clubs}};
   }
   /* 클럽마다 측정일(d)이 가장 최근인 값으로 합침 (같은 날이면 나중에 저장한 것) */
   function merged(list){
@@ -3535,7 +3542,7 @@ window.AGE18={k:"wise_age18_v1",
       h+='<div class="hm-card yd-card"><div class="k"><small>내 거리표</small><span class="yd-date">'+esc(md(m.reduce(function(a,x){return x.k.d>a?x.k.d:a;},"")))+' 측정</span></div>'+
         (over?'<span class="yd-over">다음 측정 추천일('+esc(md(nx))+')이 지났어요. 가게에서 다시 재보세요.</span>':'')+
         '<div class="yd-tbl" role="table" aria-label="클럽별 평균 거리"><div class="yd-h" role="row"><span role="columnheader">클럽</span><span role="columnheader">캐리</span><span role="columnheader">토탈</span><span role="columnheader">바람</span></div>'+
-        m.map(function(x){var k=x.k,g=windGrade(k);return '<div class="yd-r" role="row"><span role="cell">'+esc(clubName(k.c))+(k.n<10?'<em> '+k.n+'구</em>':'')+'</span><span role="cell"><b>'+k.ca+'</b></span><span role="cell">'+(k.to!=null?k.to:'—')+'</span><span role="cell">'+(g==null?'—':'<i class="yd-w yd-w'+g+'">'+WIND[g]+'</i>')+'</span></div>';}).join("")+'</div>'+
+        m.map(function(x){var k=x.k,g=windGrade(k,x.t.g);return '<div class="yd-r" role="row"><span role="cell">'+esc(clubName(k.c))+(k.n<10?'<em> '+k.n+'구</em>':'')+'</span><span role="cell"><b>'+k.ca+'</b></span><span role="cell">'+(k.to!=null?k.to:'—')+'</span><span role="cell">'+(g==null?'—':'<i class="yd-w yd-w'+g+'">'+WIND[g]+'</i>')+'</span></div>';}).join("")+'</div>'+
         '<span class="note">평균 캐리·토탈(m). 10구 중 가장 길고 짧은 1개씩 뺀 8구 평균이에요. 바람은 공 높이·백스핀으로 본 바람 타는 정도예요.</span>'+
         (askDel?'<div class="confirm"><span>이 폰에 저장된 거리표가 모두 지워져요.</span><button class="btn btn-plain" type="button" data-yd="del">지우기</button><button class="btn btn-plain" type="button" data-yd="nodel">취소</button></div>'
           :'<button type="button" class="btn btn-plain yd-delask" data-yd="askdel">거리표 지우기</button>')+'</div>';
