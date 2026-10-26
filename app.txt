@@ -3126,8 +3126,7 @@ window.AGE18={k:"wise_age18_v1",
     h+='<label class="btn btn-plain gc-fill gs-pick">사진 고르기<input type="file" id="gsFile" accept="image/*" multiple hidden></label>'+
       '<div class="gs-thumbs">'+PHOTOS.map(function(p,i){return '<span class="gs-thumb"><img src="'+p.data+'" alt="'+(i+1)+'번 사진"><button type="button" class="chip" data-gs="pdel" data-i="'+i+'" aria-label="'+(i+1)+'번 사진 빼기">✕</button></span>';}).join("")+'</div>'+
 
-      '<label class="agree"><input type="checkbox" id="gsPConsent"'+(c.photoConsent?" checked":"")+'><span>[필수] 사진 수집·이용에 동의해요<br><small class="note">받는 것: 기기 결과 사진, 측정 기기 이름 · 쓰는 곳: 샷 숫자 읽기 · 보관: 숫자를 다 읽으면 바로 지워요(휴지통에서 30일 뒤 완전히 사라져요).</small></span></label>'+
-      '<label class="agree"><input type="checkbox" id="gsGConsent"'+(c.googleConsent?" checked":"")+'><span>[필수] Google에 사진 제공(국외 이전)에 동의해요<br><small class="note">받는 곳: Google LLC(미국) · 문의 googlekrsupport@google.com<br>주는 것: 기기 결과 사진, 측정 기기 이름<br>Google이 쓰는 곳: 사진에서 숫자 읽기(Gemini AI). <b>Google이 이 사진을 자기 서비스 개선에 쓰고, 사람이 볼 수 있어요.</b><br>언제·어떻게: "사진 보내기"를 누를 때 인터넷으로 보내요<br>Google 보관 기간: Google 약관에 따라요<br>동의하지 않아도 돼요. 그러면 사진은 보내지 않고, 위에서 "직접 적기"로 숫자를 넣으면 돼요. <a href="privacy.html#privacy" target="_blank" rel="noopener">개인정보 처리방침</a></small></span></label>'+
+      '<label class="agree"><input type="checkbox" id="gsPConsent"'+(c.photoConsent?" checked":"")+'><span>[필수] 사진 수집·이용에 동의해요<br><small class="note">받는 것: 기기 결과 사진, 측정 기기 이름<br>쓰는 곳: 샷 숫자 읽기. 숫자는 Google Cloud의 AI(Gemini)가 읽어요. 미국 서버에서 읽기만 맡기고, Google은 이 사진을 AI 학습에 쓰지 않아요.<br>보관: 숫자를 다 읽으면 바로 지워요(휴지통에서 30일 뒤 완전히 사라져요).<br>동의하지 않아도 돼요. 그러면 사진 대신 "직접 적기"로 숫자를 넣으면 돼요. <a href="privacy.html#privacy" target="_blank" rel="noopener">개인정보 처리방침</a></small></span></label>'+
       '<button type="button" class="btn btn-flag gc-fill" data-gs="psend">사진 보내기</button>';
     return h;
   }
@@ -3242,7 +3241,7 @@ window.AGE18={k:"wise_age18_v1",
     if(el.dataset.gst){c[el.dataset.gst]=el.value.trim();save();}
     if(el.dataset.gsi!=null&&el.dataset.f){c.shots[+el.dataset.gsi][el.dataset.f]=el.value.trim();save();}});
   document.addEventListener("change",function(e){var el=e.target,c=cur();if(!c)return;
-    if(el.id==="gsPConsent"){c.photoConsent=el.checked;save();}if(el.id==="gsGConsent"){c.googleConsent=el.checked;save();}
+    if(el.id==="gsPConsent"){c.photoConsent=el.checked;save();}
     if(el.id==="gsPass"){c.photoPass=el.value.trim();save();}
     if(el.id==="gsFile"){var fs=[].slice.call(el.files||[]).slice(0,3-PHOTOS.length);
       Promise.all(fs.map(shrink)).then(function(a){PHOTOS=PHOTOS.concat(a).slice(0,3);keep();}).catch(function(){toast("사진을 읽지 못했어요. 다른 사진으로 해 주세요.");});}
@@ -3268,9 +3267,9 @@ window.AGE18={k:"wise_age18_v1",
     /* 사진에서 읽은 숫자를 칸에 채움 (보낸 직후 · 결과 확인 둘 다 여기로) */
     function fillFromPhoto(sh,dist){c.shots=sh.concat(blankShots(Math.max(0,CFG.fullShots-sh.length)));c.photoState="done";c.inMode="type";if(dist==="total"||dist==="carry")c.dk=dist;save();keep();}
     if(act==="psend"){
-      if(!PHOTOS.length){msg("사진을 골라 주세요.");return;}if(!c.photoConsent||!c.googleConsent){msg("두 가지 동의에 모두 체크해 주세요. 동의하기 싫으면 \"직접 적기\"를 써 주세요.");return;}
+      if(!PHOTOS.length){msg("사진을 골라 주세요.");return;}if(!c.photoConsent){msg("사진 동의에 체크해 주세요. 동의하기 싫으면 \"직접 적기\"를 써 주세요.");return;}
       b.disabled=true;msg("보내는 중이에요… AI가 숫자를 읽는 데 10~20초쯤 걸려요.");
-      papi({action:"upload",passcode:"239319",consent:true,consent_google:true,adult:!!(c.adult||AGE18.ok()),adult18:true,device_id:(window.WQ&&WQ.deviceId?WQ.deviceId():undefined),shot:lab(SHOT,c.shot),club:CNAME[c.club]||"",device:lab(DEV,c.dev),indoor:c.indoor==="in"?"실내":c.indoor==="out"?"실외":"",app_version:"round-v74",images:PHOTOS})
+      papi({action:"upload",passcode:"239319",consent:true,adult:!!(c.adult||AGE18.ok()),adult18:true,device_id:(window.WQ&&WQ.deviceId?WQ.deviceId():undefined),shot:lab(SHOT,c.shot),club:CNAME[c.club]||"",device:lab(DEV,c.dev),indoor:c.indoor==="in"?"실내":c.indoor==="out"?"실외":"",app_version:"round-v74",images:PHOTOS})
         .then(function(r){b.disabled=false;if(!r.ok){msg(PERR[r.error]||"보내지 못했어요. 잠시 뒤 다시 해 주세요.");return;}
           c.photoCode=r.code;PHOTOS=[];
           var sh=r.ai&&r.shots?parseBoss(r.shots):[];
