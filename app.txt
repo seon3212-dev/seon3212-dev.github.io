@@ -460,6 +460,8 @@ body{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
 .rt-res{display:flex;flex-direction:column;gap:6px}.rt-res button{appearance:none;text-align:left;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:10px;padding:8px 10px;font:500 14px var(--font-body);cursor:pointer}.rt-res button small{display:block;color:var(--muted);font-size:12px}
 .rt-ok{font-size:13px;color:var(--fairway);font-weight:600}.rt-ok small{color:var(--muted);font-weight:400}
 .rt-st{font-size:13px;font-weight:600}
+.yd-sum{cursor:pointer;list-style:none}.yd-sum::-webkit-details-marker{display:none}
+details.yd-card:not([open]) .yd-sum{margin-bottom:0}
 </style>
 
 <div class="wrap">
@@ -512,7 +514,7 @@ body{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
       <b>공 치기 전에, 동반자 케미 한번 볼까요?</b>
       <span>골프 유형 검사를 하고 서로 어떤 스타일인지 맞춰 보세요. 같이 치는 사람을 알면 라운드가 더 재밌어져요.</span>
       <button type="button" class="btn btn-flag" data-tab="type">골프 유형 검사 시작</button>
-      <small>19세 이상만 할 수 있어요.</small>
+      <small>만 18세 이상만 할 수 있어요.</small>
     </div>
 
     <div class="card">
@@ -532,6 +534,8 @@ body{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
         <div class="q"><label class="ql" for="date">날짜</label><input type="date" id="date"></div>
         <div class="q"><label class="ql" for="tee">티오프</label><input type="time" id="tee"></div>
       </div>
+      <div class="q bk-fill"><label class="btn btn-plain" id="bkLbl" style="align-self:flex-start">예약 캡처로 채우기<input type="file" id="bkFile" accept="image/*" hidden></label>
+        <span class="note" id="bkNote">예약 알림톡이나 라운드정보 화면을 캡처해 올리면 골프장·날짜·티오프를 채워요. 캡처는 저장하지 않아요. <a href="privacy.html#privacy" target="_blank" rel="noopener">개인정보 처리방침</a></span></div>
     </div>
 
     <div class="card">
@@ -562,6 +566,7 @@ body{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
           <div class="q" id="tnRow"><span class="ql">파3 니어</span><div class="quick" id="tnChips"></div><div class="hd-avg" id="tnCashRow" hidden><div class="hd-arow"><span>벌금</span><input type="number" id="tnCash" data-tnv="tnCash" inputmode="numeric" min="0" step="1000" aria-label="니어 못 한 사람 벌금"></div></div><div class="hd-avg" id="tnPotRow" hidden><div class="hd-arow"><span>걷는 돈 (1인)</span><input type="number" id="tnPot" data-tnv="tnPot" inputmode="numeric" min="0" step="10000" aria-label="니어 판돈 1인"></div><div class="hd-arow"><span>니어 상금</span><input type="number" id="tnPrize" data-tnv="tnPrize" inputmode="numeric" min="0" step="1000" aria-label="파3 하나 니어 상금"></div></div><p class="note" id="tnNote"></p></div>
         </div>
         </details>
+        <div id="hpOpts" class="q" hidden><span class="ql">홀마다 가져가는 돈</span><div class="quick" data-g="hpMode"></div></div>
         <div id="nearOpts" class="q" hidden><span class="ql">파3 니어가 없으면</span><div class="quick" data-g="nearMode"></div><span class="note" id="nearInfo"></span></div>
         <div id="drawOpts" class="q" hidden><span class="ql">뽑기 방법</span><div class="quick" data-g="drawMode"></div><p class="note" id="drawNote"></p></div>
         <div id="vtOpts" class="q" hidden><span class="ql">비기면</span><div class="quick" data-g="vtie"></div><p class="note" id="vtNote"></p></div>
@@ -950,7 +955,7 @@ window.AGE18={k:"wise_age18_v1",
     return {tab:"plan",course:"",courseId:null,nines:null,date:today(),tee:"",players:["","","",""],
       move:"self",pick:{},buffer:40,drive:50,pack:{},from:null,courseLoc:null,route:null,
       stops:{coffee:{on:false,where:"course"},gimbap:{on:false,where:"home"},store:{on:false,where:"home"},gas:{on:false,where:"home"},meal:{on:false,where:"course"}},
-      bet:{on:false,game:"tadang",amt:{},bp:{tie3:true,tie4:true,triple:true,yangpa:false,par3dbl:true,birdie:true},hd:{when:"none",pre:"avg",avg:{},list:[]},hdDraft:{},bpWhen:"next",bonus:{birdie:{mode:"stroke",v:1},putt:{mode:"stroke",v:3},shot:{mode:"stroke",v:5},hio:{mode:"stroke",v:10}},eg:{},pk:{},dr:{},joker:"bogey",drawMode:"app",vtie:"carry",stack:"cap4",hrank:2,skip:{first:"on",last:"on"},nearMode:"carry",tnear:false,tn:{},tnCash:10000,tnPot:50000,tnPrize:10000,order:null,vg:{},hz:{},near:{},dc:{},ab:{},gal:[],uc:{}},age19:false,
+      bet:{on:false,game:"tadang",amt:{},bp:{tie3:true,tie4:true,triple:true,yangpa:false,par3dbl:true,birdie:true},hd:{when:"none",pre:"avg",avg:{},list:[]},hdDraft:{},bpWhen:"next",bonus:{birdie:{mode:"stroke",v:1},putt:{mode:"stroke",v:3},shot:{mode:"stroke",v:5},hio:{mode:"stroke",v:10}},eg:{},pk:{},dr:{},joker:"bogey",drawMode:"app",vtie:"carry",stack:"cap4",hrank:2,skip:{first:"on",last:"on"},nearMode:"carry",hpMode:"4321",tnear:false,tn:{},tnCash:10000,tnPot:50000,tnPrize:10000,order:null,vg:{},hz:{},near:{},dc:{},ab:{},gal:[],uc:{}},age19:false,
       par:DEFAULT_PAR.slice(),scores:[0,1,2,3].map(function(){return Array(18).fill(null);}),hole:0,sample:false};
   }
   function sample(){
@@ -1172,15 +1177,21 @@ window.AGE18={k:"wise_age18_v1",
     {id:"jopok",name:"조폭",sub:"판돈 스킨스",min:3,unit:"홀 상금 (원)",
       desc:["모두 같은 판돈을 내서 가운데 모아요.","홀마다 혼자 1등이면 홀 상금을 가져가요. 1등이 여럿이면 다음 홀로 이월(상금이 쌓여요).","돈 딴 사람이 더블 보기면 마지막에 딴 돈을, 트리플 보기 이상이면 딴 돈 전부를 판에 돌려놔요.","버디하면 가장 많이 딴 사람에게서 홀 상금만큼 뺏어 와요.","끝나고 남은 판돈은 똑같이 나눠요."]},
     {id:"happy",name:"해피",sub:"4321",min:4,max:4,
-      desc:["4명이 판돈을 똑같이 내요(예: 5만 원씩, 모두 20만 원).","홀마다 등수대로 가져가요. 5만 원씩이면 1등 4천·2등 3천·3등 2천·4등 1천(홀마다 1만 원), 10만 원씩이면 두 배예요.","동타면 앞 홀에서 더 못 친 사람이 앞 등수를 가져가요(앞 홀도 같으면 그 전 홀로). 1번 홀처럼 끝까지 같으면 뽑기로 정한 타순이 빠른 사람이 앞 등수예요.","남는 돈은 파3 니어 상금이에요(5만 원씩이면 2만 원 ÷ 파3 4개 = 5천 원).","니어가 없으면 다음 파3로 이월하거나 공금(그늘집·밥값)으로 돌려요."]},
+      desc:["4명이 판돈을 똑같이 내요(예: 5만 원씩, 모두 20만 원).","홀마다 등수대로 가져가요. 5만 원씩이면 1등 4천·2등 3천·3등 2천·4등 1천(홀마다 1만 원), 10만 원씩이면 두 배예요.","동타면 앞 홀에서 더 못 친 사람이 앞 등수를 가져가요(앞 홀도 같으면 그 전 홀로). 1번 홀처럼 끝까지 같으면 뽑기로 정한 타순이 빠른 사람이 앞 등수예요.","남는 돈은 파3 니어 상금이에요(5만 원씩이면 2만 원 ÷ 파3 4개 = 5천 원).","니어가 없으면 다음 파3로 이월하거나 공금(그늘집·밥값)으로 돌려요.","15만 원씩 걷어 캐디피 15만 원을 먼저 빼고, 홀마다 1등 8천·2등 6천·3등 4천·4등 2천을 가져가는 모임도 있어요. 아래에서 \"8·6·4·2천 원\"과 먼저 빼는 돈을 넣으면 돼요."]},
     {id:"scratch",name:"스크래치",sub:"전체 타수",min:2,unit:"한 타당 금액 (원)",
       desc:["18홀 전체 타수를 두 사람씩 비교해요.","전체 타수 차이 × 금액을 진 사람이 이긴 사람에게 줘요. 배판 없어요.","홀마다 지금까지의 누적으로 보여줘요."]}
   ];
   var AMT={tadang:[["unit","한 타당 금액 (원)","예: 1000",1000]],scratch:[["unit","한 타당 금액 (원)","예: 1000",1000]],vegas:[["seed","한 사람이 걷는 돈 (원)","예: 100000",10000]],
-    hussein:[["unit","한 홀 금액 (원)","예: 1000",1000]],jopok:[["seed","한 사람이 내는 판돈 (원)","예: 50000",10000],["unit","홀 상금 (원)","예: 10000",1000]],happy:[["seed","한 사람이 걷는 돈 (원)","예: 50000",10000]]};
+    hussein:[["unit","한 홀 금액 (원)","예: 1000",1000]],jopok:[["seed","한 사람이 내는 판돈 (원)","예: 50000",10000],["unit","홀 상금 (원)","예: 10000",1000]],happy:[["seed","한 사람이 걷는 돈 (원)","예: 50000",10000],["fee","판돈에서 먼저 빼는 돈 (캐디피 등, 원)","예: 150000",10000],["near","파3 니어 상금 (원 · 비우면 남는 돈을 파3 수로 나눔)","예: 10000",1000],["birdie","버디 상금 (원 · 비우면 없음)","예: 10000",1000]]};
   function amtFields(gid){if(gid==="hussein"&&S.bet.hzMode==="pot")return [["seed","한 사람이 걷는 돈 (원)","예: 100000",10000],["unit","홀 상금 (원)","예: 20000",1000]];return AMT[gid]||[];}
   function amt(k,gid){var a=(S.bet.amt||{})[gid||S.bet.game]||{};return Math.max(0,Math.floor(+a[k]||0));}
-  function happyUnit(){return Math.floor(amt("seed","happy")/50);}
+  function happyFee(){return amt("fee","happy");}
+  function happyRest(){var n=4,p3=S.par.filter(function(x){return x===3;}).length,left=amt("seed","happy")*n-happyFee()-18*10*happyUnit()-p3*nearPrize(n,"happy"),ba=amt("birdie","happy");
+    if(left<0)return ' · <b style="color:var(--over)">걷은 돈이 '+money(-left)+' 모자라요</b>';
+    if(ba>0)return ' · 버디 <b>'+money(ba)+'</b>씩, 버디 상금으로 <b>'+money(left)+'</b> 있어요(다 쓰면 끝, 남으면 알아서)';
+    return left>0&&amt("near","happy")>0?' · 남는 돈 '+money(left)+'은 알아서':'';}
+  function birdiePool(n){if(!(amt("birdie","happy")>0))return 0;var p3=S.par.filter(function(x){return x===3;}).length;return Math.max(0,amt("seed","happy")*n-happyFee()-18*10*happyUnit()-p3*nearPrize(n,"happy"));}
+  function happyUnit(){if(S.bet.hpMode==="2468")return 2000;return Math.max(0,Math.floor((amt("seed","happy")*4-happyFee())/200));}
   function gameOf(id){for(var k=0;k<GAMES.length;k++)if(GAMES[k].id===id)return GAMES[k];return GAMES[0];}
   function lastOf(h,a){if(h<0)return [];var st=fullHole(h,a);if(!st)return [];var vs=a.map(function(i){return st[i];}),mx=Math.max.apply(null,vs),mn=Math.min.apply(null,vs);if(mx===mn)return [];return a.filter(function(i){return st[i]===mx;});}
   function inIv(L,h){return (L||[]).some(function(x){return x[0]<=h&&(x[1]==null||h<x[1]);});}
@@ -1202,7 +1213,7 @@ window.AGE18={k:"wise_age18_v1",
   function offHole(h){return holeMode(h)==="off";}
   function bOnly(h){return holeMode(h)==="birdie";}
   function betHoles(){return 18-(offHole(0)?1:0)-(offHole(17)?1:0);}
-  function nearPrize(n,gid){gid=gid||S.bet.game;var sd=amt("seed",gid),spent=gid==="vegas"?18*2*vegasUnit():18*10*happyUnit(),p3=S.par.filter(function(x){return x===3;}).length;if(!p3)return 0;return Math.max(0,Math.floor((sd*n-spent)/p3));}
+  function nearPrize(n,gid){gid=gid||S.bet.game;if(gid==="happy"&&amt("near","happy")>0)return amt("near","happy");var sd=amt("seed",gid),spent=gid==="vegas"?18*2*vegasUnit():18*10*happyUnit()+happyFee(),p3=S.par.filter(function(x){return x===3;}).length;if(!p3)return 0;return Math.max(0,Math.floor((sd*n-spent)/p3));}
   function sticksOf(h,a){var pk=(S.bet.pk||{})[h];if(!pk)return null;var by={A:[],B:[],J:[]};for(var z=0;z<a.length;z++){var c=pk[a[z]];if(!by[c])return null;by[c].push(a[z]);}
     if(by.J.length>1)return null;if(by.J.length===0)return by.A.length===2&&by.B.length===2?[by.A,by.B]:null;
     var pair=by.A.length===2?by.A:(by.B.length===2?by.B:null),lone=by.A.length===1?by.A:(by.B.length===1?by.B:null);return pair&&lone?[pair,[lone[0],by.J[0]]]:null;}
@@ -1226,7 +1237,7 @@ window.AGE18={k:"wise_age18_v1",
     if(G.min&&a.length<G.min)return {bad:G.name+"는 "+G.min+"명 이상이어야 해요.",act:a};
     if(G.id==="vegas"&&g.drawMode==="off")return {bad:"뽑기는 오프라인으로 해요. 앱은 스코어만 적고 정산하지 않아요.",act:a};
     var unit=G.id==="happy"?happyUnit():amt("unit"),tot=zero(a),per={},played=0,skipped=[],need=[],doubled=[],extra={},offH=[];
-    var tnFund=0,tnLeft=tnMode(g)==="pot"?(+g.tnPot||0)*a.length:0,carry=1,win=zero(a),last=zero(a),seed=amt("seed"),pot=seed*a.length,np=nearPrize(a.length),bank=0,fund=0,nearNeed=[],dq=0;
+    var tnFund=0,tnLeft=tnMode(g)==="pot"?(+g.tnPot||0)*a.length:0,carry=1,win=zero(a),last=zero(a),seed=amt("seed"),pot=seed*a.length,np=nearPrize(a.length),bank=0,fund=0,nearNeed=[],bpool=G.id==="happy"?birdiePool(a.length):0,bAmt=G.id==="happy"?amt("birdie","happy"):0,bOut=0,dq=0;
     for(var h=0;h<18;h++){
       if(offHole(h)){offH.push(h+1);per[h]={off:true};continue;}
       var st=fullHole(h,a);
@@ -1302,6 +1313,7 @@ window.AGE18={k:"wise_age18_v1",
           else if(+nw>=0&&a.indexOf(+nw)>=0){d[+nw]+=bank;ev2.push("니어 "+nameOf(+nw)+" "+money(bank));bank=0;}
           else if(g.nearMode==="fund"){fund+=bank;ev2.push("니어 없음 → 공금 "+money(bank));bank=0;}
           else ev2.push("니어 없음 → 다음 파3 상금 "+money(bank+np)+"(이월)");}
+        if(bAmt>0)a.forEach(function(i){var sc0=S.scores[i][h];if(sc0!=null&&sc0<=par-1){var pay=Math.min(bAmt,bpool);if(pay>0){d[i]+=pay;bpool-=pay;ev2.push("버디 "+nameOf(i)+" "+money(pay));}else{bOut++;ev2.push("버디 "+nameOf(i)+" · 버디 상금 다 씀");}}});
         a.forEach(function(i){win[i]+=d[i];});tag=ev2.join(" · ");
       }else if(G.id==="jopok"){
         var ev=[];
@@ -1322,7 +1334,7 @@ window.AGE18={k:"wise_age18_v1",
       per[h]={d:d,cum:cum,tag:tag,pot:(G.id==="jopok"||(G.id==="hussein"&&g.hzMode==="pot"))?pot:null};
     }
     if(G.id==="jopok"||(G.id==="hussein"&&g.hzMode==="pot")){var share=Math.floor(pot/a.length);a.forEach(function(i){tot[i]=win[i]+share-seed;});extra={pot:pot,share:share,rest:pot-share*a.length,seed:seed};}
-    if(G.id==="happy"||G.id==="vegas"){var paid=0;a.forEach(function(i){tot[i]=win[i]-seed;paid+=win[i];});extra={seed:seed,left:seed*a.length-paid,fund:fund,bank:bank,np:np,nearNeed:nearNeed};}
+    if(G.id==="happy"||G.id==="vegas"){var paid=0,fee0=G.id==="happy"?happyFee():0;a.forEach(function(i){tot[i]=win[i]-seed;paid+=win[i];});extra={seed:seed,fee:fee0,left:seed*a.length-fee0-paid,fund:fund,bank:bank,np:np,nearNeed:nearNeed};}
     if(G.id==="tadang"&&tnMode(g)==="pot"){var tnS=+g.tnPot||0,tnP=tnS*a.length;a.forEach(function(i){tot[i]-=tnS;});extra={tnPot:tnP,tnShare:tnS,tnLeft:tnLeft};}
     if(G.id==="tadang"&&tnMode(g)==="cash")extra={tnFund:tnFund};
     var hdR=hdApply(a,per,unit);hdR.on.forEach(function(x){tot[x.f]-=x.won;tot[x.t]+=x.won;});
@@ -1414,7 +1426,7 @@ window.AGE18={k:"wise_age18_v1",
   function tnMode(g){var t=g&&g.tnear;return t===true?"stroke":(["stroke","cash","pot"].indexOf(t)>=0?t:"off");}
   function won(v){return (v>0?"+":(v<0?"−":""))+Math.abs(v).toLocaleString("ko-KR")+"원";}
   function money(v){return Math.abs(v).toLocaleString("ko-KR")+"원";}
-  function betReady(){var G=gameOf(S.bet.game);return S.bet.on&&G.ready!==false&&S.age19&&((G.id==="vegas"&&S.bet.drawMode==="off")||(amtFields(G.id)||[]).every(function(f){return amt(f[0])>0;}))&&(G.id!=="happy"||happyUnit()>0);}
+  function betReady(){var G=gameOf(S.bet.game);return S.bet.on&&G.ready!==false&&S.age19&&((G.id==="vegas"&&S.bet.drawMode==="off")||(amtFields(G.id)||[]).every(function(f){return f[0]==="fee"||f[0]==="near"||f[0]==="birdie"||amt(f[0])>0;}))&&(G.id!=="happy"||happyUnit()>0);}
   function ruleText(){var t=ruleText0();if(!S.bet.on)return t;var L=[[0,"첫 홀"],[17,"마지막 홀"]].map(function(x){var m=holeMode(x[0]);return m==="off"?x[1]+" 내기 안 함":(m==="birdie"?x[1]+" 버디피만":null);}).filter(Boolean);return t+(L.length?" · "+L.join(" · "):"");}
   function ruleText0(){
     if(!S.bet.on)return "내기 안 함";
@@ -1426,14 +1438,14 @@ window.AGE18={k:"wise_age18_v1",
     if(G.id==="vegas"&&g.drawMode==="off")return "뽑기(한국식) · 오프라인 진행";
     if(G.id==="vegas")return "뽑기(한국식) 1인 "+sd+" · 비기면 "+({carry:"이월 적립",next:"다음 홀 2배",none:"배판 없음"}[g.vtie||"carry"])+" · 조커 "+({bogey:"무조건 보기",four:"무조건 4타",par:"무조건 파"}[g.joker||"bogey"])+" · 니어 없으면 "+(g.nearMode==="fund"?"공금":"이월");
     if(G.id==="hussein")return g.hzMode==="pot"?"후세인(판돈) 1인 "+sd+" · 홀 상금 "+u+" · "+hzRule():"후세인 홀당 "+u+" · "+hzRule();
-    if(G.id==="happy")return "해피(4321) 1인 "+sd+" · 니어 없으면 "+(g.nearMode==="fund"?"공금":"이월");
+    if(G.id==="happy")return "해피("+(g.hpMode==="2468"?"8642":"4321")+") 1인 "+sd+(happyFee()?" · 먼저 빼는 돈 "+money(happyFee()):"")+" · 니어 없으면 "+(g.nearMode==="fund"?"공금":"이월");
     if(G.id==="jopok")return "조폭 판돈 1인 "+sd+" · 홀 상금 "+u;
     return G.name;
   }
 
   /* ---------- 그리기: 다음 라운드 ---------- */
   var MOVES=[["self","각자 가요","따로 출발"],["drive","내가 태워요","픽업"],["ride","얻어 타요","누가 태워 줌"]];
-  var GOPT={bpWhen:[["this","당홀"],["next","다음 홀"]],stack:[["cap2","2배까지"],["cap4","4배까지"]],hrank:[[2,"앞 홀 2등"],["turn","타순대로 돌아가며"],["manual","직접 고르기"]],nearMode:[["carry","다음 파3로 이월"],["fund","공금으로"]],hzMode:[["direct","홀마다 주고받기"],["pot","판돈 걷기"]],joker:[["bogey","무조건 보기"],["four","무조건 4타"],["par","무조건 파"]],drawMode:[["app","휴대폰으로 뽑기"],["manual","뽑기통 · 결과만 입력"],["off","오프라인"]],vtie:[["carry","이월 적립"],["next","비긴 만큼 다음 홀 2배"],["none","배판 없음"]]};
+  var GOPT={bpWhen:[["this","당홀"],["next","다음 홀"]],stack:[["cap2","2배까지"],["cap4","4배까지"]],hrank:[[2,"앞 홀 2등"],["turn","타순대로 돌아가며"],["manual","직접 고르기"]],nearMode:[["carry","다음 파3로 이월"],["fund","공금으로"]],hpMode:[["4321","4·3·2·1 (걷는 돈에 맞춰)"],["2468","8·6·4·2천 원"]],hzMode:[["direct","홀마다 주고받기"],["pot","판돈 걷기"]],joker:[["bogey","무조건 보기"],["four","무조건 4타"],["par","무조건 파"]],drawMode:[["app","휴대폰으로 뽑기"],["manual","뽑기통 · 결과만 입력"],["off","오프라인"]],vtie:[["carry","이월 적립"],["next","비긴 만큼 다음 홀 2배"],["none","배판 없음"]]};
   function norm(x){return String(x||"").replace(/\s+/g,"").toLowerCase();}
   function clubById(id){var c=id==null?null:COURSES[id];return c&&c.name===S.course?c:null;}
   function recent(){try{var a=JSON.parse(localStorage.getItem(RKEY)||"[]");return Array.isArray(a)?a:[];}catch(e){return [];}}
@@ -1489,6 +1501,37 @@ window.AGE18={k:"wise_age18_v1",
     else{S.nines=null;S.par=DEFAULT_PAR.slice();}
     pushRecent(c.name);$("picker").hidden=true;$("cq").value="";$("cResults").innerHTML="";changed();reveal("courseBtn");
   }
+
+  /* ---------- 예약 캡처로 채우기 (길찾기 서버 booking → 골프장·날짜·티오프·코스만) ---------- */
+  function clubMatch(name){
+    var strip=function(x){return norm(x).replace(/(컨트리클럽|골프클럽|골프앤리조트|골프&리조트|골프장|리조트|cc|gc)$/,"");};
+    var q=norm(name),qs=strip(name);if(qs.length<2)return -1;var hit=-1,cnt=0;
+    for(var i=0;i<COURSES.length;i++){var ns=[COURSES[i].name].concat(COURSES[i].aliases||[]);
+      for(var j=0;j<ns.length;j++){if(norm(ns[j])===q)return i;}
+      if(ns.some(function(n){var a=strip(n);return a.length>=2&&(a===qs||a.indexOf(qs)>=0||qs.indexOf(a)>=0);})){if(hit!==i)cnt++;hit=i;}}
+    return cnt===1?hit:-1;
+  }
+  function nineIdx(c,n){if(!n)return -1;var q=norm(n);for(var k=0;k<c.courses.length;k++){var a=norm(c.courses[k].name);if(a===q||a.indexOf(q)>=0||q.indexOf(a)>=0)return k;}return -1;}
+  function shrink(file){return new Promise(function(ok,no){var fr=new FileReader();fr.onerror=no;fr.onload=function(){var im=new Image();im.onerror=no;im.onload=function(){
+    var mx=1600,w=im.width,h=im.height,r=Math.min(1,mx/Math.max(w,h));var cv=document.createElement("canvas");cv.width=Math.round(w*r);cv.height=Math.round(h*r);
+    cv.getContext("2d").drawImage(im,0,0,cv.width,cv.height);ok(cv.toDataURL("image/jpeg",0.85));};im.src=fr.result;};fr.readAsDataURL(file);});}
+  var BKERR={NO_CLOUD:"지금은 캡처 읽기를 쓸 수 없어요. 직접 넣어 주세요.",UNREADABLE:"예약 내용을 찾지 못했어요. 예약 알림톡이나 라운드정보 화면을 올려 주세요.",IMAGE_TOO_BIG:"캡처가 너무 커요. 다시 캡처해 주세요.",NETWORK:"인터넷 연결을 확인해 주세요.",BUSY:"잠시 뒤 다시 해 주세요."};
+  function bookFill(file){
+    var lbl=$("bkLbl");if(lbl.dataset.busy)return;lbl.dataset.busy="1";lbl.firstChild.nodeValue="읽는 중이에요…";
+    var done=function(){delete lbl.dataset.busy;lbl.firstChild.nodeValue="예약 캡처로 채우기";$("bkFile").value="";};
+    shrink(file).then(function(url){return rapi({action:"booking",image:{mime:"image/jpeg",data:url.split(",")[1]}});},function(){return {ok:false,error:"UNREADABLE"};})
+    .then(function(r){done();if(!r||!r.ok){toast(BKERR[r&&r.error]||"캡처를 읽지 못했어요. 직접 넣어 주세요.");return;}
+      var got=[];
+      if(r.course){var i=clubMatch(r.course);
+        if(i>=0){chooseClub(i);var c=COURSES[i];if(c.courses&&c.courses.length>=2&&S.nines){var k0=nineIdx(c,r.front),k1=nineIdx(c,r.back);
+          if(k0>=0){if(c.courses.length===2)S.nines=k0===1?[1,0]:[0,1];else{if(k1<0||k1===k0)k1=S.nines[1]!==k0?S.nines[1]:(k0+1)%c.courses.length;S.nines=[k0,k1];}
+            S.par=c.courses[S.nines[0]].par.concat(c.courses[S.nines[1]].par);}}}
+        else{S.course=r.course;S.courseId=null;S.nines=null;}got.push("골프장");}
+      if(r.date){S.date=r.date;got.push("날짜");}
+      if(r.time){S.tee=r.time;got.push("티오프");}
+      changed();toast(got.length?"채웠어요: "+got.join("·")+". 맞는지 한번 확인해 주세요.":"예약 내용을 찾지 못했어요.");});
+  }
+  document.addEventListener("change",function(e){if(e.target&&e.target.id==="bkFile"&&e.target.files&&e.target.files[0])bookFill(e.target.files[0]);});
   function renderPlan(){
     function keep(id,v){if(document.activeElement!==$(id))$(id).value=v;}
     keep("course",S.courseId==null?(S.course||""):"");keep("date",S.date||"");keep("tee",S.tee||"");renderPicker();
@@ -1511,14 +1554,15 @@ window.AGE18={k:"wise_age18_v1",
     if(ab.getAttribute("data-g")!==G.id+(S.bet.hzMode||"")){ab.setAttribute("data-g",G.id+(S.bet.hzMode||""));ab.innerHTML=fl.map(function(f){return '<div class="q"><label class="ql" for="amt-'+f[0]+'">'+f[1]+'</label>'+(f[0]==="seed"?'<div class="quick" id="seedQ"></div>':'')+'<input type="number" id="amt-'+f[0]+'" data-amt="'+f[0]+'" inputmode="numeric" step="'+f[3]+'" min="0" placeholder="'+(f[0]==="seed"?"직접 적기":f[2])+'"></div>';}).join("")+((G.id==="happy"||G.id==="vegas")?'<p class="note" id="happyInfo"></p>':'');}
     if($("seedQ"))$("seedQ").innerHTML=[10000,50000,100000].map(function(v){return '<button type="button" class="chip" data-amtq="seed:'+v+'" aria-pressed="'+(amt("seed")===v)+'">'+(v/10000)+'만 원</button>';}).join("");
     fl.forEach(function(f){keep("amt-"+f[0],amt(f[0])||"");});
-    $("nearOpts").hidden=G.id!=="happy"&&G.id!=="vegas";var vOff=S.bet.drawMode==="off";$("jkOpts").hidden=G.id!=="vegas"||vOff;$("vtOpts").hidden=G.id!=="vegas"||vOff;$("drawOpts").hidden=G.id!=="vegas";
+    $("nearOpts").hidden=G.id!=="happy"&&G.id!=="vegas";$("hpOpts").hidden=G.id!=="happy";var vOff=S.bet.drawMode==="off";$("jkOpts").hidden=G.id!=="vegas"||vOff;$("vtOpts").hidden=G.id!=="vegas"||vOff;$("drawOpts").hidden=G.id!=="vegas";
     if(G.id==="vegas"){var vu2=vegasUnit()||10000;$("drawNote").textContent={app:"홀마다 스코어 화면에 막대 5개가 떠요. 네 명이 차례로 하나씩 누르면 색과 팀이 공개돼요. 정산은 앱이 해요.",manual:"카트 뽑기통으로 뽑고, 스코어 화면에서 각자 뽑은 색만 눌러 넣어요. 정산은 앱이 해요.",off:"뽑기와 정산은 오프라인으로 해요. 앱은 스코어만 적어요."}[S.bet.drawMode||"app"];
       $("vtNote").textContent={carry:"비길 때마다 다음 홀 상금이 쌓여요("+money(vu2*2)+" → "+money(vu2*3)+" → "+money(vu2*4)+"). 누가 이기면 다시 처음부터.",next:"비긴 횟수만큼 뒤에 승부가 난 판들 상금이 2배("+money(vu2*2)+")예요. 세 번 비기면 뒤 세 판이 2배.",none:"비기면 그 홀 상금은 없고 판돈에 남아요."}[S.bet.vtie||"carry"];}
     if(G.id==="vegas"){var vu=vegasUnit(),p3v=S.par.filter(function(x){return x===3;}).length,npw=nearPrize(4,"vegas");
       $("happyInfo").innerHTML=vu>0?('걷는 돈에 맞춰 자동으로 정해져요 · 홀마다 이긴 팀 각자 <b>'+money(vu)+'</b> · 파3 '+p3v+'개 니어 <b>'+money(npw)+'</b>씩'+(npw<=0?' (니어 상금이 안 남아요)':'')):'걷는 돈을 넣으면 홀 상금과 니어 상금이 자동으로 나와요.';
       $("jkNote").textContent={bogey:"조커는 홀마다 보기로 쳐요(파3 4타, 파4 5타, 파5 6타).",four:"조커는 홀과 상관없이 4타예요. 파5에선 버디, 파4에선 파, 파3에선 보기가 돼요.",par:"조커는 홀마다 파로 쳐요."}[S.bet.joker||"bogey"];$("nearInfo").textContent="";}
     if(G.id==="happy"){var hu=happyUnit(),p3n=S.par.filter(function(x){return x===3;}).length,npv=nearPrize(4);
-      $("happyInfo").innerHTML=hu>0?('걷는 돈에 맞춰 자동으로 정해져요 · 1등 <b>'+money(hu*4)+'</b> · 2등 <b>'+money(hu*3)+'</b> · 3등 <b>'+money(hu*2)+'</b> · 4등 <b>'+money(hu)+'</b> · 파3 '+p3n+'개 니어 <b>'+money(npv)+'</b>씩'+(npv<=0?' (니어 상금이 안 남아요)':'')):'걷는 돈을 넣으면 등수 금액과 니어 상금이 자동으로 나와요.';
+      var hf=happyFee(),hsd=amt("seed","happy");
+      $("happyInfo").innerHTML=hu>0?((hf>0&&hsd>0?'4명 '+money(hsd*4)+'에서 '+money(hf)+'을 먼저 빼고 <b>'+money(Math.max(0,hsd*4-hf))+'</b>으로 시작해요 · ':'')+(S.bet.hpMode==="2468"?'':'걷는 돈에 맞춰 자동으로 정해져요 · ')+'1등 <b>'+money(hu*4)+'</b> · 2등 <b>'+money(hu*3)+'</b> · 3등 <b>'+money(hu*2)+'</b> · 4등 <b>'+money(hu)+'</b> · 파3 '+p3n+'개 니어 <b>'+money(npv)+'</b>씩'+(npv<=0?' (니어 상금이 안 남아요)':'')+happyRest()):'걷는 돈을 넣으면 등수 금액과 니어 상금이 자동으로 나와요.';
       $("nearInfo").textContent="";}
     var sk=S.bet.skip||{};$("skipChips").innerHTML=[["first","첫 홀"],["last","마지막 홀"]].map(function(x){var cur=sk[x[0]]||"on";if(cur==="birdie"&&G.id!=="tadang")cur="off";return '<div class="skrow"><b>'+x[1]+'</b>'+[["on","내기"],["off","안 함"]].concat(G.id==="tadang"?[["birdie","버디피만"]]:[]).map(function(o){return '<button type="button" class="chip" data-skip="'+x[0]+':'+o[0]+'" aria-pressed="'+(cur===o[0])+'">'+o[1]+'</button>';}).join("")+'</div>';}).join("");$("skipNote").textContent=G.id==="tadang"?"기본은 모든 홀 내기해요. 안 함은 스코어만 적고, 버디피만은 그 홀에서 버디·이글·홀인원 보너스만 주고받아요.":"기본은 모든 홀 내기해요. 안 함을 고른 홀은 스코어만 적어요.";
     $("tadOpts").hidden=G.id!=="tadang";renderHd();
@@ -1672,7 +1716,7 @@ window.AGE18={k:"wise_age18_v1",
       if(r.bad)out.innerHTML='<p class="note">'+esc(r.bad)+'</p>';
       else if(!r.played)out.innerHTML='<p class="note">모두의 타수가 들어간 홀부터 정산해요.</p>';
       else{var ord=r.act.slice().sort(function(x,y){return r.tot[y]-r.tot[x];});
-        var ex=(G.id==="happy"||G.id==="vegas")?' 판돈 1인 '+money(r.extra.seed)+'을 뺀 결과예요. 판돈 중 '+money(r.extra.left)+'이 남아요'+(r.offH&&r.offH.length&&r.extra.left>0?' (빠진 홀 몫 포함 · 나눠 갖거나 캐디팁 등 알아서 써요)':'')+(r.extra.fund?' (공금 '+money(r.extra.fund)+' 포함)':'')+(r.extra.bank?' · 아직 안 준 니어 상금 '+money(r.extra.bank):'')+(r.extra.nearNeed.length?' · 니어 안 고른 '+r.extra.nearNeed.join(", ")+'번 홀':'')+'.':(G.id==="jopok"||(G.id==="hussein"&&S.bet.hzMode==="pot"))?' 판돈 1인 '+money(r.extra.seed)+'을 빼고, 남은 판돈 '+money(r.extra.pot)+'을 '+r.act.length+'명이 '+money(r.extra.share)+'씩 나눈 결과예요'+(r.extra.rest?' (나머지 '+money(r.extra.rest)+'은 따로)':'')+'.':(r.extra&&r.extra.tnPot?' 니어 판돈 1인 '+money(r.extra.tnShare)+'을 뺀 결과예요. 판돈 중 '+money(r.extra.tnLeft)+'이 남아요 (이월·공금 등 알아서).':(r.extra&&r.extra.tnFund!=null?' 니어 벌금 공금 '+money(r.extra.tnFund)+'이 모였어요 (낸 돈은 각자 결과에 빠져 있어요 · 캐디피 등에 쓰고 모자라면 알아서).':''));
+        var ex=(G.id==="happy"||G.id==="vegas")?' 판돈 1인 '+money(r.extra.seed)+'을 뺀 결과예요. '+(r.extra.fee?'캐디피 등 '+money(r.extra.fee)+'은 판돈에서 먼저 냈어요. ':'')+'판돈 중 '+money(r.extra.left)+'이 남아요'+(r.offH&&r.offH.length&&r.extra.left>0?' (빠진 홀 몫 포함 · 나눠 갖거나 캐디팁 등 알아서 써요)':'')+(r.extra.fund?' (공금 '+money(r.extra.fund)+' 포함)':'')+(r.extra.bank?' · 아직 안 준 니어 상금 '+money(r.extra.bank):'')+(r.extra.nearNeed.length?' · 니어 안 고른 '+r.extra.nearNeed.join(", ")+'번 홀':'')+'.':(G.id==="jopok"||(G.id==="hussein"&&S.bet.hzMode==="pot"))?' 판돈 1인 '+money(r.extra.seed)+'을 빼고, 남은 판돈 '+money(r.extra.pot)+'을 '+r.act.length+'명이 '+money(r.extra.share)+'씩 나눈 결과예요'+(r.extra.rest?' (나머지 '+money(r.extra.rest)+'은 따로)':'')+'.':(r.extra&&r.extra.tnPot?' 니어 판돈 1인 '+money(r.extra.tnShare)+'을 뺀 결과예요. 판돈 중 '+money(r.extra.tnLeft)+'이 남아요 (이월·공금 등 알아서).':(r.extra&&r.extra.tnFund!=null?' 니어 벌금 공금 '+money(r.extra.tnFund)+'이 모였어요 (낸 돈은 각자 결과에 빠져 있어요 · 캐디피 등에 쓰고 모자라면 알아서).':''));
         out.innerHTML='<ul class="settle">'+ord.map(function(i){var v=r.tot[i];return '<li><span class="nm">'+esc(nameOf(i))+'</span><span class="amt '+(v>0?"plus":(v<0?"minus":""))+'">'+won(v)+'</span></li>';}).join("")+'</ul><p class="note">'+r.played+'홀 정산'+(r.offH&&r.offH.length?' · 내기 안 한 '+r.offH.join(", ")+'번 홀 제외':'')+(r.skipped.length?' · 타수 빠진 '+r.skipped.join(", ")+'번 제외':'')+(r.need.length?' · '+(G.id==="vegas"?"뽑기":"후세인")+' 안 정한 '+r.need.join(", ")+'번 제외':'')+(r.doubled.length?' · 배판 '+r.doubled.join(", "):'')+esc(hdNote(r.hd))+'.'+ex+'</p>';}}
     $("parset").innerHTML=S.par.map(function(p,k){return '<button type="button" data-ph="'+k+'" aria-label="'+(k+1)+'번 홀 파 '+p+'"><span>'+(k+1)+'</span>'+p+'</button>';}).join("");
     $("parTotal").textContent="합계 파 "+S.par.reduce(function(x,y){return x+y;},0)+(S.course?" · "+S.course:"");
@@ -3009,7 +3053,7 @@ window.AGE18={k:"wise_age18_v1",
     root.innerHTML=prog(c)+'<div class="card">'+({intro:sIntro,safety:sSafety,shot:sShot,ask:sAsk,device:sDevice,guide:sGuide,shots:sShots,notice:sNotice}[c.step])(c)+'</div>';
   }
   /* ---------- 내 스윙 (스윙 영상 분석이 이 폰에 남긴 기록을 읽어 보여 줌 — 서버로 보내지 않음) ---------- */
-  var SW_URL="https://seon3212-dev.github.io/swing/",SW_TEMPO="wq_tempo_hist_v1",SW_RES="wq_swing_results_v1",SW_SAME=0.07;
+  var SW_URL="https://app.wisegolf.kr/swing/",SW_TEMPO="wq_tempo_hist_v1",SW_RES="wq_swing_results_v1",SW_SAME=0.07;
   var SW_NAME={tempo:"스윙 템포",head:"머리 움직임",center:"중심 좌우 이동",spine:"척추각(어드레스)",sway:"하체 스웨이",shoulder:"어깨 회전",pressure:"체중 압력"};
   var SW_UNIT={head:"몸통 길이 대비 ",sway:"몸통 길이 대비 ",center:"몸통 길이 대비 "};
   var SW_ST={good:["좋음","gp-good"],caution:["주의","gp-watch"],bad:["보완","gp-pri"]};
@@ -3520,7 +3564,8 @@ window.AGE18={k:"wise_age18_v1",
   function today(){var d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");}
   function md(s){return s?(+s.slice(5,7))+"/"+(+s.slice(8,10)):"";}
 
-  var pending=null,failed=null,askDel=false;
+  var pending=null,failed=null,askDel=false,ydOpen=false;
+  document.addEventListener("toggle",function(e){if(e.target&&e.target.id==="ydFold")ydOpen=e.target.open;},true);
   function render(){
     var box=$("ydBox");if(!box)return;var h="";
     if(pending){
@@ -3539,13 +3584,13 @@ window.AGE18={k:"wise_age18_v1",
       o.list.forEach(function(t){if(t.next&&(!nx||t.issued>=last.issued))nx=t.next;});
       nx=last.next||nx;
       var over=nx&&today()>nx;
-      h+='<div class="hm-card yd-card"><div class="k"><small>내 거리표</small><span class="yd-date">'+esc(md(m.reduce(function(a,x){return x.k.d>a?x.k.d:a;},"")))+' 측정</span></div>'+
+      h+='<details class="hm-card yd-card" id="ydFold"'+(ydOpen?' open':'')+'><summary class="k yd-sum"><small>내 거리표</small><span class="yd-date">'+m.length+'개 클럽 · '+esc(md(m.reduce(function(a,x){return x.k.d>a?x.k.d:a;},"")))+' 측정'+(over?' · 다시 잴 때':'')+' ▾</span></summary>'+
         (over?'<span class="yd-over">다음 측정 추천일('+esc(md(nx))+')이 지났어요. 가게에서 다시 재보세요.</span>':'')+
         '<div class="yd-tbl" role="table" aria-label="클럽별 평균 거리"><div class="yd-h" role="row"><span role="columnheader">클럽</span><span role="columnheader">캐리</span><span role="columnheader">토탈</span><span role="columnheader">바람</span></div>'+
         m.map(function(x){var k=x.k,g=windGrade(k,x.t.g);return '<div class="yd-r" role="row"><span role="cell">'+esc(clubName(k.c))+(k.n<10?'<em> '+k.n+'구</em>':'')+'</span><span role="cell"><b>'+k.ca+'</b></span><span role="cell">'+(k.to!=null?k.to:'—')+'</span><span role="cell">'+(g==null?'—':'<i class="yd-w yd-w'+g+'">'+WIND[g]+'</i>')+'</span></div>';}).join("")+'</div>'+
         '<span class="note">평균 캐리·토탈(m). 10구 중 가장 길고 짧은 1개씩 뺀 8구 평균이에요. 바람은 공 높이·백스핀으로 본 바람 타는 정도예요.</span>'+
         (askDel?'<div class="confirm"><span>이 폰에 저장된 거리표가 모두 지워져요.</span><button class="btn btn-plain" type="button" data-yd="del">지우기</button><button class="btn btn-plain" type="button" data-yd="nodel">취소</button></div>'
-          :'<button type="button" class="btn btn-plain yd-delask" data-yd="askdel">거리표 지우기</button>')+'</div>';
+          :'<button type="button" class="btn btn-plain yd-delask" data-yd="askdel">거리표 지우기</button>')+'</details>';
     }
     box.innerHTML=h;
   }
@@ -3556,7 +3601,7 @@ window.AGE18={k:"wise_age18_v1",
     if(dup>=0)o.list.splice(dup,1);o.list.push(t);
     while(o.list.length>MAXKEEP)o.list.shift();
     if(!store(o)){toast("이 브라우저는 저장이 막혀 있어요. 사파리·크롬 기본 브라우저로 열어 주세요.");return;}
-    pending=null;render();toast(dup>=0?"같은 거리표라 새로 덮어 저장했어요":"거리표를 저장했어요");
+    pending=null;ydOpen=true;render();toast(dup>=0?"같은 거리표라 새로 덮어 저장했어요":"거리표를 저장했어요");
   }
   document.addEventListener("click",function(e){
     var b=e.target.closest("button");if(!b||!b.dataset.yd)return;var a=b.dataset.yd;
