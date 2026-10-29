@@ -937,10 +937,11 @@ window.AGE18={k:"wise_age18_v1",
   var PACKS={
     g110:["골프화","장갑 2개","공 15개 이상(잃어버려도 괜찮게)","티 넉넉히·볼마커","갈아입을 옷·양말","모자·선크림","캐디피 현금","신분증·카드","물·간식","우산·우비(비 예보면)"],
     b100:["골프화","장갑 2개","공 10개 이상","티 넉넉히·볼마커","갈아입을 옷","모자·선크림","캐디피 현금","카드","물"],
-    n90:["골프화","장갑 2개","공 8~10개","티·볼마커","거리측정기(있으면)","갈아입을 옷","모자·선크림","캐디피 현금","카드"],
-    m80:["골프화","장갑 여분","공 6~8개(같은 모델)","티·볼마커·그린 보수기","거리측정기(충전)","갈아입을 옷","모자·선크림","캐디피 현금"],
-    a70:["거리측정기(충전 확인)","같은 모델 공 6개","장갑 여분·그립 상태","볼마커·그린 보수기","코스 공략 메모","스트레칭 밴드","캐디피 현금","갈아입을 옷"]};
-  function PACK(){return PACKS[getLevel()||"b100"];}
+    n90:[]};
+  /* 준비물은 골린이·백돌이만. 90대부터는 각자 챙기는 걸로 둠 (예전 m80·a70 선택도 90대 이상으로 봄) */
+  var PLEVELS=[["g110","골린이","입문 ~ 110타"],["b100","백돌이·백순이","100타대"],["n90","90대 이상","준비물은 각자"]];
+  function lvGroup(){var v=getLevel();return v==="g110"||v==="b100"?v:(v?"n90":null);}
+  function PACK(){return PACKS[lvGroup()||"b100"];}
   var ARRIVAL=[
     {after:0,title:"클럽하우스 앞에서 백 내리기",note:"직원이 받아요"},
     {after:3,title:"주차",note:"안내 표지 따라"},
@@ -1618,8 +1619,8 @@ window.AGE18={k:"wise_age18_v1",
     }).join("");
     if(!S.tee){$("depart").firstChild.nodeValue="--:--";$("dayTag").textContent="";$("goSum").textContent="티오프 시간을 넣으면 출발 시간이 나와요.";$("timeline").innerHTML="";}
     var lv=getLevel();$("packCard").hidden=false;
-    $("packLevel").innerHTML='<span class="note" style="align-self:center">내 수준</span>'+LEVELS.map(function(l){return '<button type="button" class="chip" data-level="'+l[0]+'" aria-pressed="'+(lv===l[0])+'">'+l[1]+'</button>';}).join("");
-    $("packNote").textContent=lv?"수준에 맞춘 준비물이에요.":"수준을 고르면 준비물이 맞춰져요. 지금은 백돌이 기준이에요.";
+    var lg=lvGroup();$("packLevel").innerHTML='<span class="note" style="align-self:center">내 수준</span>'+PLEVELS.map(function(l){return '<button type="button" class="chip" data-level="'+l[0]+'" aria-pressed="'+(lg===l[0])+'">'+l[1]+'</button>';}).join("");
+    $("packNote").textContent=lg==="n90"?"90대부터는 각자 챙기는 걸로 둬서 목록은 안 보여요.":lv?"수준에 맞춘 준비물이에요.":"수준을 고르면 준비물이 맞춰져요. 지금은 백돌이 기준이에요.";
     $("pack").innerHTML=PACK().map(function(n,i){return '<li><label><input type="checkbox" data-pack="'+i+'"'+(S.pack[n]?" checked":"")+'><span>'+n+'</span></label></li>';}).join("");
     var bc=bufCustom();$("bufferChips").innerHTML='<button type="button" class="chip" data-buf="custom" aria-pressed="'+bc+'">직접 입력</button>'+[30,40].map(function(v){return '<button type="button" class="chip" data-buf="'+v+'" aria-pressed="'+(!bc&&+S.buffer===v)+'">'+v+'분 전</button>';}).join("");$("bufInRow").hidden=!bc;kv("bufIn",S.buffer);
     $("rtBox").innerHTML=rtBoxHtml();autoRoute();
@@ -1746,7 +1747,7 @@ window.AGE18={k:"wise_age18_v1",
     try{history.replaceState(null,"","#"+t);}catch(e){}
     window.scrollTo(0,0);
   }
-  function renderLevel(){var lv=getLevel();$("levelAsk").hidden=!!lv;if(!lv)$("levelChips").innerHTML=LEVELS.map(function(l){return '<button type="button" class="chip" data-level="'+l[0]+'">'+l[1]+' <span class="note">'+l[2]+'</span></button>';}).join("");}
+  function renderLevel(){var lv=getLevel();$("levelAsk").hidden=!!lv;if(!lv)$("levelChips").innerHTML=PLEVELS.map(function(l){return '<button type="button" class="chip" data-level="'+l[0]+'">'+l[1]+' <span class="note">'+l[2]+'</span></button>';}).join("");}
   function render(){renderLevel();$("sampleBar").hidden=!(S.sample&&["plan","go","score"].indexOf(S.tab)>=0);renderPlan();renderGo();renderScore();if(S.tab==="home")renderHome();}
   /* ---------- 홈 ---------- */
   function hEsc(x){return String(x==null?"":x).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];});}
@@ -1779,7 +1780,7 @@ window.AGE18={k:"wise_age18_v1",
     if(d.tab){showTab(d.tab);return;}
     if(d.soon){toast(d.soon+"는 공개 예정이에요");return;}
     if(d.act==="newRound"){showTab("plan");if(S.sample){var nb=document.querySelector('[data-act="new"]');if(nb)nb.click();}$("picker").hidden=false;renderPicker();var cq=$("cq");if(cq)cq.focus();return;}
-    if(d.level){setLevel(d.level);render();toast("준비물을 "+LEVELS.filter(function(l){return l[0]===d.level;})[0][1]+" 기준으로 맞췄어요");return;}
+    if(d.level){setLevel(d.level);render();toast(d.level==="n90"?"90대 이상: 준비물은 각자 챙기는 걸로 둘게요":"준비물을 "+PLEVELS.filter(function(l){return l[0]===d.level;})[0][1]+" 기준으로 맞췄어요");return;}
     if(d.club!=null){chooseClub(+d.club);return;}
     if(d.region){pickRegion=pickRegion===d.region?null:d.region;pickCity=null;renderPicker();if(pickRegion)reveal($("cityBox").children.length?"cityBox":"regionList");return;}
     if(d.city){pickCity=pickCity===d.city?null:d.city;renderPicker();if(pickCity)reveal("regionList");return;}
