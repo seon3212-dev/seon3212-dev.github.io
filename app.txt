@@ -56,6 +56,25 @@ body{background:var(--bg);color:var(--ink);font-family:var(--font-body);font-siz
 
 .btn{appearance:none;border:0;border-radius:999px;padding:10px 16px;font:600 14px var(--font-body);cursor:pointer;display:inline-flex;align-items:center;gap:6px;text-decoration:none}
 .btn-flag{background:var(--flag);color:var(--flag-ink)}
+#ageGate{position:fixed;inset:0;z-index:9999;background:rgba(13,22,20,.72);display:flex;align-items:center;justify-content:center;padding:16px}
+#ageGate .ag-box{background:var(--surface);color:var(--ink);border-radius:var(--r);padding:22px 20px;max-width:360px;width:100%;box-shadow:0 12px 40px rgba(0,0,0,.3)}
+#ageGate h2{margin:0 0 8px;font:700 19px var(--font-body)}
+#ageGate p{margin:0 0 14px;font-size:15px;line-height:1.5}
+#ageGate .ag-btns{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+#ageGate .note{margin:0 0 6px;color:var(--muted);font-size:13px}#ageGate .note a{color:inherit}
+html.ag-on body{overflow:hidden}
+#bkCrop{position:fixed;inset:0;z-index:9998;background:rgba(13,22,20,.8);display:flex;align-items:center;justify-content:center;padding:12px}
+#bkCrop[hidden]{display:none}
+#bkCrop .bc-box{background:var(--surface);color:var(--ink);border-radius:var(--r);padding:16px;max-width:520px;width:100%;max-height:100%;overflow:auto;display:flex;flex-direction:column;gap:10px}
+#bkCrop .bc-box p{margin:0;font-size:13px;line-height:1.5}
+#bkCrop .bc-wrap{display:flex;justify-content:center}
+#bkCrop .bc-stage{position:relative;display:inline-block;overflow:hidden;touch-action:none;user-select:none;-webkit-user-select:none;border-radius:8px}
+#bkCrop .bc-stage img{display:block;max-width:100%;max-height:58vh;pointer-events:none}
+#bkCrop .bc-sel{position:absolute;border:2px solid var(--flag);box-shadow:0 0 0 9999px rgba(0,0,0,.55);cursor:move}
+#bkCrop .bc-sel i{position:absolute;width:22px;height:22px;background:var(--flag);border-radius:50%;border:2px solid #fff}
+#bkCrop .bc-sel i[data-h="nw"]{left:-12px;top:-12px;cursor:nwse-resize}#bkCrop .bc-sel i[data-h="ne"]{right:-12px;top:-12px;cursor:nesw-resize}
+#bkCrop .bc-sel i[data-h="sw"]{left:-12px;bottom:-12px;cursor:nesw-resize}#bkCrop .bc-sel i[data-h="se"]{right:-12px;bottom:-12px;cursor:nwse-resize}
+#bkCrop .bc-btns{display:flex;gap:8px;flex-wrap:wrap}
 .btn-plain{background:var(--chip);color:var(--ink)}
 .btn-ghost{background:transparent;color:var(--board-ink);box-shadow:inset 0 0 0 1.5px var(--board-muted)}
 button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--flag);outline-offset:2px}
@@ -534,8 +553,8 @@ details.yd-card:not([open]) .yd-sum{margin-bottom:0}
         <div class="q"><label class="ql" for="date">날짜</label><input type="date" id="date"></div>
         <div class="q"><label class="ql" for="tee">티오프</label><input type="time" id="tee"></div>
       </div>
-      <div class="q bk-fill"><label class="btn btn-plain" id="bkLbl" style="align-self:flex-start">예약 캡처로 채우기<input type="file" id="bkFile" accept="image/*" hidden></label>
-        <span class="note" id="bkNote">예약 알림톡이나 라운드정보 화면을 캡처해 올리면 골프장·날짜·티오프를 채워요. 캡처는 저장하지 않아요. <a href="privacy.html#privacy" target="_blank" rel="noopener">개인정보 처리방침</a></span></div>
+      <div class="q bk-fill"><label class="btn btn-plain" id="bkLbl" style="align-self:flex-start">예약 캡처로 채우기<input type="file" id="bkImg" accept="image/*" hidden></label>
+        <span class="note" id="bkNote">예약 알림톡이나 라운드정보 화면을 캡처해 올리고, 예약 정보 부분만 골라 보내면 골프장·날짜·티오프를 채워요. 고른 부분만 보내고 저장하지 않아요. <a href="privacy.html#privacy" target="_blank" rel="noopener">개인정보 처리방침</a></span></div>
     </div>
 
     <div class="card">
@@ -755,11 +774,25 @@ window.AGE18={k:"wise_age18_v1",
   set:function(v){try{if(v)localStorage.setItem(this.k,"y");else localStorage.removeItem(this.k);}catch(e){}try{document.dispatchEvent(new Event("wise-age18"));}catch(e){}},
   note:'<p class="note age-ok">✓ 만 18세 이상 확인했어요</p>',
   box:function(id,on){return AGE18.ok()?AGE18.note:'<label class="agree"><input type="checkbox" id="'+id+'"'+(on?" checked":"")+'><span>만 18세 이상이에요</span></label>';}};
+/* 첫 실행 확인: 앱을 처음 열 때 한 번만 묻는다 (처리방침 8번·약관 제4조) */
+(function(){
+  if(AGE18.ok())return;
+  var g=document.createElement("div");g.id="ageGate";g.setAttribute("role","dialog");g.setAttribute("aria-modal","true");g.setAttribute("aria-labelledby","ageGateT");
+  g.innerHTML='<div class="ag-box"><h2 id="ageGateT">만 18세 이상만 쓸 수 있어요</h2>'+
+    '<p>슬기로운골프생활은 만 18세 이상을 위한 앱이에요. 처음 한 번만 확인해요.</p>'+
+    '<div class="ag-btns"><button type="button" class="btn btn-flag" id="ageYes">만 18세 이상이에요</button><button type="button" class="btn btn-plain" id="ageNo">아니에요</button></div>'+
+    '<p class="note" id="ageMsg" hidden>죄송해요. 만 18세 미만은 이 앱을 쓸 수 없어요.</p>'+
+    '<p class="note"><a href="privacy.html" target="_blank" rel="noopener">개인정보 처리방침 · 이용약관</a></p></div>';
+  function mount(){document.body.appendChild(g);document.documentElement.classList.add("ag-on");var y=document.getElementById("ageYes");if(y)y.focus();
+    y.addEventListener("click",function(){AGE18.set(true);document.documentElement.classList.remove("ag-on");g.remove();});
+    document.getElementById("ageNo").addEventListener("click",function(){document.getElementById("ageMsg").hidden=false;});}
+  if(document.body)mount();else document.addEventListener("DOMContentLoaded",mount);
+})();
 </script>
 <script>
 /* ---------- 골프 유형 검사 (GRAS ERFA) — 문항과 채점은 검사 서버에만 있다 ---------- */
 (function(){
-  var GRAS_API = "https://script.google.com/macros/s/AKfycbz4aGblc6lrfqolwbt6x9imyHetDBVgHcPnb5SeZJsmbqnmnkEciMFo1xt3NoIPcwDJ/exec";               /* 배포한 Apps Script 웹 앱 주소(…/exec) */
+  var GRAS_API = "https://script.google.com/macros/s/AKfycbzBddn9HgwXfFiLxeJ4D505ZO-rA5FpTtBswb9ZE4EWu1pu3CkF9K4qCN3ZXUdVQQU2/exec";               /* 배포한 Apps Script 웹 앱 주소(…/exec) */
   var APP_VERSION = "round-v74";
   var LKEY = "gras_app_v1";
 
@@ -1003,7 +1036,7 @@ window.AGE18={k:"wise_age18_v1",
     return l;
   }
   /* ---------- 실제 길찾기 (와이즈골프 길찾기 서버 — 카카오) ---------- */
-  var ROUTE_API="https://script.google.com/macros/s/AKfycbzQatv-s5nuuwFGxORcuFm_laqiYt4o-QC5CLwcQk0gKcXTFfApH4cmwZhPoBOcJ_-Ozg/exec"; /* 길찾기 서버 (와이즈쿼드·규칙 질문 서버와 별개) */
+  var ROUTE_API="https://script.google.com/macros/s/AKfycbynPjX0ft1Slv6V0uU8bbadrZf7wyagt1nJFyPVUA6kJpsOmmFWg_-UmZPdl-1ZtNFI/exec"; /* 길찾기 서버 (와이즈쿼드·규칙 질문 서버와 별개) */
   var rtRes=null,rtBusy="",rtMsg="";
   function rapi(b){return fetch(ROUTE_API,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(b)}).then(function(r){return r.json();}).catch(function(){return {ok:false,error:"NETWORK"};});}
   function rpt(p){return p&&isFinite(+p.x)&&isFinite(+p.y)?{x:+p.x,y:+p.y}:null;}
@@ -1517,10 +1550,38 @@ window.AGE18={k:"wise_age18_v1",
     var mx=1600,w=im.width,h=im.height,r=Math.min(1,mx/Math.max(w,h));var cv=document.createElement("canvas");cv.width=Math.round(w*r);cv.height=Math.round(h*r);
     cv.getContext("2d").drawImage(im,0,0,cv.width,cv.height);ok(cv.toDataURL("image/jpeg",0.85));};im.src=fr.result;};fr.readAsDataURL(file);});}
   var BKERR={NO_CLOUD:"지금은 캡처 읽기를 쓸 수 없어요. 직접 넣어 주세요.",UNREADABLE:"예약 내용을 찾지 못했어요. 예약 알림톡이나 라운드정보 화면을 올려 주세요.",IMAGE_TOO_BIG:"캡처가 너무 커요. 다시 캡처해 주세요.",NETWORK:"인터넷 연결을 확인해 주세요.",BUSY:"잠시 뒤 다시 해 주세요."};
-  function bookFill(file){
+  /* 예약 캡처 잘라 보내기: 동반자 이름·전화번호가 서버로 가지 않게, 고른 부분만 보낸다 */
+  var BC={img:null,r:null};
+  function bcEl(){var g=$("bkCrop");if(g)return g;g=document.createElement("div");g.id="bkCrop";g.hidden=true;g.setAttribute("role","dialog");g.setAttribute("aria-modal","true");g.setAttribute("aria-labelledby","bcT");
+    g.innerHTML='<div class="bc-box"><b id="bcT">예약 정보 부분만 골라 주세요</b><p class="note">골프장·날짜·티오프 시간이 보이는 부분만 네모 안에 넣어 주세요. 이름·전화번호는 네모 밖으로 빼면 보내지 않아요. 네모는 끌어서 옮기고, 모서리로 크기를 바꿔요.</p>'+
+      '<div class="bc-wrap"><div class="bc-stage" id="bcStage"><img id="bcImg" alt="올린 예약 캡처"><div class="bc-sel" id="bcSel"><i data-h="nw"></i><i data-h="ne"></i><i data-h="sw"></i><i data-h="se"></i></div></div></div>'+
+      '<div class="bc-btns"><button type="button" class="btn btn-flag" id="bcSend">이 부분만 보내기</button><button type="button" class="btn btn-plain" id="bcCancel">취소</button></div></div>';
+    document.body.appendChild(g);bcWire();return g;}
+  function bcDraw(){var r=BC.r,sel=$("bcSel");sel.style.left=r.x*100+"%";sel.style.top=r.y*100+"%";sel.style.width=r.w*100+"%";sel.style.height=r.h*100+"%";}
+  function bcOpen(file){var fr=new FileReader();fr.onload=function(){var im=new Image();im.onload=function(){BC.img=im;BC.r={x:0.06,y:0.3,w:0.88,h:0.3};var g=bcEl();$("bcImg").src=im.src;g.hidden=false;document.documentElement.classList.add("ag-on");bcDraw();$("bcSend").focus();};im.onerror=function(){toast("사진을 열지 못했어요.");};im.src=fr.result;};fr.onerror=function(){toast("사진을 열지 못했어요.");};fr.readAsDataURL(file);}
+  function bcClose(){var g=$("bkCrop");if(g)g.hidden=true;document.documentElement.classList.remove("ag-on");BC.img=null;}
+  function bcWire(){var st=$("bcStage"),drag=null,MIN=0.06;
+    function pt(e){var b=st.getBoundingClientRect();return {x:Math.min(1,Math.max(0,(e.clientX-b.left)/b.width)),y:Math.min(1,Math.max(0,(e.clientY-b.top)/b.height))};}
+    st.addEventListener("pointerdown",function(e){var p=pt(e),h=e.target.dataset&&e.target.dataset.h,r=BC.r;
+      if(h)drag={mode:h};else if(e.target.id==="bcSel")drag={mode:"move",dx:p.x-r.x,dy:p.y-r.y};else{drag={mode:"new",ox:p.x,oy:p.y};BC.r={x:p.x,y:p.y,w:MIN,h:MIN};bcDraw();}
+      try{st.setPointerCapture(e.pointerId);}catch(_){}e.preventDefault();});
+    st.addEventListener("pointermove",function(e){if(!drag)return;var p=pt(e),r=BC.r,x2=r.x+r.w,y2=r.y+r.h;
+      if(drag.mode==="move"){r.x=Math.min(1-r.w,Math.max(0,p.x-drag.dx));r.y=Math.min(1-r.h,Math.max(0,p.y-drag.dy));}
+      else if(drag.mode==="new"){r.x=Math.min(drag.ox,p.x);r.y=Math.min(drag.oy,p.y);r.w=Math.max(MIN,Math.abs(p.x-drag.ox));r.h=Math.max(MIN,Math.abs(p.y-drag.oy));r.w=Math.min(r.w,1-r.x);r.h=Math.min(r.h,1-r.y);}
+      else{var m=drag.mode;if(m.indexOf("w")>=0){r.x=Math.min(p.x,x2-MIN);r.w=x2-r.x;}if(m.indexOf("e")>=0){r.w=Math.max(MIN,p.x-r.x);}if(m.indexOf("n")>=0){r.y=Math.min(p.y,y2-MIN);r.h=y2-r.y;}if(m.indexOf("s")>=0){r.h=Math.max(MIN,p.y-r.y);}}
+      bcDraw();});
+    ["pointerup","pointercancel"].forEach(function(t){st.addEventListener(t,function(){drag=null;});});
+    $("bcCancel").addEventListener("click",bcClose);
+    $("bcSend").addEventListener("click",function(){var im=BC.img,r=BC.r;if(!im)return;var nw=im.naturalWidth,nh=im.naturalHeight;
+      var sx=Math.round(r.x*nw),sy=Math.round(r.y*nh),sw=Math.max(1,Math.round(r.w*nw)),sh=Math.max(1,Math.round(r.h*nh)),k=Math.min(1,1600/Math.max(sw,sh));
+      var cv=document.createElement("canvas");cv.width=Math.round(sw*k);cv.height=Math.round(sh*k);cv.getContext("2d").drawImage(im,sx,sy,sw,sh,0,0,cv.width,cv.height);
+      var url=cv.toDataURL("image/jpeg",0.85);bcClose();bookFill(url);});
+    document.addEventListener("keydown",function(e){if(e.key==="Escape"&&!$("bkCrop").hidden)bcClose();});}
+  window.WG_BCROP={open:bcOpen,rect:function(r){if(r){BC.r=r;bcDraw();}return BC.r;}}; /* 테스트용 */
+  function bookFill(url){
     var lbl=$("bkLbl");if(lbl.dataset.busy)return;lbl.dataset.busy="1";lbl.firstChild.nodeValue="읽는 중이에요…";
-    var done=function(){delete lbl.dataset.busy;lbl.firstChild.nodeValue="예약 캡처로 채우기";$("bkFile").value="";};
-    shrink(file).then(function(url){return rapi({action:"booking",image:{mime:"image/jpeg",data:url.split(",")[1]}});},function(){return {ok:false,error:"UNREADABLE"};})
+    var done=function(){delete lbl.dataset.busy;lbl.firstChild.nodeValue="예약 캡처로 채우기";};
+    rapi({action:"booking",image:{mime:"image/jpeg",data:url.split(",")[1]}})
     .then(function(r){done();if(!r||!r.ok){toast(BKERR[r&&r.error]||"캡처를 읽지 못했어요. 직접 넣어 주세요.");return;}
       var got=[];
       if(r.course){var i=clubMatch(r.course);
@@ -1532,7 +1593,7 @@ window.AGE18={k:"wise_age18_v1",
       if(r.time){S.tee=r.time;got.push("티오프");}
       changed();toast(got.length?"채웠어요: "+got.join("·")+". 맞는지 한번 확인해 주세요.":"예약 내용을 찾지 못했어요.");});
   }
-  document.addEventListener("change",function(e){if(e.target&&e.target.id==="bkFile"&&e.target.files&&e.target.files[0])bookFill(e.target.files[0]);});
+  document.addEventListener("change",function(e){if(e.target&&e.target.id==="bkImg"){var f=e.target.files&&e.target.files[0];e.target.value="";if(f)bcOpen(f);}});
   function renderPlan(){
     function keep(id,v){if(document.activeElement!==$(id))$(id).value=v;}
     keep("course",S.courseId==null?(S.course||""):"");keep("date",S.date||"");keep("tee",S.tee||"");renderPicker();
@@ -1910,7 +1971,7 @@ window.AGE18={k:"wise_age18_v1",
 <script>
 /* ---------- 와이즈쿼드 서버 (사진 받기 + 진단 결과 모으기) — 이름·전화번호·직접 쓴 글·아픈 곳 답은 보내지 않음 ---------- */
 (function(){
-  var WQ=window.WQ={api:"https://script.google.com/macros/s/AKfycbwr-N3r2leolAFnQQ9HCX12dm1KgpPdixQ8UzOd8IUwhaentwcqf7-ZIypu8rpmnUNO/exec"};   /* 와이즈쿼드 서버(Apps Script 웹 앱 …/exec) — 배포 뒤 주소를 넣음 */
+  var WQ=window.WQ={api:"https://script.google.com/macros/s/AKfycbzP6jEaugcR-CqO1Ut-9muYY5P1Hq0lijtZa6F_ZavV8Zk8k5WCtDa2aJ2acTPRfkbr/exec"};   /* 와이즈쿼드 서버(Apps Script 웹 앱 …/exec) — 배포 뒤 주소를 넣음 */
   WQ.deviceId=function(){var k="wq_device_id",v=null;try{v=localStorage.getItem(k);}catch(e){}
     if(!v||!/^[a-z0-9]{12,40}$/.test(v)){var a="abcdefghijkmnpqrstuvwxyz23456789";v="";for(var i=0;i<20;i++)v+=a.charAt(Math.floor(Math.random()*a.length));try{localStorage.setItem(k,v);}catch(e){}}
     return v;};
@@ -3171,7 +3232,7 @@ window.AGE18={k:"wise_age18_v1",
     h+='<label class="btn btn-plain gc-fill gs-pick">사진 고르기<input type="file" id="gsFile" accept="image/*" multiple hidden></label>'+
       '<div class="gs-thumbs">'+PHOTOS.map(function(p,i){return '<span class="gs-thumb"><img src="'+p.data+'" alt="'+(i+1)+'번 사진"><button type="button" class="chip" data-gs="pdel" data-i="'+i+'" aria-label="'+(i+1)+'번 사진 빼기">✕</button></span>';}).join("")+'</div>'+
 
-      '<label class="agree"><input type="checkbox" id="gsPConsent"'+(c.photoConsent?" checked":"")+'><span>[필수] 사진 수집·이용에 동의해요<br><small class="note">받는 것: 기기 결과 사진, 측정 기기 이름<br>쓰는 곳: 샷 숫자 읽기. 숫자는 Google Cloud의 AI(Gemini)가 읽어요. 미국 서버에서 읽기만 맡기고, Google은 이 사진을 AI 학습에 쓰지 않아요.<br>보관: 숫자를 다 읽으면 바로 지워요(휴지통에서 30일 뒤 완전히 사라져요).<br>동의하지 않아도 돼요. 그러면 사진 대신 "직접 적기"로 숫자를 넣으면 돼요. <a href="privacy.html#privacy" target="_blank" rel="noopener">개인정보 처리방침</a></small></span></label>'+
+      '<label class="agree"><input type="checkbox" id="gsPConsent"'+(c.photoConsent?" checked":"")+'><span>아래 사진 안내를 확인했어요<br><small class="note">받는 것: 기기 결과 사진, 측정 기기 이름<br>쓰는 곳: 샷 숫자 읽기. 숫자 읽기는 Google Cloud의 AI(Gemini)에 맡겨요(미국 서버). Google은 이 사진을 AI 학습에 쓰지 않아요.<br>보관: 숫자를 다 읽으면 바로 영구 삭제해요(휴지통에 남기지 않아요).<br>사진에 다른 사람의 이름·전화번호·얼굴이 보이면 가리고 올려 주세요.<br>사진을 보내기 싫으면 "직접 적기"로 숫자를 넣으면 돼요. <a href="privacy.html#privacy" target="_blank" rel="noopener">개인정보 처리방침</a></small></span></label>'+
       '<button type="button" class="btn btn-flag gc-fill" data-gs="psend">사진 보내기</button>';
     return h;
   }
@@ -3312,7 +3373,7 @@ window.AGE18={k:"wise_age18_v1",
     /* 사진에서 읽은 숫자를 칸에 채움 (보낸 직후 · 결과 확인 둘 다 여기로) */
     function fillFromPhoto(sh,dist){c.shots=sh.concat(blankShots(Math.max(0,CFG.fullShots-sh.length)));c.photoState="done";c.inMode="type";if(dist==="total"||dist==="carry")c.dk=dist;save();keep();}
     if(act==="psend"){
-      if(!PHOTOS.length){msg("사진을 골라 주세요.");return;}if(!c.photoConsent){msg("사진 동의에 체크해 주세요. 동의하기 싫으면 \"직접 적기\"를 써 주세요.");return;}
+      if(!PHOTOS.length){msg("사진을 골라 주세요.");return;}if(!c.photoConsent){msg("사진 안내를 확인했다고 체크해 주세요. 사진을 보내기 싫으면 \"직접 적기\"를 써 주세요.");return;}
       b.disabled=true;msg("보내는 중이에요… AI가 숫자를 읽는 데 10~20초쯤 걸려요.");
       papi({action:"upload",passcode:"239319",consent:true,adult:!!(c.adult||AGE18.ok()),adult18:true,device_id:(window.WQ&&WQ.deviceId?WQ.deviceId():undefined),shot:lab(SHOT,c.shot),club:CNAME[c.club]||"",device:lab(DEV,c.dev),indoor:c.indoor==="in"?"실내":c.indoor==="out"?"실외":"",app_version:"round-v74",images:PHOTOS})
         .then(function(r){b.disabled=false;if(!r.ok){msg(PERR[r.error]||"보내지 못했어요. 잠시 뒤 다시 해 주세요.");return;}
@@ -3354,7 +3415,7 @@ window.AGE18={k:"wise_age18_v1",
 <script>
 /* ---------- 규칙 사전 (가이드 탭) — 찾기는 이 기기 안에서. 풀이를 늘리려고 질문만 기기 번호 없이 규칙 질문 서버(RuleQ)에 모은다 ---------- */
 (function(){
-  var RULE_API="https://script.google.com/macros/s/AKfycbyB_neanDGNShZ6W2UWboMxCBbxAobcOgosuHQUyiFRl0rOvoPcLqsQ3lJNlmGZGY3XzQ/exec"; /* 규칙 질문 서버 (와이즈쿼드 서버와 별개) */
+  var RULE_API="https://script.google.com/macros/s/AKfycbyoXBaww2-_qOippVm8PVrrmZlFduAzF7syRAY7VrR-j9Lb6-7Txi-581r0Mub8R8kMew/exec"; /* 규칙 질문 서버 (와이즈쿼드 서버와 별개) */
   var DATA=[];try{DATA=JSON.parse(document.getElementById("ruData").textContent)||[];}catch(e){DATA=[];}
   function $(id){return document.getElementById(id);}
   function esc(x){return String(x==null?"":x).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];});}
