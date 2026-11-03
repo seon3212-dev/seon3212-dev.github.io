@@ -1655,15 +1655,17 @@ window.AGE18={k:"wise_age18_v1",
   /* ---------- 골프장 날씨 (기상청 동네예보) ---------- */
   var WX={key:"",at:0,data:null,busy:false,err:""};
   function wxDays(){if(!S.date)return null;var d=new Date(S.date+"T00:00:00"),t=new Date();t.setHours(0,0,0,0);return Math.round((d-t)/86400000);}
-  function wxIcon(r){var p=+r.pty||0;if(p===1||p===5)return "🌧";if(p===2||p===6)return "🌨";if(p===3||p===7)return "❄️";if(p===4)return "🌦";var s=+r.sky;return s===1?"☀️":(s===3?"⛅":(s===4?"☁️":"·"));}
+  function wxIcon(r){var p=+r.pty||0;if(p===1||p===5)return "🌧";if(p===2||p===6)return "🌨";if(p===3||p===7)return "❄️";if(p===4)return "🌦";var s=+r.sky,h=+String(r.t||"12").slice(0,2),night=h>=19||h<6;return s===1?(night?"🌙":"☀️"):(s===3?(night?"☁️":"⛅"):(s===4?"☁️":"·"));}
   function wxDir(v){if(v==null||!isFinite(+v))return "";return ["북","북동","동","남동","남","남서","서","북서"][Math.round(((+v)%360)/45)%8]+"풍";}
   function wxWind(w){w=+w;return w<4?"약한 바람":(w<9?"약간 강한 바람":(w<14?"강한 바람":"매우 강한 바람"));}
   function wxRain(r){var v=String(r.pcp==null?"":r.pcp);return (!v||v==="강수없음"||v==="0")?"":v.replace("mm 미만","mm↓");}
-  function wxWindow(rows){
+  function wxWindow(rows){ /* 티오프 1시간 전 ~ 5시간 뒤 (자정을 넘어도 이어서), 티오프가 없으면 그날 6~18시 2시간 간격 */
     if(!rows||!rows.length)return [];
-    var tee=S.tee?(+S.tee.slice(0,2)):null;
-    var pick=rows.filter(function(r){var h=+r.t.slice(0,2);return tee==null?(h>=6&&h<=18&&h%2===0):(h>=tee-1&&h<=tee+5);});
-    return pick.length?pick:rows.slice(0,8);
+    rows=rows.slice().sort(function(a,b){return (a.d+a.t)<(b.d+b.t)?-1:1;});
+    var day=S.date.replace(/-/g,"");
+    if(!S.tee)return rows.filter(function(r){var h=+r.t.slice(0,2);return r.d===day&&h>=6&&h<=18&&h%2===0;});
+    var t0=new Date(S.date+"T"+S.tee.slice(0,2)+":00:00").getTime();
+    return rows.filter(function(r){var t=new Date(r.d.slice(0,4)+"-"+r.d.slice(4,6)+"-"+r.d.slice(6,8)+"T"+r.t.slice(0,2)+":00:00").getTime();return t>=t0-3600000&&t<=t0+5*3600000;});
   }
   function wxNeed(){var k=S.course+"|"+S.date;return k!==WX.key||Date.now()-WX.at>30*60000;}
   function wxLoad(force){
@@ -1671,7 +1673,7 @@ window.AGE18={k:"wise_age18_v1",
     WX.busy=true;WX.err="";renderWx();
     ensureCourse().then(function(ok){
       if(!ok||!S.courseLoc){WX.busy=false;WX.key=k;WX.at=Date.now();WX.data=null;WX.err="PLACE";renderWx();return;}
-      return wapi({action:"weather",lat:S.courseLoc.y,lon:S.courseLoc.x,date:S.date}).then(function(r){WX.busy=false;WX.key=k;WX.at=Date.now();if(r&&r.ok){WX.data=r;WX.err="";}else{WX.data=null;WX.err=(r&&r.error)||"ERR";}renderWx();});
+      return wapi({action:"weather",lat:S.courseLoc.y,lon:S.courseLoc.x}).then(function(r){WX.busy=false;WX.key=k;WX.at=Date.now();if(r&&r.ok){WX.data=r;WX.err="";}else{WX.data=null;WX.err=(r&&r.error)||"ERR";}renderWx();});
     });
   }
   function renderWx(){
@@ -1685,13 +1687,13 @@ window.AGE18={k:"wise_age18_v1",
     if(WX.err==="PLACE"){b.innerHTML='<p class="note">골프장 위치를 찾지 못했어요. 골프장 이름을 목록에서 골라 주세요.</p>';return;}
     if(WX.err){b.innerHTML='<p class="note">날씨를 받지 못했어요. 잠시 뒤 \'지금 다시 받기\'를 눌러 주세요.</p>';return;}
     if(!WX.data){b.innerHTML='';return;}
-    var rows=(WX.data.rows||[]).filter(function(r){return r.d===S.date.replace(/-/g,"");}),w=wxWindow(rows);
+    var rows=WX.data.rows||[],w=wxWindow(rows);
     if(!w.length){b.innerHTML='<p class="note">이 날짜 예보가 아직 없어요. 조금 뒤에 다시 받아 보세요.</p>';return;}
     var tee=S.tee?(+S.tee.slice(0,2)):null,maxPop=0,rain=false,maxW=0;
     w.forEach(function(r){if(+r.pop>maxPop)maxPop=+r.pop;if((+r.pty||0)>0||wxRain(r))rain=true;if(+r.wsd>maxW)maxW=+r.wsd;});
     var sum=(tee!=null?"라운드 시간대 ":"낮 동안 ")+"비 확률 최대 "+maxPop+"%"+(rain?" · 비 소식 있어요":"")+" · 바람 최대 "+Math.round(maxW*10)/10+"m/s ("+wxWind(maxW)+")";
     b.innerHTML='<p class="wx-sum'+(rain||maxPop>=60?' rain':'')+'">'+esc(sum)+'</p><div class="wx-hrs">'+w.map(function(r){var h=+r.t.slice(0,2),rn=wxRain(r);
-      return '<div class="wx-h'+(tee!=null&&h===tee?' tee':'')+'"><small>'+h+'시'+(tee!=null&&h===tee?' 티오프':'')+'</small><span class="ic" aria-hidden="true">'+wxIcon(r)+'</span><b>'+(r.tmp==null?'-':Math.round(+r.tmp))+'°</b><span class="rp">'+(r.pop==null?'':r.pop+'%')+(rn?' '+esc(rn):'')+'</span><span class="wd">'+esc(wxDir(r.vec))+' '+(r.wsd==null?'':Math.round(+r.wsd*10)/10+'m/s')+'</span></div>';}).join("")+'</div>'+
+      var isT=tee!=null&&h===tee&&r.d===S.date.replace(/-/g,"");return '<div class="wx-h'+(isT?' tee':'')+'"><small>'+h+'시'+(isT?' 티오프':'')+'</small><span class="ic" aria-hidden="true">'+wxIcon(r)+'</span><b>'+(r.tmp==null?'-':Math.round(+r.tmp))+'°</b><span class="rp">'+(r.pop==null?'':r.pop+'%')+(rn?' '+esc(rn):'')+'</span><span class="wd">'+esc(wxDir(r.vec))+' '+(r.wsd==null?'':Math.round(+r.wsd*10)/10+'m/s')+'</span></div>';}).join("")+'</div>'+
       (WX.data.issued?'<p class="note">'+WX.data.issued.slice(4,6)+'/'+WX.data.issued.slice(6,8)+' '+WX.data.issued.slice(9,11)+'시 발표'+(WX.data.ultra?' · 6시간 안은 '+WX.data.ultra.slice(9,11)+':'+WX.data.ultra.slice(11,13)+' 발표 초단기 예보':'')+'</p>':'');
   }
   function renderPlan(){
