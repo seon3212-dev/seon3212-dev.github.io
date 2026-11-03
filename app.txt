@@ -3,7 +3,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Sans+KR:wght@400;500;600;700&display=swap">
 <style>
-/* Layout: one phone column with three tabs pinned on top — "다음 라운드" is the hub where the round is chosen once; "가는 길" and "스코어·정산" read from it */
+/* Layout: one phone column with four tabs pinned on top — "정보" is the hub where the round is chosen once; "가는 길", "스코어·내기" read from it; "비용" splits shared costs */
 :root{
   --bg:#EEF2EC;        /* fairway at dawn */
   --surface:#FFFFFF;
@@ -49,8 +49,8 @@ body{background:var(--bg);color:var(--ink);font-family:var(--font-body);font-siz
 .brand b{font-size:15px}
 .beta{display:inline-block;font-size:11.5px;font-weight:600;padding:2px 8px;border-radius:999px;background:var(--flag);color:var(--flag-ink);margin-left:6px;vertical-align:1px}
 .tag{font-size:12px;color:var(--muted)}
-.seg{display:grid;grid-template-columns:repeat(3,1fr);background:var(--chip);border-radius:999px;padding:4px;gap:4px}
-.seg button{appearance:none;border:0;background:transparent;color:var(--ink);font:600 14px var(--font-body);padding:9px 4px;border-radius:999px;cursor:pointer}
+.seg{display:grid;grid-template-columns:repeat(4,1fr);background:var(--chip);border-radius:999px;padding:4px;gap:4px}
+.seg button{appearance:none;border:0;background:transparent;color:var(--ink);font:600 14px var(--font-body);padding:9px 2px;white-space:nowrap;letter-spacing:-.02em;border-radius:999px;cursor:pointer}
 .seg button[aria-selected="true"]{background:var(--surface);box-shadow:0 1px 2px rgba(0,0,0,.12)}
 .sample{font-size:13px;background:var(--chip);border-radius:12px;padding:10px 12px;display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap}
 
@@ -188,6 +188,22 @@ input[type=time],input[type=number]{font-family:var(--font-display);font-size:22
 .step{display:flex;align-items:center;gap:6px}
 .step button{width:42px;height:42px;border-radius:50%;border:1px solid var(--line);background:var(--surface);color:var(--ink);font-size:20px;cursor:pointer}
 .step output{font-family:var(--font-display);font-size:30px;font-weight:700;min-width:40px;text-align:center;font-variant-numeric:tabular-nums}
+details.card.bet-card>summary{cursor:pointer;list-style:none;display:block;font-size:inherit;font-weight:inherit}details.card.bet-card>summary::after{content:none}.bet-card>summary::-webkit-details-marker{display:none}.bet-card .mr-top{display:flex;justify-content:space-between;align-items:center;gap:8px}.bet-card .mr-top b{font-size:18px}.bet-card .mr-act::after{content:"펼치기 ▾";font-size:13px;font-weight:700;padding:3px 10px;border-radius:999px;background:var(--chip,#e6ece8)}.bet-card[open] .mr-act::after{content:"접기 ▴"}.bet-card>summary .note{display:block;margin-top:4px}.bet-card[open]>summary{margin-bottom:12px}
+.cs-lead{margin:-4px 0 12px}.cs-add{display:flex;gap:8px;margin-top:10px}.cs-add input{flex:1;min-width:0}.cs-from{margin-top:8px}
+.cs-item{border:1px solid var(--line);border-radius:12px;padding:12px;margin:0 0 10px;display:grid;gap:8px}
+.cs-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.cs-row input[type=text]{flex:1;min-width:0}.cs-row input[type=number]{width:150px;font-size:20px}.cs-row select{width:auto;font-size:15px;padding:6px 8px}
+.cs-item .chip.mini,.chip.mini{padding:4px 10px;font-size:13px}.cs-del{margin-left:auto;background:none;border:0;color:var(--muted);font:600 13px var(--font-body);cursor:pointer;padding:6px}
+.cs-pers .chip .x{margin-left:6px;opacity:.6}
+.cs-thumbs{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}.cs-thumbs figure{margin:0;position:relative}.cs-thumbs img{width:64px;height:64px;object-fit:cover;border-radius:8px;border:1px solid var(--line)}.cs-thumbs button{position:absolute;top:-6px;right:-6px;width:22px;height:22px;border-radius:50%;border:0;background:var(--ink);color:var(--surface);font-size:13px;line-height:22px;padding:0;cursor:pointer}
+.cs-sum{display:grid;gap:4px;margin:4px 0 12px}.cs-sum div{display:flex;justify-content:space-between;font-variant-numeric:tabular-nums}.cs-sum .p{font-weight:600}
+.cs-tx{list-style:none;margin:0;padding:0;display:grid;gap:8px}.cs-tx li{display:flex;justify-content:space-between;align-items:center;background:var(--chip);border-radius:12px;padding:10px 14px;font-weight:600}.cs-tx b{font-size:18px;font-variant-numeric:tabular-nums}
+.cs-share{margin:4px 0 12px}
+.wx-head{display:flex;justify-content:space-between;align-items:center;gap:8px}.wx-head h2{margin:0}.wx-head .btn{min-height:34px;padding:4px 12px;font-size:13px}
+.wx-sum{margin:10px 0 8px;font-weight:600}.wx-sum.rain{color:#1f5fa8}
+.wx-hrs{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(58px,1fr);gap:6px;overflow-x:auto;padding-bottom:4px}
+.wx-h{background:var(--chip);border-radius:12px;padding:8px 4px;text-align:center;display:grid;gap:2px;font-variant-numeric:tabular-nums}
+.wx-h.tee{outline:2px solid var(--fairway)}.wx-h small{font-size:12px;color:var(--muted)}.wx-h .ic{font-size:22px;line-height:1.2}.wx-h b{font-size:16px}.wx-h .rp{font-size:12px;color:#1f5fa8;font-weight:600}.wx-h .wd{font-size:12px}
+.wx-src{margin-top:8px}
 .more-rules{margin:8px 0 2px}.more-rules>summary{cursor:pointer;list-style:none;display:block;padding:12px 14px;border:1.5px solid var(--ink,#1d2a22);border-radius:14px;background:var(--surface,#fff)}.more-rules>summary::-webkit-details-marker{display:none}.more-rules .mr-top{display:flex;justify-content:space-between;align-items:center;gap:8px}.more-rules .mr-act::after{content:"펼치기 ▾";font-size:13px;font-weight:700;padding:3px 10px;border-radius:999px;background:var(--chip,#e6ece8)}.more-rules[open] .mr-act::after{content:"접기 ▴"}.more-rules[open]>summary{margin-bottom:10px}.more-rules>summary .note{display:block;margin-top:4px}.hd-detail{margin-top:6px}.hd-detail>summary{cursor:pointer;font-size:13px;font-weight:700;padding:6px 0}.hd-avg{display:grid;gap:8px;margin:6px 0}.hd-arow{display:grid;grid-template-columns:72px 1fr;align-items:center;gap:10px}.hd-arow span{font-weight:700}.hd-arow input{max-width:140px}.settle.sh-list li{grid-template-columns:1fr auto auto;align-items:center}.settle.sh-list .amt{font-size:18px}.settle.sh-list .chip{min-height:32px;padding:2px 12px}
 .sc-wrap{overflow-x:auto;margin-inline:-4px;padding-inline:4px}
 table.sc{border-collapse:collapse;font-variant-numeric:tabular-nums;font-size:14px;min-width:100%}
@@ -487,9 +503,10 @@ details.yd-card:not([open]) .yd-sum{margin-bottom:0}
   <div class="tabs">
     <div class="brand"><b>슬기로운골프생활<span class="beta">시험판</span></b><span class="tag">가입 없이 · 돈은 계산만</span></div>
     <div class="seg" id="segRound" role="tablist" aria-label="라운드 화면">
-      <button type="button" role="tab" id="tab-plan" data-tab="plan">다음 라운드</button>
+      <button type="button" role="tab" id="tab-plan" data-tab="plan">정보</button>
       <button type="button" role="tab" id="tab-go" data-tab="go">가는 길</button>
-      <button type="button" role="tab" id="tab-score" data-tab="score">스코어·정산</button>
+      <button type="button" role="tab" id="tab-score" data-tab="score">스코어·내기</button>
+      <button type="button" role="tab" id="tab-cost" data-tab="cost">비용</button>
     </div>
   </div>
 
@@ -557,6 +574,12 @@ details.yd-card:not([open]) .yd-sum{margin-bottom:0}
         <span class="note" id="bkNote">예약 알림톡이나 라운드정보 화면을 캡처해 올리고, 예약 정보 부분만 골라 보내면 골프장·날짜·티오프를 채워요. 고른 부분만 보내고 저장하지 않아요. <a href="privacy.html#privacy" target="_blank" rel="noopener">개인정보 처리방침</a></span></div>
     </div>
 
+    <section class="card wx" id="wxCard" hidden aria-live="polite">
+      <div class="wx-head"><h2>골프장 날씨</h2><button type="button" class="btn btn-plain" data-act="wxRefresh">지금 다시 받기</button></div>
+      <div id="wxBody"></div>
+      <p class="note wx-src" id="wxSrc"></p>
+    </section>
+
     <div class="card">
       <h2>같이 치는 사람</h2>
       <div class="names" id="names"></div>
@@ -570,37 +593,11 @@ details.yd-card:not([open]) .yd-sum{margin-bottom:0}
     </div>
 
     <div class="card">
-      <h2>내기 게임</h2>
-      <div class="games" id="games"></div>
-      <div id="betBox" class="q" hidden>
-        <div class="gdesc" id="gdesc"></div>
-        <div id="amtBox" class="q"></div>
-        <details class="more-rules" id="moreRules"><summary><span class="mr-top"><b>규칙 더 정하기</b><span class="mr-act"></span></span><span class="note" id="moreSum"></span></summary>
-        <div class="q" id="skipRow"><span class="ql">첫 홀 · 마지막 홀</span><div class="quick" id="skipChips"></div><p class="note" id="skipNote">기본은 모든 홀 내기해요. 안 함을 고른 홀은 스코어만 적어요.</p></div>
-        <div id="hdBox" class="q"></div>
-        <div id="tadOpts" class="q">
-          <div class="q"><span class="ql">배판 조건</span><div class="quick" id="bpChips"></div><p class="note">눌러서 켜고 끌 수 있어요.</p></div>
-          <div class="q" id="bpWhenRow"><span class="ql">배판 방식</span><div class="quick" data-g="bpWhen"></div><div class="quick" data-g="stack" style="margin-top:8px"></div><p class="note" id="bpWhenNote"></p></div>
-          <div class="q"><span class="ql">버디·이글·홀인원 보너스</span><div class="bonus"><div class="bnrow"><b>버디</b><div class="quick" id="bm-birdie"></div><div class="bnval" id="bvw-birdie"><input type="number" id="bv-birdie" data-bv="birdie" inputmode="numeric" min="0" step="1" aria-label="버디 값"><span id="bu-birdie"></span></div></div><div class="bnrow"><b>퍼트 이글</b><div class="quick" id="bm-putt"></div><div class="bnval" id="bvw-putt"><input type="number" id="bv-putt" data-bv="putt" inputmode="numeric" min="0" step="1" aria-label="퍼트 이글 값"><span id="bu-putt"></span></div></div><div class="bnrow"><b>샷 이글</b><div class="quick" id="bm-shot"></div><div class="bnval" id="bvw-shot"><input type="number" id="bv-shot" data-bv="shot" inputmode="numeric" min="0" step="1" aria-label="샷 이글 값"><span id="bu-shot"></span></div></div><div class="bnrow"><b>홀인원</b><div class="quick" id="bm-hio"></div><div class="bnval" id="bvw-hio"><input type="number" id="bv-hio" data-bv="hio" inputmode="numeric" min="0" step="1" aria-label="홀인원 값"><span id="bu-hio"></span></div></div></div><p class="note">타 더: 그 사람과 비교할 때 타당 몇 개 더 · 금액: 나머지 각자에게서 받기. 둘 다 보너스면 차이만큼만.</p></div>
-          <div class="q" id="tnRow"><span class="ql">파3 니어</span><div class="quick" id="tnChips"></div><div class="hd-avg" id="tnCashRow" hidden><div class="hd-arow"><span>벌금</span><input type="number" id="tnCash" data-tnv="tnCash" inputmode="numeric" min="0" step="1000" aria-label="니어 못 한 사람 벌금"></div></div><div class="hd-avg" id="tnPotRow" hidden><div class="hd-arow"><span>걷는 돈 (1인)</span><input type="number" id="tnPot" data-tnv="tnPot" inputmode="numeric" min="0" step="10000" aria-label="니어 판돈 1인"></div><div class="hd-arow"><span>니어 상금</span><input type="number" id="tnPrize" data-tnv="tnPrize" inputmode="numeric" min="0" step="1000" aria-label="파3 하나 니어 상금"></div></div><p class="note" id="tnNote"></p></div>
-        </div>
-        </details>
-        <div id="hpOpts" class="q" hidden><span class="ql">홀마다 가져가는 돈</span><div class="quick" data-g="hpMode"></div></div>
-        <div id="nearOpts" class="q" hidden><span class="ql">파3 니어가 없으면</span><div class="quick" data-g="nearMode"></div><span class="note" id="nearInfo"></span></div>
-        <div id="drawOpts" class="q" hidden><span class="ql">뽑기 방법</span><div class="quick" data-g="drawMode"></div><p class="note" id="drawNote"></p></div>
-        <div id="vtOpts" class="q" hidden><span class="ql">비기면</span><div class="quick" data-g="vtie"></div><p class="note" id="vtNote"></p></div>
-        <div id="jkOpts" class="q" hidden><span class="ql">조커 뽑은 사람 타수</span><div class="quick" data-g="joker"></div><p class="note" id="jkNote"></p></div>
-        <div id="hzOpts" class="q" hidden><span class="ql">돈 방식</span><div class="quick" data-g="hzMode"></div><p class="note" id="hzNote"></p><span class="ql">후세인 정하기</span><div class="quick" data-g="hrank"></div><p class="note" id="hrNote"></p></div>
-        <label class="agree"><input type="checkbox" id="age19"><span>내기하는 사람은 모두 19세 이상이고, 위 규칙에 모두 동의했어요</span></label>
-      </div>
-    </div>
-
-    <div class="card">
       <h2>이번 라운드</h2>
       <ul class="recap" id="recap"></ul>
       <div class="go">
         <button type="button" class="g1" data-tab="go"><small>가는 길</small><b id="goDepart">--:--</b><span>출발 · 자세히 보기</span></button>
-        <button type="button" class="g2" data-tab="score"><small>스코어·정산</small><b id="goScore">시작 전</b><span>타수 적기</span></button>
+        <button type="button" class="g2" data-tab="score"><small>스코어·내기</small><b id="goScore">시작 전</b><span>타수 적기</span></button>
       </div>
     </div>
   </section>
@@ -638,8 +635,36 @@ details.yd-card:not([open]) .yd-sum{margin-bottom:0}
     </details>
   </section>
 
-  <!-- ===================== 스코어·정산 ===================== -->
+  <!-- ===================== 스코어·내기 ===================== -->
   <section id="view-score" role="tabpanel" aria-labelledby="tab-score" class="wrap" hidden>
+    <details class="card bet-card" id="betCard">
+      <summary class="bc-sum"><span class="mr-top"><b>내기 규칙</b><span class="mr-act"></span></span><span class="note" id="betSum"></span></summary>
+      <div class="bc-body">
+      <div class="games" id="games"></div>
+      <div id="betBox" class="q" hidden>
+        <div class="gdesc" id="gdesc"></div>
+        <div id="amtBox" class="q"></div>
+        <details class="more-rules" id="moreRules"><summary><span class="mr-top"><b>규칙 더 정하기</b><span class="mr-act"></span></span><span class="note" id="moreSum"></span></summary>
+        <div class="q" id="skipRow"><span class="ql">첫 홀 · 마지막 홀</span><div class="quick" id="skipChips"></div><p class="note" id="skipNote">기본은 모든 홀 내기해요. 안 함을 고른 홀은 스코어만 적어요.</p></div>
+        <div id="hdBox" class="q"></div>
+        <div id="tadOpts" class="q">
+          <div class="q"><span class="ql">배판 조건</span><div class="quick" id="bpChips"></div><p class="note">눌러서 켜고 끌 수 있어요.</p></div>
+          <div class="q" id="bpWhenRow"><span class="ql">배판 방식</span><div class="quick" data-g="bpWhen"></div><div class="quick" data-g="stack" style="margin-top:8px"></div><p class="note" id="bpWhenNote"></p></div>
+          <div class="q"><span class="ql">버디·이글·홀인원 보너스</span><div class="bonus"><div class="bnrow"><b>버디</b><div class="quick" id="bm-birdie"></div><div class="bnval" id="bvw-birdie"><input type="number" id="bv-birdie" data-bv="birdie" inputmode="numeric" min="0" step="1" aria-label="버디 값"><span id="bu-birdie"></span></div></div><div class="bnrow"><b>퍼트 이글</b><div class="quick" id="bm-putt"></div><div class="bnval" id="bvw-putt"><input type="number" id="bv-putt" data-bv="putt" inputmode="numeric" min="0" step="1" aria-label="퍼트 이글 값"><span id="bu-putt"></span></div></div><div class="bnrow"><b>샷 이글</b><div class="quick" id="bm-shot"></div><div class="bnval" id="bvw-shot"><input type="number" id="bv-shot" data-bv="shot" inputmode="numeric" min="0" step="1" aria-label="샷 이글 값"><span id="bu-shot"></span></div></div><div class="bnrow"><b>홀인원</b><div class="quick" id="bm-hio"></div><div class="bnval" id="bvw-hio"><input type="number" id="bv-hio" data-bv="hio" inputmode="numeric" min="0" step="1" aria-label="홀인원 값"><span id="bu-hio"></span></div></div></div><p class="note">타 더: 그 사람과 비교할 때 타당 몇 개 더 · 금액: 나머지 각자에게서 받기. 둘 다 보너스면 차이만큼만.</p></div>
+          <div class="q" id="tnRow"><span class="ql">파3 니어</span><div class="quick" id="tnChips"></div><div class="hd-avg" id="tnCashRow" hidden><div class="hd-arow"><span>벌금</span><input type="number" id="tnCash" data-tnv="tnCash" inputmode="numeric" min="0" step="1000" aria-label="니어 못 한 사람 벌금"></div></div><div class="hd-avg" id="tnPotRow" hidden><div class="hd-arow"><span>걷는 돈 (1인)</span><input type="number" id="tnPot" data-tnv="tnPot" inputmode="numeric" min="0" step="10000" aria-label="니어 판돈 1인"></div><div class="hd-arow"><span>니어 상금</span><input type="number" id="tnPrize" data-tnv="tnPrize" inputmode="numeric" min="0" step="1000" aria-label="파3 하나 니어 상금"></div></div><p class="note" id="tnNote"></p></div>
+        </div>
+        </details>
+        <div id="hpOpts" class="q" hidden><span class="ql">홀마다 가져가는 돈</span><div class="quick" data-g="hpMode"></div></div>
+        <div id="nearOpts" class="q" hidden><span class="ql">파3 니어가 없으면</span><div class="quick" data-g="nearMode"></div><span class="note" id="nearInfo"></span></div>
+        <div id="drawOpts" class="q" hidden><span class="ql">뽑기 방법</span><div class="quick" data-g="drawMode"></div><p class="note" id="drawNote"></p></div>
+        <div id="vtOpts" class="q" hidden><span class="ql">비기면</span><div class="quick" data-g="vtie"></div><p class="note" id="vtNote"></p></div>
+        <div id="jkOpts" class="q" hidden><span class="ql">조커 뽑은 사람 타수</span><div class="quick" data-g="joker"></div><p class="note" id="jkNote"></p></div>
+        <div id="hzOpts" class="q" hidden><span class="ql">돈 방식</span><div class="quick" data-g="hzMode"></div><p class="note" id="hzNote"></p><span class="ql">후세인 정하기</span><div class="quick" data-g="hrank"></div><p class="note" id="hrNote"></p></div>
+        <label class="agree"><input type="checkbox" id="age19"><span>내기하는 사람은 모두 19세 이상이고, 위 규칙에 모두 동의했어요</span></label>
+      </div>
+      </div>
+    </details>
+
     <section class="card" aria-label="지금 홀">
       <div class="holehead">
         <div class="holeno" id="holeNo">1</div>
@@ -661,7 +686,7 @@ details.yd-card:not([open]) .yd-sum{margin-bottom:0}
 
     <section class="card" aria-label="정산">
       <h2>정산</h2>
-      <div class="rules"><span id="ruleLine"></span><button type="button" class="btn btn-plain" data-tab="plan">규칙 바꾸기</button></div>
+      <div class="rules"><span id="ruleLine"></span><button type="button" class="btn btn-plain" data-act="openBet">규칙 바꾸기</button></div>
       <div id="settle"></div>
       <div class="share"><button class="btn btn-flag" type="button" data-act="copyScore">단톡방에 올릴 결과 복사</button></div>
       <textarea class="copybox" id="scoreCopy" readonly hidden aria-label="복사할 결과"></textarea>
@@ -677,6 +702,37 @@ details.yd-card:not([open]) .yd-sum{margin-bottom:0}
     </details>
 
     <div id="resetArea"><button class="btn btn-plain" type="button" data-act="askNew">새 라운드 시작</button></div>
+  </section>
+
+  <!-- ===================== 비용 ===================== -->
+  <section id="view-cost" role="tabpanel" aria-labelledby="tab-cost" class="wrap" hidden>
+    <h1 class="ask">비용 나누기</h1>
+    <p class="note cs-lead">그린피·카트비, 캐디피, 밥값처럼 누가 대신 낸 돈을 나눠요. 내기 돈은 여기 넣지 않고 '스코어·내기'에서 따로 계산해요.</p>
+    <section class="card">
+      <h2>누구랑 나눠요?</h2>
+      <div class="quick" id="csPeople"></div>
+      <div class="cs-add"><input type="text" id="csName" maxlength="12" placeholder="이름 추가 (예: 김프로)" aria-label="나눌 사람 이름"><button type="button" class="btn btn-plain" data-cs="addP">추가</button></div>
+      <button type="button" class="btn btn-plain cs-from" data-cs="fromRound">라운드 멤버 불러오기</button>
+    </section>
+    <section class="card">
+      <h2>쓴 돈</h2>
+      <div id="csItems"></div>
+      <button type="button" class="btn btn-flag" data-cs="addI">항목 추가</button>
+      <div class="q cs-pics"><label class="btn btn-plain" for="csPic">영수증 사진 붙이기</label><input type="file" id="csPic" accept="image/*" multiple hidden><div class="cs-thumbs" id="csThumbs"></div><p class="note">사진은 이 화면에만 잠깐 두고 보낼 때 같이 넘겨요. 저장하지 않고, 서버로도 보내지 않아요.</p></div>
+    </section>
+    <section class="card" aria-live="polite">
+      <h2>정산</h2>
+      <div class="q"><span class="ql">끝자리</span><div class="quick" id="csUnit"></div></div>
+      <div id="csResult"></div>
+    </section>
+    <section class="card">
+      <h2>받을 곳 <span class="note">(선택)</span></h2>
+      <div class="q"><label class="ql" for="csAcct">계좌</label><input type="text" id="csAcct" maxlength="60" placeholder="예: 농협 000-0000-0000-00 홍길동" autocomplete="off"></div>
+      <div class="q"><label class="ql" for="csPay">카카오페이 송금 링크</label><input type="text" id="csPay" maxlength="120" placeholder="https://qr.kakaopay.com/..." autocomplete="off" inputmode="url"><span class="note">카카오페이 앱 → 송금 → 송금코드에서 내 링크를 복사해 넣어요. 이 폰에만 저장돼요.</span></div>
+    </section>
+    <div class="share cs-share"><button type="button" class="btn btn-flag" data-cs="share">카톡·문자로 보내기</button><button type="button" class="btn btn-plain" data-cs="copy">글만 복사</button></div>
+    <textarea class="copybox" id="csCopy" readonly hidden aria-label="보낼 정산 글"></textarea>
+    <div id="csReset"><button type="button" class="btn btn-plain" data-cs="askClear">비용 다 지우기</button></div>
   </section>
 
   <!-- ===================== 골프 유형 검사 ===================== -->
@@ -1038,6 +1094,8 @@ window.AGE18={k:"wise_age18_v1",
   /* ---------- 실제 길찾기 (와이즈골프 길찾기 서버 — 카카오) ---------- */
   var ROUTE_API="https://script.google.com/macros/s/AKfycbynPjX0ft1Slv6V0uU8bbadrZf7wyagt1nJFyPVUA6kJpsOmmFWg_-UmZPdl-1ZtNFI/exec"; /* 길찾기 서버 (와이즈쿼드·규칙 질문 서버와 별개) */
   var rtRes=null,rtBusy="",rtMsg="";
+  var WX_API="https://script.google.com/macros/s/AKfycbyaINwoYyw3b4QxHI-v1W0CLm0J-D73bDy3HlWVtBhN151aotwXUyw2IXzgxRnRMpOo/exec"; /* 날씨 서버 (기상청 동네예보) — 배포 후 주소 */
+  function wapi(b){return fetch(WX_API,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(b)}).then(function(r){return r.json();}).catch(function(){return {ok:false,error:"NETWORK"};});}
   function rapi(b){return fetch(ROUTE_API,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(b)}).then(function(r){return r.json();}).catch(function(){return {ok:false,error:"NETWORK"};});}
   function rpt(p){return p&&isFinite(+p.x)&&isFinite(+p.y)?{x:+p.x,y:+p.y}:null;}
   function seqItems(){
@@ -1594,9 +1652,52 @@ window.AGE18={k:"wise_age18_v1",
       changed();toast(got.length?"채웠어요: "+got.join("·")+". 맞는지 한번 확인해 주세요.":"예약 내용을 찾지 못했어요.");});
   }
   document.addEventListener("change",function(e){if(e.target&&e.target.id==="bkImg"){var f=e.target.files&&e.target.files[0];e.target.value="";if(f)bcOpen(f);}});
+  /* ---------- 골프장 날씨 (기상청 동네예보) ---------- */
+  var WX={key:"",at:0,data:null,busy:false,err:""};
+  function wxDays(){if(!S.date)return null;var d=new Date(S.date+"T00:00:00"),t=new Date();t.setHours(0,0,0,0);return Math.round((d-t)/86400000);}
+  function wxIcon(r){var p=+r.pty||0;if(p===1||p===5)return "🌧";if(p===2||p===6)return "🌨";if(p===3||p===7)return "❄️";if(p===4)return "🌦";var s=+r.sky;return s===1?"☀️":(s===3?"⛅":(s===4?"☁️":"·"));}
+  function wxDir(v){if(v==null||!isFinite(+v))return "";return ["북","북동","동","남동","남","남서","서","북서"][Math.round(((+v)%360)/45)%8]+"풍";}
+  function wxWind(w){w=+w;return w<4?"약한 바람":(w<9?"약간 강한 바람":(w<14?"강한 바람":"매우 강한 바람"));}
+  function wxRain(r){var v=String(r.pcp==null?"":r.pcp);return (!v||v==="강수없음"||v==="0")?"":v.replace("mm 미만","mm↓");}
+  function wxWindow(rows){
+    if(!rows||!rows.length)return [];
+    var tee=S.tee?(+S.tee.slice(0,2)):null;
+    var pick=rows.filter(function(r){var h=+r.t.slice(0,2);return tee==null?(h>=6&&h<=18&&h%2===0):(h>=tee-1&&h<=tee+5);});
+    return pick.length?pick:rows.slice(0,8);
+  }
+  function wxNeed(){var k=S.course+"|"+S.date;return k!==WX.key||Date.now()-WX.at>30*60000;}
+  function wxLoad(force){
+    if(!WX_API||WX.busy)return;var k=S.course+"|"+S.date;if(!force&&!wxNeed())return;
+    WX.busy=true;WX.err="";renderWx();
+    ensureCourse().then(function(ok){
+      if(!ok||!S.courseLoc){WX.busy=false;WX.key=k;WX.at=Date.now();WX.data=null;WX.err="PLACE";renderWx();return;}
+      return wapi({action:"weather",lat:S.courseLoc.y,lon:S.courseLoc.x,date:S.date}).then(function(r){WX.busy=false;WX.key=k;WX.at=Date.now();if(r&&r.ok){WX.data=r;WX.err="";}else{WX.data=null;WX.err=(r&&r.error)||"ERR";}renderWx();});
+    });
+  }
+  function renderWx(){
+    var c=$("wxCard");if(!c)return;
+    var dd=wxDays(),show=!!(WX_API&&String(S.course||"").trim()&&S.date&&!S.sample&&dd!=null&&dd>=0);
+    c.hidden=!show;if(!show)return;
+    var b=$("wxBody"),src=$("wxSrc"),where=S.courseLoc&&S.courseLoc.for===S.course?(S.courseLoc.addr||S.courseLoc.name||S.course):S.course;
+    src.textContent="출처: 기상청 동네예보 (5km 칸) · "+where;
+    if(dd>3){b.innerHTML='<p class="note">골프장 날씨는 라운드 3일 전부터 나와요. (D-'+dd+')</p>';return;}
+    if(WX.busy&&!WX.data){b.innerHTML='<p class="note">날씨를 받는 중이에요…</p>';return;}
+    if(WX.err==="PLACE"){b.innerHTML='<p class="note">골프장 위치를 찾지 못했어요. 골프장 이름을 목록에서 골라 주세요.</p>';return;}
+    if(WX.err){b.innerHTML='<p class="note">날씨를 받지 못했어요. 잠시 뒤 \'지금 다시 받기\'를 눌러 주세요.</p>';return;}
+    if(!WX.data){b.innerHTML='';return;}
+    var rows=(WX.data.rows||[]).filter(function(r){return r.d===S.date.replace(/-/g,"");}),w=wxWindow(rows);
+    if(!w.length){b.innerHTML='<p class="note">이 날짜 예보가 아직 없어요. 조금 뒤에 다시 받아 보세요.</p>';return;}
+    var tee=S.tee?(+S.tee.slice(0,2)):null,maxPop=0,rain=false,maxW=0;
+    w.forEach(function(r){if(+r.pop>maxPop)maxPop=+r.pop;if((+r.pty||0)>0||wxRain(r))rain=true;if(+r.wsd>maxW)maxW=+r.wsd;});
+    var sum=(tee!=null?"라운드 시간대 ":"낮 동안 ")+"비 확률 최대 "+maxPop+"%"+(rain?" · 비 소식 있어요":"")+" · 바람 최대 "+Math.round(maxW*10)/10+"m/s ("+wxWind(maxW)+")";
+    b.innerHTML='<p class="wx-sum'+(rain||maxPop>=60?' rain':'')+'">'+esc(sum)+'</p><div class="wx-hrs">'+w.map(function(r){var h=+r.t.slice(0,2),rn=wxRain(r);
+      return '<div class="wx-h'+(tee!=null&&h===tee?' tee':'')+'"><small>'+h+'시'+(tee!=null&&h===tee?' 티오프':'')+'</small><span class="ic" aria-hidden="true">'+wxIcon(r)+'</span><b>'+(r.tmp==null?'-':Math.round(+r.tmp))+'°</b><span class="rp">'+(r.pop==null?'':r.pop+'%')+(rn?' '+esc(rn):'')+'</span><span class="wd">'+esc(wxDir(r.vec))+' '+(r.wsd==null?'':Math.round(+r.wsd*10)/10+'m/s')+'</span></div>';}).join("")+'</div>'+
+      (WX.data.issued?'<p class="note">'+WX.data.issued.slice(4,6)+'/'+WX.data.issued.slice(6,8)+' '+WX.data.issued.slice(9,11)+'시 발표'+(WX.data.ultra?' · 6시간 안은 '+WX.data.ultra.slice(9,11)+':'+WX.data.ultra.slice(11,13)+' 발표 초단기 예보':'')+'</p>':'');
+  }
   function renderPlan(){
     function keep(id,v){if(document.activeElement!==$(id))$(id).value=v;}
     keep("course",S.courseId==null?(S.course||""):"");keep("date",S.date||"");keep("tee",S.tee||"");renderPicker();
+    renderWx();if(S.tab==="plan"&&$("wxCard")&&!$("wxCard").hidden&&wxDays()<=3&&wxNeed())wxLoad(false);
     var nm=$("names");
     if(!nm.children.length)nm.innerHTML=[0,1,2,3].map(function(i){return '<input type="text" id="pn'+i+'" data-pn="'+i+'" aria-label="'+(i+1)+'번째 사람" placeholder="'+(i===0?"나":(i===1?"동반자 이름":"비우면 빠짐"))+'">';}).join("");
     [0,1,2,3].forEach(function(i){keep("pn"+i,S.players[i]||"");});
@@ -1690,7 +1791,7 @@ window.AGE18={k:"wise_age18_v1",
     var po=S.pickOrder,poOk=po&&p.pk.length>=2&&po.sig===orderSig(p.pk);
     $("pickups").innerHTML=(poOk?'<p class="note">태우는 순서: <b>'+esc(p.pk.map(function(x){return nameOf(x.i);}).join(" → "))+'</b> (실제 길로 모든 순서를 계산해 가장 빠른 순서'+(po.given!=null&&po.given>po.min?' · 고른 순서보다 '+(po.given-po.min)+'분 빨라요':'')+')</p>':(p.pk.length>=2?'<p class="note">모두 \'찾기\'로 찾으면 태우는 순서를 가장 빠르게 정해요.</p>':''))+(p.pk.length?p.pk.map(function(x){
       return '<div class="pk"><b>'+esc(nameOf(x.i))+'</b><div class="rt-row"><input type="text" data-place="'+x.i+'" id="place'+x.i+'" placeholder="만날 곳 (아파트 정문 등)" value="'+esc(x.place)+'"><button type="button" class="btn btn-plain" data-pfind="'+x.i+'">찾기</button></div>'+((S.pick[x.i]||{}).pt?'<span class="rt-ok">위치 찾음 <small>'+esc(S.pick[x.i].pt.addr||"")+'</small></span>':'')+(rtBusy==="pick:"+x.i||(rtRes&&rtRes.target==="pick:"+x.i)?rtList("pick:"+x.i):'')+'<span class="note">'+((S.pick[x.i]||{}).pt?'실제 길로 계산돼요 · 백 싣기 3분은 자동':'\'찾기\'로 만날 곳을 찾아야 시간이 계산돼요')+'</span></div>';
-    }).join("")+(p.pk.length>=3?'<p class="note">4명이 한 차면 골프백 4개가 트렁크에 다 안 들어갈 수 있어요.</p>':''):'<p class="note">"다음 라운드"에서 태울 사람을 고르세요.</p>');
+    }).join("")+(p.pk.length>=3?'<p class="note">4명이 한 차면 골프백 4개가 트렁크에 다 안 들어갈 수 있어요.</p>':''):'<p class="note">"정보"에서 태울 사람을 고르세요.</p>');
     var fa=document.activeElement,typing=fa&&fa.id&&fa.id.indexOf("stayIn-")===0;
     if(!typing)$("stops").innerHTML=STOPS.map(function(d){var st=S.stops[d.id];return '<div class="item"><input type="checkbox" id="st-'+d.id+'" data-stop="'+d.id+'"'+(st.on?" checked":"")+'><label class="nm" for="st-'+d.id+'">'+d.name+'<span>'+(d.sub?d.sub+" · ":"")+stayOf(d)+'분'+(st.rest?' (직접 입력)':'')+'</span></label><select data-where="'+d.id+'" aria-label="'+d.name+' 위치"'+(st.on?"":" disabled")+'>'+(d.id==="meal"?[["inside","골프장 안"],["course","골프장 근처 맛집"]]:[["home","출발지 근처"],["course","골프장 근처"]]).map(function(o){return '<option value="'+o[0]+'"'+(st.where===o[0]?" selected":"")+'>'+o[1]+'</option>';}).join("")+'</select>'+(st.on?'<div class="quick" style="grid-column:1/-1"><button type="button" class="chip" data-stayk="'+d.id+':go" aria-pressed="'+!st.rest+'">용무만 '+d.stay+'분</button><button type="button" class="chip" data-stayk="'+d.id+':rest" aria-pressed="'+!!st.rest+'">직접 입력</button>'+(st.rest?'<span class="hd-arow" style="margin:0"><span>몇 분</span><input type="number" id="stayIn-'+d.id+'" data-stayin="'+d.id+'" inputmode="numeric" min="0" max="180" step="5" placeholder="분" value="'+(st.restMin!=null&&st.restMin!==""?esc(String(st.restMin)):"")+'" aria-label="'+d.name+' 머무는 시간 분"></span>':'')+'</div>':'')+(st.on&&d.id!=="meal"||st.on&&d.id==="meal"&&st.where!=="inside"?'<div style="grid-column:1/-1;display:flex;flex-direction:column;gap:6px">'+(st.pt?'<span class="rt-ok">'+esc(st.pt.name)+' <small>'+esc(st.pt.addr||"")+'</small></span>':'')+'<button type="button" class="btn btn-plain" data-sfind="'+d.id+'" style="align-self:flex-start">'+(st.pt?'다른 가게 고르기':'가는 길 가게 고르기')+'</button>'+(rtBusy==="stop:"+d.id||(rtRes&&rtRes.target==="stop:"+d.id)?rtList("stop:"+d.id):'')+'</div>':'')+'</div>';}).join("");
   }
@@ -1703,9 +1804,10 @@ window.AGE18={k:"wise_age18_v1",
     return L.join("\n");
   }
 
-  /* ---------- 그리기: 스코어·정산 ---------- */
+  /* ---------- 그리기: 스코어·내기 ---------- */
   function term(d,par,v){if(v===1)return "홀인원";if(v>=par*2)return "양파";var t={"-3":"알바트로스","-2":"이글","-1":"버디","0":"파","1":"보기","2":"더블 보기","3":"트리플 보기"};return t[String(d)]||("+"+d);}
   function renderScore(){
+    var bs=$("betSum");if(bs)bs.textContent=S.bet.on?ruleText()+(betReady()?"":" · 아직 시작 전 (금액·19세 동의 확인)"):"내기 안 함 · 눌러서 정해요";
     var h=S.hole,par=S.par[h];
     $("holeNo").innerHTML=(h+1)+'<small>번 홀 · 파 '+par+'</small>';
     $("prevH").disabled=h===0;$("nextH").disabled=h===17;
@@ -1728,7 +1830,7 @@ window.AGE18={k:"wise_age18_v1",
     var hs=$("holeSettle"),G=gameOf(S.bet.game);
     if(!S.bet.on){hs.innerHTML="";}
     else if(G.ready===false){hs.innerHTML='<p class="note">'+G.name+' 규칙을 받는 중이에요.</p>';}
-    else if(!betReady()){hs.innerHTML='<p class="note">"다음 라운드"에서 금액'+(G.id==="jopok"?"·판돈":"")+'과 19세·동의를 넣으면 홀마다 '+G.name+' 결과가 여기 떠요.</p>';}
+    else if(!betReady()){hs.innerHTML='<p class="note">위 “내기 규칙”에서 금액'+(G.id==="jopok"?"·판돈":"")+'과 19세·동의를 넣으면 홀마다 '+G.name+' 결과가 여기 떠요.</p>';}
     else{var rr=calc();
       if(rr.bad){hs.innerHTML='<p class="note">'+esc(rr.bad)+'</p>';}
       else{var ctl="",a4=rr.act;
@@ -1772,8 +1874,8 @@ window.AGE18={k:"wise_age18_v1",
     var out=$("settle");
     if(!S.bet.on)out.innerHTML='<p class="note">내기를 안 하는 라운드예요. 스코어만 공유돼요.</p>';
     else if(G.ready===false)out.innerHTML='<p class="note">'+G.name+' 규칙을 받는 중이에요.</p>';
-    else if(!S.age19)out.innerHTML='<p class="note">"다음 라운드"에서 19세·규칙 동의를 체크하면 정산이 나와요.</p>';
-    else if(!betReady())out.innerHTML='<p class="note">"다음 라운드"에서 금액'+(G.id==="jopok"?"과 판돈":"")+'을 넣으면 정산이 나와요.</p>';
+    else if(!S.age19)out.innerHTML='<p class="note">위 “내기 규칙”에서 19세·규칙 동의를 체크하면 정산이 나와요.</p>';
+    else if(!betReady())out.innerHTML='<p class="note">위 “내기 규칙”에서 금액'+(G.id==="jopok"?"과 판돈":"")+'을 넣으면 정산이 나와요.</p>';
     else{var r=calc();
       if(r.bad)out.innerHTML='<p class="note">'+esc(r.bad)+'</p>';
       else if(!r.played)out.innerHTML='<p class="note">모두의 타수가 들어간 홀부터 정산해요.</p>';
@@ -1796,10 +1898,13 @@ window.AGE18={k:"wise_age18_v1",
   /* ---------- 탭 ---------- */
   function showTab(t){
     S.tab=t;save();
-    ["home","plan","go","score","type","gpas","gcas","gsas","guide"].forEach(function(x){$("view-"+x).hidden=x!==t;var tb=$("tab-"+x);if(tb)tb.setAttribute("aria-selected",String(x===t));});
-    var inRound=t==="plan"||t==="go"||t==="score";$("segRound").hidden=!inRound;$("sampleBar").hidden=!(inRound&&S.sample);
+    ["home","plan","go","score","cost","type","gpas","gcas","gsas","guide"].forEach(function(x){$("view-"+x).hidden=x!==t;var tb=$("tab-"+x);if(tb)tb.setAttribute("aria-selected",String(x===t));});
+    var inRound=t==="plan"||t==="go"||t==="score"||t==="cost";$("segRound").hidden=!inRound;$("sampleBar").hidden=!(inRound&&S.sample);
     [["nav-home",t==="home"],["nav-round",inRound],["nav-guide",t==="guide"],["nav-diag",t==="type"||t==="gpas"||t==="gcas"||t==="gsas"]].forEach(function(n){var el=$(n[0]);if(n[1])el.setAttribute("aria-current","page");else el.removeAttribute("aria-current");});
     if(t==="home")renderHome();
+    if(t==="plan"){renderWx();if($("wxCard")&&!$("wxCard").hidden&&wxDays()<=3&&wxNeed())wxLoad(false);}
+    if(t==="score"){var bc=$("betCard");if(bc)bc.open=!!(S.bet.on&&!betReady());}
+    if(t==="cost"&&window.COST_OPEN)window.COST_OPEN();
     if(t==="type"&&window.GRAS_OPEN)window.GRAS_OPEN();
     if(t==="gpas"&&window.GPAS_OPEN)window.GPAS_OPEN();
     if(t==="gcas"&&window.GCAS_OPEN)window.GCAS_OPEN();
@@ -1809,7 +1914,7 @@ window.AGE18={k:"wise_age18_v1",
     window.scrollTo(0,0);
   }
   function renderLevel(){var lv=getLevel();$("levelAsk").hidden=!!lv;if(!lv)$("levelChips").innerHTML=PLEVELS.map(function(l){return '<button type="button" class="chip" data-level="'+l[0]+'">'+l[1]+' <span class="note">'+l[2]+'</span></button>';}).join("");}
-  function render(){renderLevel();$("sampleBar").hidden=!(S.sample&&["plan","go","score"].indexOf(S.tab)>=0);renderPlan();renderGo();renderScore();if(S.tab==="home")renderHome();}
+  function render(){renderLevel();$("sampleBar").hidden=!(S.sample&&["plan","go","score","cost"].indexOf(S.tab)>=0);renderPlan();renderGo();renderScore();if(S.tab==="home")renderHome();}
   /* ---------- 홈 ---------- */
   function hEsc(x){return String(x==null?"":x).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];});}
   function renderHome(){
@@ -1915,6 +2020,8 @@ window.AGE18={k:"wise_age18_v1",
       case "goFrom":$("goMore").open=true;setTimeout(function(){var f=$("rtFrom");if(f){f.scrollIntoView({block:"center"});f.focus();}},50);return;
       case "copyGo":if(S.tee&&!plan().real){toast(S.move==="ride"?"태워 주는 사람이 보낸 링크의 시간을 따라요":"출발 장소를 넣고 실제 길을 먼저 계산해 주세요");return;}copy(goText(),"goCopy","문구를 복사했어요. 단톡방에 붙여넣으세요.");return;
       case "goIcs":if(!S.tee||!S.date){toast("날짜와 티오프 시간을 먼저 넣어 주세요");return;}var pi=plan();if(!pi.real){toast(S.move==="ride"?"태워 주는 사람이 보낸 링크에서 캘린더 알림을 넣어 주세요":"출발 장소를 넣고 실제 길을 먼저 계산해 주세요");return;}if(!(window.WG_ICS&&window.WG_ICS({date:S.date,wake:pi.wake,title:"골프 라운드 기상 ("+(S.course||"골프장")+" "+fmt(pi.tee)+")",desc:fmt(pi.depart)+" 출발 → "+fmt(pi.arrive)+" 도착 · "+fmt(pi.tee)+" 티오프"})))toast("캘린더 파일을 만들지 못했어요.");return;
+      case "wxRefresh":wxLoad(true);return;
+      case "openBet":(function(){var bc=$("betCard");if(bc){bc.open=true;bc.scrollIntoView({block:"start"});}})();return;
       case "copyScore":copy(scoreText(),"scoreCopy","결과를 복사했어요. 단톡방에 붙여넣으세요.");return;
       case "hdAdd":{var dr=S.bet.hdDraft||{};
         if(dr.f==null||dr.t==null){toast("주는 사람과 받는 사람을 골라 주세요.");return;}
@@ -1964,7 +2071,7 @@ window.AGE18={k:"wise_age18_v1",
   });
 
   render();
-  var h0=(location.hash||"").slice(1);window.START_TAB=h0;showTab(["home","plan","go","score","type"].indexOf(h0)>=0?h0:"home");
+  var h0=(location.hash||"").slice(1);window.START_TAB=h0;showTab(["home","plan","go","score","cost","type"].indexOf(h0)>=0?h0:"home");
   window.SHOW_TAB=showTab;  /* 진단 탭 바로가기(#gpas·#gcas·#gsas)는 맨 아래에서 — 진단 화면이 다 준비된 뒤 */
 })();
 </script>
@@ -3753,7 +3860,7 @@ window.AGE18={k:"wise_age18_v1",
 <script>
 /* ---------- 내 기록 백업: 이 폰 브라우저에 저장된 앱 기록을 파일 하나로 받기 / 불러오기 — 서버로 보내지 않는다 ---------- */
 (function(){
-  var KEYS=["golfround.v1","golfround.profile.v1","golfround.recent.v1","gpas_app_v1","gcas_app_v1","gsas_app_v1","gras_app_v1","wise_ride_v1","wise_wdt_v1","wq_device_id","wq_tempo_hist_v1","wq_swing_results_v1","wise_age18_v1"];
+  var KEYS=["golfround.v1","golfround.profile.v1","golfround.recent.v1","gpas_app_v1","gcas_app_v1","gsas_app_v1","gras_app_v1","wise_ride_v1","wise_wdt_v1","wq_device_id","wq_tempo_hist_v1","wq_swing_results_v1","wise_age18_v1","wise_cost_v1"];
   var APP="wisegolf-golf-life";
   function $(id){return document.getElementById(id);}
   function toast(msg){var t=document.querySelector(".toast");if(!t){t=document.createElement("div");t.className="toast";t.setAttribute("role","status");document.body.appendChild(t);}t.textContent=msg;t.hidden=false;clearTimeout(toast.t);toast.t=setTimeout(function(){t.hidden=true;},3000);}
@@ -3795,6 +3902,127 @@ window.AGE18={k:"wise_age18_v1",
 <script>
 /* 바로가기 주소: …/#gpas · #gcas · #gsas · #guide 로 들어오면 그 화면을 바로 엶 (예: 스윙 분석에서 'GSAS로 돌아가기') */
 (function(){var h=window.START_TAB||"";if(["gpas","gcas","gsas","guide"].indexOf(h)>=0&&window.SHOW_TAB)window.SHOW_TAB(h);})();
+</script>
+<script>
+/* ===== 비용 나누기 — 이 폰에만 저장, 서버로 보내지 않음 ===== */
+(function(){
+  var KEY="wise_cost_v1",RKEY="golfround.v1",UNITS=[[1,"1원"],[100,"100원"],[1000,"1,000원"]],WHATS=["그린피·카트비","캐디피","점심","저녁","기타"];
+  var C=load(),PICS=[];
+  function $(id){return document.getElementById(id);}
+  function blank(){return {people:[],items:[],unit:100,acct:"",pay:""};}
+  function load(){try{var o=JSON.parse(localStorage.getItem(KEY)||"null");if(o&&o.people){var b=blank();Object.keys(b).forEach(function(k){if(o[k]===undefined)o[k]=b[k];});return o;}}catch(e){}return blank();}
+  function save(){try{localStorage.setItem(KEY,JSON.stringify(C));}catch(e){}}
+  function esc(x){return String(x==null?"":x).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];});}
+  function won(n){return Math.round(n).toLocaleString("ko-KR")+"원";}
+  function toast(msg){var t=document.querySelector(".toast");if(!t){t=document.createElement("div");t.className="toast";t.setAttribute("role","status");document.body.appendChild(t);}t.textContent=msg;t.hidden=false;clearTimeout(toast.t);toast.t=setTimeout(function(){t.hidden=true;},2000);}
+  function round(){try{return JSON.parse(localStorage.getItem(RKEY)||"null");}catch(e){return null;}}
+  function roundNames(){var r=round();if(!r||!r.players||r.sample)return [];var a=[];r.players.forEach(function(n,i){n=String(n||"").trim();if(n)a.push(n);else if(i===0)a.push("나");});return a;}
+  function uid(){return Math.random().toString(36).slice(2,8);}
+  function seed(){if(!C.people.length){var rn=roundNames();C.people=rn.length?rn:["나"];}if(!C.items.length)C.items.push(newItem("그린피·카트비"));}
+  function newItem(w){return {id:uid(),what:w||"",amt:0,payer:0,share:null};} /* share=null → 전원 */
+  function sharers(it){var n=C.people.length;return it.share?it.share.filter(function(i){return i<n;}):C.people.map(function(_,i){return i;});}
+
+  /* 계산: 각자 낸 돈 - 각자 몫 = 받을(+)/낼(-) 돈 → 최소 송금 */
+  function calc(){
+    var n=C.people.length,paid=new Array(n).fill(0),owe=new Array(n).fill(0),total=0;
+    C.items.forEach(function(it){var a=+it.amt||0;if(!(a>0))return;var sh=sharers(it);if(!sh.length||it.payer>=n)return;total+=a;paid[it.payer]+=a;sh.forEach(function(i){owe[i]+=a/sh.length;});});
+    var bal=paid.map(function(p,i){return p-owe[i];});
+    var cred=[],debt=[];bal.forEach(function(b,i){if(b>0.5)cred.push({i:i,v:b});else if(b<-0.5)debt.push({i:i,v:-b});});
+    cred.sort(function(a,b){return b.v-a.v;});debt.sort(function(a,b){return b.v-a.v;});
+    var tx=[],ci=0,di=0;
+    while(ci<cred.length&&di<debt.length){var m=Math.min(cred[ci].v,debt[di].v);tx.push({f:debt[di].i,t:cred[ci].i,v:m});cred[ci].v-=m;debt[di].v-=m;if(cred[ci].v<0.5)ci++;if(debt[di].v<0.5)di++;}
+    var u=C.unit||1;tx.forEach(function(x){x.r=Math.ceil(x.v/u-1e-9)*u;});
+    return {paid:paid,owe:owe,tx:tx,total:total};
+  }
+  function render(){
+    seed();
+    $("csPeople").className="quick cs-pers";
+    $("csPeople").innerHTML=C.people.map(function(nm,i){return '<button type="button" class="chip" data-cs="delP" data-i="'+i+'" aria-label="'+esc(nm)+' 빼기">'+esc(nm)+'<span class="x" aria-hidden="true">✕</span></button>';}).join("");
+    $("csItems").innerHTML=C.items.map(function(it,k){
+      var sh=sharers(it);
+      var opts=C.people.map(function(nm,i){return '<option value="'+i+'"'+(i===it.payer?' selected':'')+'>'+esc(nm)+'</option>';}).join("");
+      return '<div class="cs-item" data-k="'+k+'">'+
+        '<div class="cs-row"><input type="text" data-csf="what" value="'+esc(it.what)+'" maxlength="16" placeholder="무엇 (예: 그린피·카트비)" aria-label="항목 이름"><button type="button" class="cs-del" data-cs="delI">지우기</button></div>'+
+        '<div class="quick">'+WHATS.map(function(w){return '<button type="button" class="chip mini" data-cs="what" data-w="'+w+'" aria-pressed="'+(it.what===w)+'">'+w+'</button>';}).join("")+'</div>'+
+        '<div class="cs-row"><input type="number" data-csf="amt" inputmode="numeric" min="0" step="1000" value="'+(it.amt||"")+'" placeholder="금액" aria-label="금액"><span>원</span><span class="note">낸 사람</span><select data-csf="payer" aria-label="낸 사람">'+opts+'</select></div>'+
+        '<div><span class="note cs-shn">'+shNote(it)+'</span><div class="quick">'+C.people.map(function(nm,i){return '<button type="button" class="chip mini" data-cs="tog" data-i="'+i+'" aria-pressed="'+(sh.indexOf(i)>=0)+'">'+esc(nm)+'</button>';}).join("")+'</div></div>'+
+      '</div>';}).join("")||'<p class="note">항목을 추가해 주세요.</p>';
+    $("csUnit").innerHTML=UNITS.map(function(u){return '<button type="button" class="chip" data-cs="unit" data-u="'+u[0]+'" aria-pressed="'+(C.unit===u[0])+'">'+u[1]+' 단위'+(u[0]>1?' 올림':'')+'</button>';}).join("");
+    renderResult();
+    $("csAcct").value=C.acct||"";$("csPay").value=C.pay||"";
+    renderThumbs();
+  }
+  function shNote(it){var sh=sharers(it);return '나눌 사람 ('+sh.length+'명'+(sh.length&&+it.amt>0?' · 1인 '+won((+it.amt)/sh.length):'')+')';}
+  function renderResult(){
+    var r=calc(),h="";
+    if(!(r.total>0)){$("csResult").innerHTML='<p class="note">금액을 넣으면 누가 누구에게 얼마 보내면 되는지 바로 나와요.</p>';return;}
+    h+='<div class="cs-sum"><div class="p"><span>합계</span><span>'+won(r.total)+'</span></div>'+C.people.map(function(nm,i){return '<div><span>'+esc(nm)+'</span><span>낸 돈 '+won(r.paid[i])+' · 몫 '+won(r.owe[i])+'</span></div>';}).join("")+'</div>';
+    h+=r.tx.length?'<ul class="cs-tx">'+r.tx.map(function(x){return '<li><span>'+esc(C.people[x.f])+' → '+esc(C.people[x.t])+'</span><b>'+won(x.r)+'</b></li>';}).join("")+'</ul>':'<p class="note">주고받을 돈이 없어요.</p>';
+    if(C.unit>1&&r.tx.some(function(x){return x.r!==Math.round(x.v);}))h+='<p class="note">'+C.unit.toLocaleString("ko-KR")+'원 단위로 올려서, 남는 몇 백 원은 받는 사람 몫이에요.</p>';
+    $("csResult").innerHTML=h;
+  }
+  function text(){
+    var r=calc(),L=[],rd=round();
+    var head="[비용 정산]";if(rd&&!rd.sample&&rd.date){var d=new Date(rd.date+"T00:00:00");if(!isNaN(d))head+=" "+(d.getMonth()+1)+"/"+d.getDate();}if(rd&&!rd.sample&&rd.course)head+=" "+rd.course;
+    L.push(head);
+    C.items.forEach(function(it){var a=+it.amt||0;if(!(a>0))return;var sh=sharers(it);L.push("· "+(it.what||"기타")+" "+won(a)+" ("+(C.people[it.payer]||"")+" 냄, "+sh.length+"명)");});
+    L.push("");
+    if(r.tx.length){L.push("보낼 돈");r.tx.forEach(function(x){L.push(C.people[x.f]+" → "+C.people[x.t]+" "+won(x.r));});}else L.push("주고받을 돈이 없어요.");
+    if(C.acct)L.push("","받는 계좌: "+C.acct);
+    if(C.pay)L.push("카카오페이: "+C.pay);
+    L.push("— 슬기로운골프생활 · WISE GOLF");
+    return L.join("\n");
+  }
+  function renderThumbs(){$("csThumbs").innerHTML=PICS.map(function(p,i){return '<figure><img src="'+p.url+'" alt="영수증 '+(i+1)+'"><button type="button" data-cs="delPic" data-i="'+i+'" aria-label="영수증 '+(i+1)+' 빼기">✕</button></figure>';}).join("");}
+  function copyText(t){var fb=$("csCopy");var fail=function(){fb.value=t;fb.hidden=false;fb.focus();fb.select();toast("아래 글을 길게 눌러 복사하세요.");};try{navigator.clipboard.writeText(t).then(function(){fb.hidden=true;toast("정산 글을 복사했어요. 단톡방에 붙여넣으세요.");},fail);}catch(e){fail();}}
+  function share(){
+    var r=calc();if(!(r.total>0)){toast("금액을 먼저 넣어 주세요.");return;}
+    var t=text(),files=PICS.map(function(p){return p.file;});
+    var data={text:t};
+    if(files.length&&navigator.canShare&&navigator.canShare({files:files}))data.files=files;
+    if(navigator.share){navigator.share(data).catch(function(e){if(e&&e.name==="AbortError")return;copyText(t);});}
+    else copyText(t);
+  }
+  function itemOf(el){var b=el.closest(".cs-item");return b?C.items[+b.getAttribute("data-k")]:null;}
+  function removePerson(i){
+    if(C.people.length<=1){toast("한 명은 남겨 두세요.");return;}
+    C.people.splice(i,1);
+    C.items.forEach(function(it){if(it.payer===i)it.payer=0;else if(it.payer>i)it.payer--;if(it.share)it.share=it.share.filter(function(x){return x!==i;}).map(function(x){return x>i?x-1:x;});});
+  }
+  document.addEventListener("click",function(e){
+    var b=e.target.closest("[data-cs]");if(!b||!$("view-cost")||!$("view-cost").contains(b))return;
+    var a=b.getAttribute("data-cs"),it=itemOf(b);
+    if(a==="addP"){var nm=$("csName").value.trim();if(!nm){toast("이름을 넣어 주세요.");return;}if(C.people.length>=30){toast("30명까지 나눌 수 있어요.");return;}C.people.push(nm);$("csName").value="";save();render();return;}
+    if(a==="delP"){removePerson(+b.getAttribute("data-i"));save();render();return;}
+    if(a==="fromRound"){var rn=roundNames();if(!rn.length){toast("불러올 라운드 멤버가 없어요.");return;}rn.forEach(function(n){if(C.people.indexOf(n)<0)C.people.push(n);});save();render();toast("라운드 멤버를 불러왔어요.");return;}
+    if(a==="addI"){C.items.push(newItem(""));save();render();return;}
+    if(a==="delI"&&it){C.items.splice(C.items.indexOf(it),1);save();render();return;}
+    if(a==="what"&&it){it.what=b.getAttribute("data-w");save();render();return;}
+    if(a==="tog"&&it){var i=+b.getAttribute("data-i"),sh=sharers(it).slice(),k=sh.indexOf(i);if(k>=0){if(sh.length<=1){toast("한 명은 나눠야 해요.");return;}sh.splice(k,1);}else sh.push(i);sh.sort(function(x,y){return x-y;});it.share=sh.length===C.people.length?null:sh;save();render();return;}
+    if(a==="unit"){C.unit=+b.getAttribute("data-u");save();render();return;}
+    if(a==="delPic"){var pi=+b.getAttribute("data-i");try{URL.revokeObjectURL(PICS[pi].url);}catch(_){ }PICS.splice(pi,1);renderThumbs();return;}
+    if(a==="share"){share();return;}
+    if(a==="copy"){var r=calc();if(!(r.total>0)){toast("금액을 먼저 넣어 주세요.");return;}copyText(text());return;}
+    if(a==="askClear"){$("csReset").innerHTML='<div class="confirm"><span>사람·항목이 모두 지워져요. 계좌와 송금 링크는 남아요.</span><button class="btn btn-plain" type="button" data-cs="clear">지우기</button><button class="btn btn-plain" type="button" data-cs="noClear">취소</button></div>';return;}
+    if(a==="noClear"||a==="clear"){if(a==="clear"){C={people:[],items:[],unit:C.unit,acct:C.acct,pay:C.pay};PICS.forEach(function(p){try{URL.revokeObjectURL(p.url);}catch(_){ }});PICS=[];save();render();toast("비용을 지웠어요.");}$("csReset").innerHTML='<button type="button" class="btn btn-plain" data-cs="askClear">비용 다 지우기</button>';return;}
+  });
+  document.addEventListener("input",function(e){
+    var el=e.target;if(!$("view-cost")||!$("view-cost").contains(el))return;
+    if(el.id==="csAcct"){C.acct=el.value.trim();save();return;}
+    if(el.id==="csPay"){C.pay=el.value.trim();save();return;}
+    var f=el.getAttribute("data-csf"),it=itemOf(el);if(!f||!it)return;
+    if(f==="what"){it.what=el.value;save();return;}
+    if(f==="amt"){it.amt=Math.max(0,Math.round(+el.value||0));save();renderResult();var nb=el.closest(".cs-item"),nt=nb&&nb.querySelector(".cs-shn");if(nt)nt.textContent=shNote(it);return;}
+  });
+  document.addEventListener("change",function(e){
+    var el=e.target;if(!$("view-cost")||!$("view-cost").contains(el))return;
+    if(el.id==="csPic"){Array.prototype.slice.call(el.files||[]).slice(0,6-PICS.length).forEach(function(f){PICS.push({file:f,url:URL.createObjectURL(f)});});el.value="";renderThumbs();return;}
+    var f=el.getAttribute("data-csf"),it=itemOf(el);if(!f||!it)return;
+    if(f==="payer"){it.payer=+el.value;save();setTimeout(render,0);return;}
+  });
+  window.COST_OPEN=function(){render();};
+  window.WG_COST={calc:calc,text:text,state:function(){return C;}}; /* 테스트용 */
+})();
 </script>
 
 </body></html>
