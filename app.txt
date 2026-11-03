@@ -707,7 +707,7 @@ details.yd-card:not([open]) .yd-sum{margin-bottom:0}
   <!-- ===================== 비용 ===================== -->
   <section id="view-cost" role="tabpanel" aria-labelledby="tab-cost" class="wrap" hidden>
     <h1 class="ask">비용 나누기</h1>
-    <p class="note cs-lead">그린피·카트비, 캐디피, 밥값처럼 누가 대신 낸 돈을 나눠요. 내기 돈은 여기 넣지 않고 '스코어·내기'에서 따로 계산해요.</p>
+    <p class="note cs-lead">그린피·카트비, 캐디피, 식사처럼 누가 대신 낸 돈을 나눠요. 내기 돈은 여기 넣지 않고 '스코어·내기'에서 따로 계산해요.</p>
     <section class="card">
       <h2>누구랑 나눠요?</h2>
       <div class="quick" id="csPeople"></div>
@@ -3908,7 +3908,7 @@ window.AGE18={k:"wise_age18_v1",
 <script>
 /* ===== 비용 나누기 — 이 폰에만 저장, 서버로 보내지 않음 ===== */
 (function(){
-  var KEY="wise_cost_v1",RKEY="golfround.v1",UNITS=[[1,"1원"],[100,"100원"],[1000,"1,000원"]],WHATS=["그린피·카트비","캐디피","점심","저녁","기타"];
+  var KEY="wise_cost_v1",RKEY="golfround.v1",UNITS=[[1,"1원"],[100,"100원"],[1000,"1,000원"]],WHATS=["그린피·카트비","캐디피","식사","기타"];
   var C=load(),PICS=[];
   function $(id){return document.getElementById(id);}
   function blank(){return {people:[],items:[],unit:100,acct:"",pay:""};}
