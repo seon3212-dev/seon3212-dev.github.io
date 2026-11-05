@@ -2023,7 +2023,7 @@ window.AGE18={k:"wise_age18_v1",
     if(t==="guide"&&window.GUIDE_OPEN)window.GUIDE_OPEN();
     if(t==="quiz"&&window.QUIZ_OPEN)window.QUIZ_OPEN();
     if(t==="shot"&&window.SHOT_OPEN)window.SHOT_OPEN();
-    try{history.replaceState(null,"","#"+t);}catch(e){}
+    try{history.replaceState(null,"","#"+(t==="shot"?"oneshot":t));}catch(e){}
     window.scrollTo(0,0);
   }
   function renderLevel(){var lv=getLevel();$("levelAsk").hidden=!!lv;if(!lv)$("levelChips").innerHTML=PLEVELS.map(function(l){return '<button type="button" class="chip" data-level="'+l[0]+'">'+l[1]+' <span class="note">'+l[2]+'</span></button>';}).join("");}
@@ -2187,7 +2187,7 @@ window.AGE18={k:"wise_age18_v1",
   });
 
   render();
-  var h0=(location.hash||"").slice(1);window.START_TAB=h0;showTab(["home","plan","go","score","cost","type","quiz","shot"].indexOf(h0)>=0?h0:"home");
+  var h0=(location.hash||"").slice(1);if(h0==="oneshot")h0="shot";window.START_TAB=h0;showTab(["home","plan","go","score","cost","type","quiz","shot"].indexOf(h0)>=0?h0:"home");
   window.SHOW_TAB=showTab;  /* 진단 탭 바로가기(#gpas·#gcas·#gsas)는 맨 아래에서 — 진단 화면이 다 준비된 뒤 */
 })();
 </script>
@@ -3969,7 +3969,7 @@ window.SHOT_GEN=(function(){
   window.QUIZ_OPEN=function(){qzRender();};
   window.SHOT_OPEN=function(){shRender();};
   /* 앱이 이 스크립트보다 먼저 첫 화면을 그리므로, 주소로 바로 들어온 경우를 여기서 채운다 */
-  var h0=(location.hash||"").slice(1);if(h0==="quiz")qzRender();if(h0==="shot")shRender();window.MG_HOME();
+  var h0=(location.hash||"").slice(1);if(h0==="quiz")qzRender();if(h0==="shot"||h0==="oneshot")shRender();window.MG_HOME();
 
   document.addEventListener("click",function(e){
     var b=e.target.closest("button");if(!b)return;var d=b.dataset;
