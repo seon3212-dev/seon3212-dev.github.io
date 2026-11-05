@@ -497,6 +497,57 @@ body{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
 .rt-st{font-size:13px;font-weight:600}
 .yd-sum{cursor:pointer;list-style:none}.yd-sum::-webkit-details-marker{display:none}
 details.yd-card:not([open]) .yd-sum{margin-bottom:0}
+/* ---------- 미니게임 (룰 챌린지 · 오늘의 한 타) ---------- */
+.qz-q,.card .qz-q{margin:0;font:700 18px/1.45 var(--font-body);color:var(--ink);letter-spacing:0;text-wrap:pretty}
+.qz-q:focus,.qz-fb b:focus,.qz-score:focus{outline:none}
+.qz-opts{display:flex;flex-direction:column;gap:8px}
+.qz-opt{appearance:none;text-align:left;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);border-radius:12px;padding:12px 14px;font:500 15px/1.45 var(--font-body);cursor:pointer;min-height:48px;display:flex;gap:10px;align-items:flex-start}
+.qz-opt .lt{font-weight:700;color:var(--muted);flex:none}
+.qz-opt .mk{margin-left:auto;flex:none;font-size:13px;font-weight:700;padding-left:6px}
+.qz-opt:disabled{cursor:default}
+.qz-opt.ok{border-color:var(--fairway);box-shadow:inset 0 0 0 1px var(--fairway)}
+.qz-opt.ok .mk{color:var(--fairway)}
+.qz-opt.no{border-color:var(--over)}
+.qz-opt.no .mk{color:var(--over)}
+.qz-fb{border-left:4px solid var(--fairway);background:var(--bg);border-radius:0 12px 12px 0;padding:10px 12px;display:flex;flex-direction:column;gap:6px}
+.qz-fb.no{border-left-color:var(--over)}
+.qz-fb.mid{border-left-color:var(--flag)}
+.qz-fb p{margin:0;font-size:14px;line-height:1.55}
+.qz-ref{color:var(--muted);font-size:12.5px!important}
+.qz-btns{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.qz-res{align-items:stretch}
+.qz-score{margin:0;font:700 40px/1.1 var(--font-display);font-variant-numeric:tabular-nums}
+.qz-dots{margin:0;font-size:20px;letter-spacing:2px}
+.qz-stat{margin:0;font-size:13.5px;color:var(--muted)}
+.qz-stat b{color:var(--ink)}
+.qz-review{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:8px;font-size:13.5px}
+.qz-review small{display:block;color:var(--muted);font-size:12.5px}
+.sh-head{display:flex;flex-direction:column;gap:6px;align-items:flex-start}
+.sh-tag{display:inline-block;font-size:11.5px;font-weight:700;padding:2px 9px;border-radius:999px;background:var(--chip);color:var(--ink);white-space:nowrap}
+.sh-tag.t-a{background:var(--over);color:#fff}
+.sh-tag.t-s{background:var(--fairway);color:#fff}
+.sh-scene{display:grid;grid-template-columns:132px 1fr;gap:14px;align-items:start}
+.sh-map svg{display:block;width:100%;height:auto}
+.sh-info{margin:0;display:flex;flex-direction:column;gap:7px;font-size:13.5px;line-height:1.4}
+.sh-info dt{color:var(--muted);font-size:12px}
+.sh-info dd{margin:0;font-weight:600}
+.sh-rough{fill:#6F9A5B}.sh-fw{fill:#93C374}.sh-green{fill:#B6E08C}.sh-water{fill:#4E9BD0}.sh-bunker{fill:#EADBA8}.sh-tree{fill:#2F5A2E}
+.sh-ob{stroke:#fff;stroke-width:1.4;stroke-dasharray:3 3}
+.sh-pole{stroke:#15302A;stroke-width:.9}.sh-flag{fill:#F2C230}.sh-cup{fill:#15302A}
+.sh-ball{fill:#fff;stroke:#15302A;stroke-width:.8}
+.sh-lb{font:700 6px var(--font-body);fill:#fff;paint-order:stroke;stroke:#15302A;stroke-width:1.4px}
+.sh-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:10px}
+.sh-list li{border:1px solid var(--line);border-radius:12px;padding:10px 12px;display:flex;flex-direction:column;gap:5px}
+.sh-list li.me{border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}
+.sh-lh{display:flex;gap:8px;align-items:flex-start;font-size:14.5px}
+.sh-lh .lt{color:var(--muted);font-weight:700}
+.sh-meta{display:flex;gap:8px;align-items:center;font-size:12.5px;color:var(--muted);flex-wrap:wrap}
+.sh-list p{margin:0;font-size:13.5px;line-height:1.5}
+.sh-list p b{font-size:12px;color:var(--muted);margin-right:4px}
+.sh-fun{margin:0;font-weight:600;font-size:14.5px}
+.mg-two{margin-top:8px}
+.ru-back{align-self:flex-start;margin-bottom:8px}
+@media (max-width:360px){.sh-scene{grid-template-columns:110px 1fr}}
 </style>
 
 <div class="wrap">
@@ -520,6 +571,14 @@ details.yd-card:not([open]) .yd-sum{margin-bottom:0}
     <div id="rideBox"></div>
     <div id="hmRound"></div>
     <div id="ydBox"></div>
+    <div class="hm-card">
+      <div class="k"><small>오늘의 미니게임</small><span class="soon">매일 바뀜</span></div>
+      <b>1분이면 끝나는 골프 게임</b>
+      <div class="hm-quad mg-two">
+        <button type="button" data-tab="quiz"><span class="nm">룰 챌린지</span><b style="font:700 13px var(--font-body)">규칙 퀴즈 풀기</b><span class="fr" id="mgQz">5문제 · 1분</span></button>
+        <button type="button" data-tab="shot"><span class="nm">오늘의 한 타</span><b style="font:700 13px var(--font-body)">공략 고르기</b><span class="fr">상황 1개 · 1분</span></button>
+      </div>
+    </div>
     <div class="hm-card">
       <div class="k"><small>이번 주 가이드</small><span class="soon">공개 예정</span></div>
       <b>레벨별 골프 가이드</b>
@@ -803,6 +862,7 @@ details.yd-card:not([open]) .yd-sum{margin-bottom:0}
     <div class="gx-head">
       <h1 id="ruTitle">골프 규칙 사전</h1>
       <p>상황을 쓰면 맞는 규칙을 찾아 줘요 · 2023년판 규칙 기준</p>
+      <button type="button" class="chip" data-tab="quiz" style="align-self:flex-start">오늘의 룰 챌린지 풀기 (5문제)</button>
     </div>
     <div class="card ru-ask">
       <label class="ql" for="ruQ">어떤 상황이에요?</label>
@@ -812,6 +872,26 @@ details.yd-card:not([open]) .yd-sum{margin-bottom:0}
     </div>
     <div id="ruOut" aria-live="polite"></div>
     <details class="card ru-all"><summary>전체 규칙 보기 (장별)</summary><div id="ruAll"></div></details>
+  </section>
+
+  <!-- ===================== 미니게임: 오늘의 골프 룰 챌린지 ===================== -->
+  <section id="view-quiz" class="wrap" hidden aria-labelledby="qzTitle">
+    <div class="gx-head">
+      <div class="gp-switch" role="group" aria-label="미니게임 고르기"><button type="button" data-tab="quiz" aria-current="true">룰 챌린지</button><button type="button" data-tab="shot">오늘의 한 타</button></div>
+      <h1 id="qzTitle">오늘의 골프 룰 챌린지</h1>
+      <p>5문제 · 보기 3개 · 1분이면 끝나요</p>
+    </div>
+    <div id="qzBox" aria-live="polite"></div>
+  </section>
+
+  <!-- ===================== 미니게임: 오늘의 한 타 ===================== -->
+  <section id="view-shot" class="wrap" hidden aria-labelledby="shTitle">
+    <div class="gx-head">
+      <div class="gp-switch" role="group" aria-label="미니게임 고르기"><button type="button" data-tab="quiz">룰 챌린지</button><button type="button" data-tab="shot" aria-current="true">오늘의 한 타</button></div>
+      <h1 id="shTitle">오늘의 한 타</h1>
+      <p>상황을 보고 공략 하나를 골라요 · 1분</p>
+    </div>
+    <div id="shBox" aria-live="polite"></div>
   </section>
 
   <p class="note">만 18세 이상만 쓸 수 있어요. 가입 없이 쓰고, 라운드·정산 기록은 이 기기 브라우저에만 남습니다. 진단(유형·신체·클럽·스윙) 결과는 슬기로운골프생활 서버에 저장되며, 1년이 지나면 누구 것인지 알 수 없는 자료로만 남깁니다. 이름·전화번호는 받지 않습니다. 규칙 사전에 쓴 질문은 풀이를 늘리려고 기기 번호 없이 서버에 모입니다. 정산은 계산만 해 주고, 돈은 주고받지 않습니다. <a href="privacy.html#privacy" target="_blank" rel="noopener">개인정보 처리방침</a> · <a href="privacy.html#terms" target="_blank" rel="noopener">이용약관</a> <button type="button" class="btn btn-plain wq-forget" data-wq="forget">서버에 저장된 내 진단·유형 검사 기록 지우기</button></p>
@@ -1900,9 +1980,9 @@ window.AGE18={k:"wise_age18_v1",
   /* ---------- 탭 ---------- */
   function showTab(t){
     S.tab=t;save();
-    ["home","plan","go","score","cost","type","gpas","gcas","gsas","guide"].forEach(function(x){$("view-"+x).hidden=x!==t;var tb=$("tab-"+x);if(tb)tb.setAttribute("aria-selected",String(x===t));});
+    ["home","plan","go","score","cost","type","gpas","gcas","gsas","guide","quiz","shot"].forEach(function(x){$("view-"+x).hidden=x!==t;var tb=$("tab-"+x);if(tb)tb.setAttribute("aria-selected",String(x===t));});
     var inRound=t==="plan"||t==="go"||t==="score"||t==="cost";$("segRound").hidden=!inRound;$("sampleBar").hidden=!(inRound&&S.sample);
-    [["nav-home",t==="home"],["nav-round",inRound],["nav-guide",t==="guide"],["nav-diag",t==="type"||t==="gpas"||t==="gcas"||t==="gsas"]].forEach(function(n){var el=$(n[0]);if(n[1])el.setAttribute("aria-current","page");else el.removeAttribute("aria-current");});
+    [["nav-home",t==="home"||t==="quiz"||t==="shot"],["nav-round",inRound],["nav-guide",t==="guide"],["nav-diag",t==="type"||t==="gpas"||t==="gcas"||t==="gsas"]].forEach(function(n){var el=$(n[0]);if(n[1])el.setAttribute("aria-current","page");else el.removeAttribute("aria-current");});
     if(t==="home")renderHome();
     if(t==="plan"){renderWx();if($("wxCard")&&!$("wxCard").hidden&&wxDays()<=3&&wxNeed())wxLoad(false);}
     if(t==="score"){var bc=$("betCard");if(bc)bc.open=!!(S.bet.on&&!betReady());}
@@ -1912,6 +1992,8 @@ window.AGE18={k:"wise_age18_v1",
     if(t==="gcas"&&window.GCAS_OPEN)window.GCAS_OPEN();
     if(t==="gsas"&&window.GSAS_OPEN)window.GSAS_OPEN();
     if(t==="guide"&&window.GUIDE_OPEN)window.GUIDE_OPEN();
+    if(t==="quiz"&&window.QUIZ_OPEN)window.QUIZ_OPEN();
+    if(t==="shot"&&window.SHOT_OPEN)window.SHOT_OPEN();
     try{history.replaceState(null,"","#"+t);}catch(e){}
     window.scrollTo(0,0);
   }
@@ -1940,6 +2022,7 @@ window.AGE18={k:"wise_age18_v1",
     var gsI=window.GSAS_HOME?window.GSAS_HOME():{text:"진단하기",sub:"스윙 진단 · 10구"};
     var gs='<button type="button" data-tab="gsas"><span class="nm">스윙 GSAS</span><b style="font:700 13px var(--font-body)">'+hEsc(gsI.text)+'</b><span class="fr">'+hEsc(gsI.sub)+'</span></button>';
     $("hmQuad").innerHTML=gr+gp+gc+gs;
+    if(window.MG_HOME)window.MG_HOME();
   }
   function changed(){S.sample=false;save();render();}
 
@@ -2073,7 +2156,7 @@ window.AGE18={k:"wise_age18_v1",
   });
 
   render();
-  var h0=(location.hash||"").slice(1);window.START_TAB=h0;showTab(["home","plan","go","score","cost","type"].indexOf(h0)>=0?h0:"home");
+  var h0=(location.hash||"").slice(1);window.START_TAB=h0;showTab(["home","plan","go","score","cost","type","quiz","shot"].indexOf(h0)>=0?h0:"home");
   window.SHOW_TAB=showTab;  /* 진단 탭 바로가기(#gpas·#gcas·#gsas)는 맨 아래에서 — 진단 화면이 다 준비된 뒤 */
 })();
 </script>
@@ -3656,12 +3739,160 @@ window.AGE18={k:"wise_age18_v1",
     renderAll();
   };
   window.GUIDE_SEARCH=search;
+  /* 미니게임에서 규칙 한 칸만 바로 보여 주기 (서버로 보내지 않음) */
+  window.GUIDE_ENTRY=function(id){return BY[id]||null;};
+  window.GUIDE_SHOW=function(id,back){
+    var out=$("ruOut"),e=BY[id];if(!out||!e)return;
+    var i=$("ruQ");if(i)i.value="";
+    out.innerHTML='<button type="button" class="btn btn-plain ru-back" data-tab="'+(back==="shot"?"shot":"quiz")+'">← '+(back==="shot"?"오늘의 한 타로":"룰 챌린지로")+' 돌아가기</button>'+card(e,null,true)+'<p class="note ru-fine">쉽게 풀어 쓴 설명이에요. 그날 골프장 로컬 룰이 먼저고, 정확한 문구는 R&amp;A 원문을 확인하세요.</p>';
+    if(out.scrollIntoView)out.scrollIntoView({block:"start"});
+  };
   document.addEventListener("click",function(e){
     var b=e.target.closest("button");if(!b)return;
     if(b.dataset.ruQ!=null){var i=$("ruQ");if(i)i.value=b.dataset.ruQ;run(b.dataset.ruQ,"chip");var o=$("ruOut");if(o&&o.scrollIntoView)o.scrollIntoView({block:"start",behavior:"smooth"});return;}
     if(b.dataset.ru==="go"){run($("ruQ").value);return;}
   });
   document.addEventListener("keydown",function(e){if(e.target&&e.target.id==="ruQ"&&e.key==="Enter"){e.preventDefault();run(e.target.value);e.target.blur();}});
+})();
+</script>
+<script type="application/json" id="qzData">[{"id":"q01","r":"r18","ref":"규칙 18.2","q":"티샷이 OB 났어요. 티에서 다시 치면 그 샷은 몇 타째예요?","o":["3타째","2타째","4타째"],"ex":"OB는 1벌타를 받고 원래 친 곳에서 다시 쳐요. 첫 티샷 1타 + 벌타 1타라서 다시 치는 샷이 3타째예요. 골프장이 OB티(특설티)나 로컬 룰 E-5를 쓰면 방법이 달라져요."},{"id":"q02","r":"r18","ref":"규칙 18.3","q":"OB 같아서 아무 말 없이 공을 하나 더 쳤어요. 그 공은 어떻게 돼요?","o":["그 공이 바로 내 공이 돼요 (원래 공은 포기)","잠정구로 인정돼요","1벌타를 더 받고 잠정구가 돼요"],"ex":"잠정구는 \"잠정구 칩니다\"라고 말하고 쳐야 해요. 말 없이 치면 그 공이 1벌타를 받은 다음 샷이 되고, 원래 공은 찾아도 못 쳐요."},{"id":"q03","r":"r7","ref":"규칙 7.1·18.2","q":"공을 찾을 수 있는 시간은 얼마예요?","o":["3분","2분","5분"],"ex":"찾기 시작해서 3분 안에 못 찾으면 분실구예요. 2019년 전에는 5분이었어요."},{"id":"q04","r":"r14","ref":"규칙 14.3b","q":"드롭은 어느 높이에서 해요?","o":["무릎 높이","어깨 높이","허리 높이"],"ex":"똑바로 섰을 때 무릎 높이에서 그냥 떨어뜨려요. 어깨 높이 드롭은 2019년 전 규칙이에요."},{"id":"q05","r":"r4","ref":"규칙 4.1b","q":"골프백에 넣고 칠 수 있는 클럽은 최대 몇 개예요?","o":["14개","13개","15개"],"ex":"14개까지예요. 넘으면 스코어 경기는 어긴 홀마다 2벌타(최대 4벌타)예요. 알게 되면 바로 빼고 알려요."},{"id":"q06","r":"r4","ref":"규칙 4.3a","q":"레이저 거리 측정기, 라운드에서 써도 돼요?","o":["돼요. 단, 고저차(슬로프) 기능은 꺼야 해요","안 돼요. 공식 규칙은 금지예요","돼요. 고저차 기능도 써도 돼요"],"ex":"거리만 재는 건 돼요. 고저차 기능은 쓰면 안 돼요. 골프장·대회가 '거리 측정기 금지(로컬 룰 G-5)'를 정한 날만 못 써요."},{"id":"q07","r":"r13","ref":"규칙 13.2a","q":"깃대를 꽂아 둔 채 퍼팅했는데 공이 깃대에 맞았어요.","o":["벌타 없어요. 멈춘 자리에서 쳐요","2벌타예요","1벌타예요"],"ex":"2019년부터 깃대를 꽂아 둔 채 퍼팅해도 되고, 맞아도 벌타가 없어요. 공이 깃대에 기대어 멈췄고 공 일부라도 컵 안 지면 아래에 있으면 들어간 걸로 봐요."},{"id":"q08","r":"r11","ref":"규칙 11.1a","q":"(스코어 경기) 내 공과 동반자 공이 둘 다 그린 위에 있었어요. 내 퍼트가 동반자 공을 맞혔어요.","o":["나에게 2벌타","벌타 없어요","동반자에게 1벌타"],"ex":"치기 전에 두 공이 다 그린 위에 있었으면 친 사람이 2벌타예요. 그래서 그린에서는 방해되는 공을 마크하고 치워 달라고 해요. 동반자 공은 원래 자리에 다시 놓아요."},{"id":"q09","r":"r13","ref":"규칙 13.3a","q":"공이 컵 가장자리에 걸려서 안 떨어져요. 얼마나 기다릴 수 있어요?","o":["컵까지 걸어가는 시간 + 10초","5초","30초"],"ex":"걸어가는 시간에 10초를 더 기다릴 수 있어요. 그 안에 떨어지면 앞 타로 들어간 거예요. 그 뒤에 떨어지면 들어간 걸로 치되 1벌타를 더해요."},{"id":"q10","r":"r16","ref":"규칙 16.1b","q":"공이 카트도로 위에 멈췄어요. 벌타 없는 구제는 어디서 받아요?","o":["방해가 없어지는 가장 가까운 곳 (러프여도)","페어웨이 쪽 좋은 곳","도로 양쪽 중 내가 고른 쪽"],"ex":"카트도로가 완전히 안 걸리는 '가장 가까운 지점'에서 클럽 1개 안에 드롭해요. 그쪽이 러프나 나무 쪽이어도 그쪽이에요. 싫으면 도로 위에서 그냥 쳐도 돼요."},{"id":"q11","r":"r17","ref":"규칙 17.1d","q":"노란 말뚝 페널티 구역(옛 해저드)에 들어갔어요. 이때 할 수 없는 건?","o":["들어간 곳 옆으로 클럽 2개 안에 드롭","원래 친 곳에서 1벌타로 다시 치기","들어간 곳과 깃대를 이은 줄 뒤쪽에 드롭"],"ex":"옆으로 클럽 2개 구제는 빨간 말뚝일 때만 돼요. 노란 말뚝은 '원래 친 곳'이나 '뒤쪽 줄' 두 가지예요. 둘 다 1벌타예요."},{"id":"q12","r":"r17","ref":"규칙 17.1d","q":"페널티 구역 구제를 받을 때 기준이 되는 곳은?","o":["공이 말뚝 선을 마지막으로 넘어간 곳","공이 물에 떨어진 곳","공이 마지막에 멈춘 곳"],"ex":"공이 떨어진 곳이 아니라 페널티 구역 경계선을 마지막으로 넘어간 곳이 기준이에요. 현장에서 제일 많이 헷갈리는 부분이에요."},{"id":"q13","r":"r17","ref":"규칙 17.1b","q":"페널티 구역 안 공을 그대로 칠 때, 클럽을 공 뒤 땅에 대도 돼요?","o":["돼요. 벌타 없어요","안 돼요. 2벌타예요","안 돼요. 1벌타예요"],"ex":"2019년부터 페널티 구역 안에서도 클럽을 땅에 대고 낙엽·돌을 치울 수 있어요. 예전 해저드 규칙과 달라요."},{"id":"q14","r":"r12","ref":"규칙 12.2b","q":"벙커에서 치기 전에 클럽을 공 바로 뒤 모래에 댔어요.","o":["2벌타 (일반 페널티)","벌타 없어요","1벌타"],"ex":"벙커에서는 치기 전에 공 바로 앞·뒤 모래에 클럽을 대면 안 돼요. 연습 스윙으로 모래를 쳐도 같아요. 스코어 경기 2벌타예요."},{"id":"q15","r":"r12","ref":"규칙 12.2a·15.1","q":"벙커 안 공 옆에 있는 나뭇잎을 치워도 돼요?","o":["돼요","안 돼요. 2벌타예요","공을 들고 치워야 해요"],"ex":"나뭇잎·돌 같은 자연물은 벙커 안에서도 치울 수 있어요. 다만 치우다가 공이 움직이면 1벌타를 받고 제자리에 놓아요."},{"id":"q16","r":"r6","ref":"규칙 6.2b","q":"티샷을 할 수 있는 '티잉 구역'은 어디까지예요?","o":["두 티 마커 선에서 뒤로 클럽 2개 길이까지","두 티 마커 선에서 앞으로 클럽 1개까지","두 티 마커 사이 선 위만"],"ex":"두 티 마커를 이은 선에서 뒤로 클럽 2개 길이까지예요. 공만 그 안에 있으면 되고, 발은 밖에 있어도 돼요."},{"id":"q17","r":"r6","ref":"규칙 6.3c","q":"(스코어 경기) 남의 공을 내 공인 줄 알고 쳤어요.","o":["2벌타. 친 타수는 빼고 내 공으로 다시","1벌타. 그 공으로 계속","벌타 없이 내 공으로 다시"],"ex":"남의 공(오구)을 치면 2벌타예요. 남의 공으로 친 타수는 세지 않고, 내 공을 찾아 다시 쳐요. 다음 홀 티샷 전까지 안 고치면 실격이에요."},{"id":"q18","r":"r6","ref":"규칙 6.2b","q":"티샷하려고 셋업하다가 공이 티에서 떨어졌어요. 아직 휘두르진 않았어요.","o":["벌타 없이 다시 올려요","1벌타 받고 다시 올려요","떨어진 자리에서 쳐야 해요"],"ex":"치기 전이면 아직 플레이 중인 공이 아니라서 벌타 없이 다시 올려요. 치려고 휘둘렀는데 헛스윙이면 1타로 세요."},{"id":"q19","r":"r10","ref":"규칙 10.2a","q":"동반자에게 \"방금 몇 번 아이언 잡았어요?\"라고 물었어요. (스코어 경기)","o":["2벌타 (조언 요청)","벌타 없어요","1벌타"],"ex":"클럽 선택이나 공략을 다른 플레이어에게 묻거나 알려 주면 일반 페널티예요. 거리나 해저드 위치처럼 누구나 아는 정보, 내 캐디에게 묻는 건 괜찮아요."},{"id":"q20","r":"r10","ref":"규칙 10.1a","q":"어프로치하다가 공이 클럽에 두 번 맞았어요.","o":["벌타 없이 1타로 세요","2타로 세요","1벌타를 더해요"],"ex":"실수로 두 번 맞으면 벌타 없이 1타로 세요. 2019년 전에는 1벌타였어요."},{"id":"q21","r":"r19","ref":"규칙 19.1","q":"'못 치겠다'고 언플레이어블을 선언할 수 없는 곳은?","o":["페널티 구역(빨간·노란 말뚝) 안","벙커 안","숲속 덤불"],"ex":"언플레이어블은 페널티 구역만 빼면 어디서든 돼요. 말뚝 안에서는 규칙 17(페널티 구역 구제)로 해요."},{"id":"q22","r":"r18","ref":"정의: 아웃 오브 바운즈","q":"공이 흰 말뚝 선에 걸쳐 있어요. 조금은 코스 안쪽에 있어요.","o":["OB 아니에요. 그대로 쳐요","OB예요","반은 OB라 1벌타예요"],"ex":"공 전체가 경계선 밖에 있어야 OB예요. 조금이라도 안쪽에 걸쳐 있으면 OB가 아니에요."},{"id":"q23","r":"r16","ref":"규칙 16.3","q":"페어웨이에 떨어진 공이 자기 자국에 박혔어요.","o":["벌타 없이 공 바로 뒤 기준 클럽 1개 안 드롭","그대로 쳐야 해요","1벌타 받고 드롭"],"ex":"일반 구역에서 자기가 떨어지며 만든 자국에 박힌 공은 벌타 없이 빼요. 공 바로 뒤를 기준으로 클럽 1개 안, 홀에 가까워지지 않게 드롭해요."},{"id":"q24","r":"r13","ref":"규칙 14.1a","q":"그린에서 마크를 안 하고 공을 집어 들었어요.","o":["1벌타","벌타 없어요","2벌타"],"ex":"공을 들기 전에는 꼭 마커로 자리를 표시해야 해요. 표시 없이 들면 1벌타를 받고 제자리에 놓아요."},{"id":"q25","r":"r9","ref":"규칙 9.3","q":"페어웨이에 멈춰 있던 공이 바람에 굴러갔어요. (아무도 안 건드림)","o":["벌타 없이 새로 멈춘 자리에서 쳐요","원래 자리에 다시 놓아요","1벌타 받고 원래 자리에 놓아요"],"ex":"바람·물 같은 자연의 힘으로 움직이면 벌타 없이 멈춘 자리에서 쳐요. 단, 그린에서 마크하고 다시 놓은 공이 움직이면 원래 자리로 돌려놔요."},{"id":"q26","r":"r9","ref":"규칙 9.6","q":"까마귀가 페어웨이에 있던 내 공을 물고 갔어요.","o":["벌타 없이 원래 자리에 다른 공을 놓아요","분실구라서 1벌타","공이 떨어진 곳에서 쳐요"],"ex":"동물이나 다른 사람이 멈춘 공을 움직이면 벌타 없이 원래 자리에 놓아요. 정확한 자리를 모르면 짐작해서 놓고, 공을 못 찾으면 다른 공을 써도 돼요."},{"id":"q27","r":"r3","ref":"규칙 3.3c","q":"(스코어 경기) 동반자가 1m 퍼트에 \"OK!\"를 줬어요. 공식 규칙으로는?","o":["끝까지 넣어야 해요","OK면 1타 더해서 끝","OK면 안 넣고 끝"],"ex":"OK(컨시드)는 매치 플레이에만 있는 규칙이에요. 스코어 경기는 모든 홀을 컵에 넣고 끝내야 해요. 친선 라운드 OK는 동반자끼리 정한 관행이에요."},{"id":"q28","r":"r15","ref":"규칙 15.2a","q":"공 옆 고무레이크를 치우다가 공이 살짝 움직였어요.","o":["벌타 없이 제자리에 놓아요","1벌타 받고 제자리에","움직인 자리에서 쳐요"],"ex":"고무레이크·병 같은 '움직이는 장애물'을 치우다 공이 움직이면 벌타 없이 제자리에 놓아요. 나뭇잎·돌(자연물)일 때는 1벌타라서 달라요."},{"id":"q29","r":"r2","ref":"규칙 8.1a","q":"스윙에 걸리는 흰 OB 말뚝을 뽑고 쳤어요.","o":["2벌타 (일반 페널티)","벌타 없어요","1벌타"],"ex":"OB 말뚝은 코스의 경계라서 옮기거나 뽑으면 안 돼요. 치기 좋게 뽑으면 2벌타예요. 빨간·노란 페널티 구역 말뚝은 쉽게 뽑히면 치워도 돼요."},{"id":"q30","r":"r6","ref":"규칙 6.4b","q":"(스코어 경기) 순서가 아닌데 먼저 쳤어요.","o":["벌타 없어요","1벌타","2벌타"],"ex":"스코어 경기는 순서를 어겨도 벌타가 없어요. 준비된 사람부터 안전하게 치는 '레디 골프'를 권해요. 누구 좋으라고 짜고 순서를 바꾸면 그건 2벌타예요."}]</script>
+<script type="application/json" id="shData">[{"id":"s01","t":"앞 핀 · 그린 앞 연못","hole":"파3 티샷","info":[["남은 거리","핀까지 145m"],["공 위치","티잉 구역"],["바람","약한 맞바람"],["위험","그린 바로 앞 연못"],["핀","그린 앞쪽 (연못 가까이)"]],"map":{"fw":[30,62,40,94],"green":[50,32,20],"pin":[50,46],"ball":[50,146],"water":[[16,58,68,16]],"trees":[[10,28],[90,40]]},"o":[{"t":"핀만 보고 145m 거리 그대로 친다","tag":"공격","pts":1,"good":"잘 맞으면 버디 찬스가 붙어요.","bad":"맞바람에 조금만 짧아도 연못이에요. 앞 핀이라 실수할 여유가 거의 없어요."},{"t":"한 클럽 길게 잡고 그린 가운데를 본다","tag":"안전","pts":3,"good":"연못을 확실히 넘기고 그린에 올릴 확률이 제일 높아요.","bad":"핀과 먼 퍼트가 남아요. 길게 치면 그린 뒤로 넘어갈 수 있어요."},{"t":"연못 없는 그린 오른쪽 옆으로 보낸다","tag":"중간","pts":2,"good":"물에 빠질 걱정이 거의 없어요.","bad":"그린을 놓쳐서 어프로치를 잘해야 파가 나와요."}],"why":"앞 핀 + 맞바람 + 연못이면 '짧으면 끝'이에요. 그린 가운데를 보면 실수해도 퍼트가 남아요.","fun":"공격파는 버디를 꿈꾸고, 안전파는 연못에 공을 바치지 않아요.","rule":"r17"},{"id":"s02","t":"러프에서 180m · 그린 앞 벙커","hole":"파4 세컨드","info":[["남은 거리","핀까지 180m"],["공 위치","긴 러프 (공이 반쯤 잠김)"],["바람","없음"],["위험","그린 앞 양쪽 벙커"],["핀","그린 가운데"]],"map":{"fw":[34,40,32,120],"green":[50,30,18],"pin":[50,30],"ball":[22,140],"bunker":[[34,52,10,6],[66,52,10,6]],"trees":[[8,90],[92,70]]},"o":[{"t":"우드로 그린을 바로 노린다","tag":"공격","pts":1,"good":"제대로 맞으면 투온 기회예요.","bad":"긴 러프에서 우드는 잘 안 빠져요. 짧으면 벙커, 빗맞으면 거리 손해가 커요."},{"t":"웨지 풀스윙 거리(80m쯤)를 남기고 끊어 간다","tag":"안전","pts":3,"good":"러프 탈출이 확실하고, 자신 있는 거리에서 세 번째 샷으로 핀을 노려요.","bad":"투온은 포기해요. 웨지 거리감이 없으면 장점이 줄어요."},{"t":"유틸리티로 벙커 앞까지 최대한 보낸다","tag":"중간","pts":2,"good":"우드보다 러프에서 잘 빠지고 그린에 더 가까워져요.","bad":"남는 30~40m 어프로치가 오히려 어려울 수 있어요."}],"why":"공이 잠긴 러프에서는 '얼마나 멀리'보다 '확실히 빼기'가 먼저예요. 자신 있는 웨지 거리를 남기면 보기 이상을 막기 쉬워요.","fun":"러프에서 우드 잡는 순간, 캐디는 다음 공을 꺼내요.","rule":"r12"},{"id":"s03","t":"투온 할까 말까 · 그린 앞 개울","hole":"파5 세컨드","info":[["남은 거리","핀까지 230m"],["공 위치","페어웨이 (평평)"],["바람","약한 뒷바람"],["위험","그린 30m 앞을 가로지르는 개울"],["핀","그린 뒤쪽"]],"map":{"fw":[30,50,40,110],"green":[50,26,18],"pin":[50,18],"ball":[50,146],"water":[[14,58,72,9]],"trees":[[12,100],[88,110]]},"o":[{"t":"우드로 그린까지 투온을 노린다","tag":"공격","pts":2,"good":"뒷바람에 핀도 뒤쪽이라 거리가 맞으면 이글·버디 찬스예요.","bad":"조금만 빗맞아도 개울이에요. 230m를 꾸준히 보내는 장타자가 아니면 위험이 커요."},{"t":"개울 앞에서 80m쯤 남기고 끊는다","tag":"안전","pts":3,"good":"개울 걱정 없이 세 번째 샷을 풀스윙 웨지로 쳐요. 파가 쉽게 보여요.","bad":"투온 기회를 버려요."},{"t":"개울 바로 앞까지 최대한 보내 30m를 남긴다","tag":"중간","pts":1,"good":"그린까지 남는 거리는 제일 짧아요.","bad":"개울 앞까지 굴러가 빠질 수 있고, 어중간한 30m 어프로치가 생각보다 어려워요."}],"why":"파5는 세 번에 올려도 파예요. 개울 앞 80m를 남기면 위험 없이 버디도 노려요. 230m를 꾸준히 보내는 날이면 투온도 충분히 해 볼 만해요.","fun":"투온은 자랑거리, 개울 퐁당은 술자리 이야깃거리.","rule":"r17"},{"id":"s04","t":"짧은 쪽 핀 · 벙커 넘기기","hole":"그린 옆 어프로치","info":[["남은 거리","핀까지 15m"],["공 위치","그린 옆 러프"],["바람","없음"],["위험","공과 그린 사이 벙커"],["핀","벙커 바로 뒤 (그린 여유 적음)"]],"map":{"green":[58,52,30],"pin":[40,60],"ball":[14,96],"bunker":[[26,80,12,9]],"trees":[[88,120]]},"o":[{"t":"높이 띄워 핀 바로 옆에 세운다 (로브샷)","tag":"공격","pts":1,"good":"성공하면 원 퍼트 파예요.","bad":"조금만 얇게 맞으면 그린을 넘고, 두껍게 맞으면 벙커예요. 연습량이 많아야 하는 샷이에요."},{"t":"벙커만 넘기고 그린 가운데에 올린다","tag":"안전","pts":3,"good":"벙커를 확실히 피하고 그린에 올라와요.","bad":"핀을 지나 4~6m 퍼트가 남아요."},{"t":"벙커를 피해 옆으로 돌아 굴린다","tag":"중간","pts":2,"good":"띄우지 않아서 큰 실수가 적어요.","bad":"굴러가는 길이 길고 경사를 읽기 어려워 거리 맞추기가 까다로워요."}],"why":"핀이 벙커 바로 뒤면 '핀에 붙이기'보다 '벙커만 확실히'가 먼저예요. 그린 가운데에 올리면 투 퍼트 보기로 막아요.","fun":"로브샷 성공은 유튜브 감, 실패는 벙커 두 번 감.","rule":"r12"},{"id":"s05","t":"왼쪽 OB · 넓은 오른쪽","hole":"파4 티샷","info":[["남은 거리","핀까지 360m"],["공 위치","티잉 구역"],["바람","없음"],["위험","왼쪽 OB 말뚝 · 오른쪽 러프와 벙커"],["핀","그린 가운데"]],"map":{"fw":[34,18,30,126],"green":[49,16,12],"pin":[49,16],"ball":[49,150],"ob":[[18,4,18,156]],"bunker":[[76,70,8,6]],"trees":[[88,40],[90,110]]},"o":[{"t":"드라이버로 페어웨이 한가운데를 본다","tag":"공격","pts":1,"good":"제대로 맞으면 제일 좋은 자리예요.","bad":"왼쪽으로 조금만 감겨도 OB예요. 실수할 여유가 OB 쪽에 반밖에 없어요."},{"t":"드라이버로 페어웨이 오른쪽 끝을 본다","tag":"안전","pts":3,"good":"OB 반대쪽을 보니 실수해도 러프나 벙커에서 끝나요.","bad":"오른쪽으로 많이 밀리면 벙커나 나무 뒤가 될 수 있어요."},{"t":"우드·유틸로 짧고 똑바로 보낸다","tag":"중간","pts":2,"good":"드라이버가 흔들리는 날엔 OB 확률을 크게 줄여요.","bad":"세컨드 샷이 길게 남아 파 온이 어려워져요."}],"why":"한쪽이 OB면 반대쪽을 보는 게 기본이에요. 같은 실수를 해도 벌타 없이 끝나요. 드라이버가 안 맞는 날엔 우드로 바꾸는 것도 좋은 선택이에요.","fun":"OB 쪽을 보고 치면 공도 OB가 궁금해해요.","rule":"r18"},{"id":"s06","t":"페어웨이 벙커 · 높은 턱","hole":"파4 세컨드","info":[["남은 거리","핀까지 150m"],["공 위치","페어웨이 벙커 (모래 위 깨끗한 라이)"],["바람","없음"],["위험","눈앞 턱이 중간 높이 · 그린 앞 벙커"],["핀","그린 가운데"]],"map":{"fw":[34,20,32,130],"green":[50,22,15],"pin":[50,22],"ball":[46,128],"bunker":[[46,128,14,9],[66,40,7,5]],"trees":[[10,80],[90,90]]},"o":[{"t":"5번 아이언 풀샷으로 그린을 노린다","tag":"공격","pts":1,"good":"깨끗하게 맞으면 바로 그린이에요.","bad":"로프트가 적어 턱에 걸리기 쉬워요. 걸리면 벙커에서 한 번 더 쳐야 해요."},{"t":"턱을 확실히 넘는 8·9번으로 빼서 70~80m 남긴다","tag":"안전","pts":3,"good":"탈출이 확실하고 다음 샷이 웨지라 그린에 올리기 쉬워요.","bad":"투온은 포기해요."},{"t":"유틸리티로 최대한 멀리 보낸다","tag":"중간","pts":1,"good":"잘 맞으면 그린 근처까지 가요.","bad":"모래에서 유틸리티는 뒤땅 위험이 크고 턱에도 걸리기 쉬워요."}],"why":"벙커에서는 '턱을 넘는 클럽'이 먼저 정해지고, 거리는 그다음이에요. 한 번에 빼면 보기 이상을 막아요.","fun":"턱에 맞고 돌아온 공은 늘 같은 말을 해요. '나 다시 왔어.'","rule":"r12"},{"id":"s07","t":"나무 사이 · 좁은 틈","hole":"파4 세컨드","info":[["남은 거리","핀까지 140m"],["공 위치","숲 속 (스윙은 가능)"],["바람","없음"],["위험","그린 쪽으로 나무 사이 좁은 틈 · 옆은 페어웨이가 열림"],["핀","그린 가운데"]],"map":{"fw":[64,20,26,130],"green":[72,22,13],"pin":[72,22],"ball":[30,118],"trees":[[22,96],[38,100],[30,84],[46,82],[18,72],[40,62],[24,50],[14,110],[16,130]]},"o":[{"t":"좁은 틈 사이로 그린을 바로 노린다","tag":"공격","pts":1,"good":"통과하면 한 타를 아껴요.","bad":"나무에 맞으면 더 깊은 숲이나 OB로 갈 수 있어요. 한 타 아끼려다 두세 타를 잃기 쉬워요."},{"t":"옆 페어웨이로 짧게 꺼낸다","tag":"안전","pts":3,"good":"다음 샷을 페어웨이에서 편하게 쳐요. 보기로 막을 확률이 높아요.","bad":"한 타를 그냥 쓰는 기분이 들어요."},{"t":"언플레이어블(1벌타)로 공을 빼낸다","tag":"중간","pts":1,"good":"스윙이 막혀 있을 때는 좋은 방법이에요.","bad":"지금은 옆으로 칠 수 있어서, 1벌타를 쓰는 것보다 꺼내는 샷이 나아요."}],"why":"숲에서는 '가장 넓은 출구'가 정답에 가까워요. 옆으로 꺼내면 한 타만 쓰고 다음 샷은 정상으로 돌아와요.","fun":"나무는 90%가 공기라던데, 공은 늘 나머지 10%를 찾아가요.","rule":"r19"},{"id":"s08","t":"내리막 15m 빠른 그린","hole":"롱 퍼트","info":[["남은 거리","컵까지 15m"],["공 위치","그린 위"],["바람","없음"],["위험","빠른 내리막 · 지나가면 더 멀어짐"],["핀","그린 아래쪽"]],"map":{"green":[50,80,44],"pin":[50,50],"ball":[50,118],"trees":[[8,20],[92,30]]},"o":[{"t":"넣으려고 컵 뒤를 보고 세게 친다","tag":"공격","pts":1,"good":"라인이 맞으면 들어갈 수도 있어요.","bad":"내리막이라 빠지면 3~4m 지나가요. 3퍼트 위험이 커요."},{"t":"컵 주변 1m 원 안에 붙이는 거리로 친다","tag":"안전","pts":3,"good":"2퍼트로 끝날 확률이 가장 높아요.","bad":"한 번에 넣을 확률은 낮아요."},{"t":"일부러 짧게 쳐서 오르막 퍼트를 남긴다","tag":"중간","pts":2,"good":"다음 퍼트가 오르막이라 편해요.","bad":"너무 짧으면 두 번째 퍼트도 길게 남아요."}],"why":"긴 내리막 퍼트는 '넣기'보다 '거리 맞추기'예요. 1m 안에 붙이면 2퍼트로 끝나요.","fun":"내리막 퍼트는 살살 치면 모자라고, 세게 치면 옆 홀까지 가요.","rule":"r13"}]</script>
+<script>
+/* ---------- 미니게임: 오늘의 골프 룰 챌린지 · 오늘의 한 타 — 서버 없이 이 기기 안에서만. 점수·횟수만 이 폰에 저장 ---------- */
+(function(){
+  var QKEY="wise_quiz_v1",N=5;
+  function $(id){return document.getElementById(id);}
+  function esc(x){return String(x==null?"":x).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];});}
+  function toast(msg){var t=document.querySelector(".toast");if(!t){t=document.createElement("div");t.className="toast";t.setAttribute("role","status");document.body.appendChild(t);}t.textContent=msg;t.hidden=false;clearTimeout(toast.t);toast.t=setTimeout(function(){t.hidden=true;},2400);}
+  function json(id){try{return JSON.parse($(id).textContent)||[];}catch(e){return [];}}
+  function load(k){try{return JSON.parse(localStorage.getItem(k)||"{}")||{};}catch(e){return {};}}
+  function store(k,o){try{localStorage.setItem(k,JSON.stringify(o));}catch(e){}}
+  /* 날짜마다 같은 문제가 나오게: 날짜로 씨앗을 만든 뒤 섞기 */
+  function today(){var d=new Date();return d.getFullYear()+"-"+("0"+(d.getMonth()+1)).slice(-2)+"-"+("0"+d.getDate()).slice(-2);}
+  function md(k){var p=k.split("-");return (+p[1])+"월 "+(+p[2])+"일";}
+  function rng(s){var h=1779033703;for(var i=0;i<s.length;i++){h=Math.imul(h^s.charCodeAt(i),3432918353);h=h<<13|h>>>19;}return function(){h=Math.imul(h^h>>>16,2246822507);h=Math.imul(h^h>>>13,3266489909);h^=h>>>16;return (h>>>0)/4294967296;};}
+  function shuffle(a,r){a=a.slice();for(var i=a.length-1;i>0;i--){var j=Math.floor(r()*(i+1)),t=a[i];a[i]=a[j];a[j]=t;}return a;}
+  function entry(id){return window.GUIDE_ENTRY?window.GUIDE_ENTRY(id):null;}
+  function copyText(t,box,okMsg){var fail=function(){box.value=t;box.hidden=false;box.focus();box.select();toast("아래 글을 길게 눌러 복사하세요.");};try{navigator.clipboard.writeText(t).then(function(){box.hidden=true;toast(okMsg);},fail);}catch(e){fail();}}
+  var LT=["①","②","③"];
+
+  /* ===================== 오늘의 골프 룰 챌린지 ===================== */
+  var QZ=json("qzData"),Q=null;
+  function qzNew(){
+    var d=today(),r=rng("quiz:"+d);
+    var qs=shuffle(QZ,r).slice(0,N).map(function(q){var o=shuffle([0,1,2],r);return {q:q,o:o,pick:null};});
+    Q={d:d,qs:qs,i:0,done:false};
+  }
+  function qzScore(){return Q.qs.filter(function(x){return x.pick===0;}).length;}
+  function qzRender(focus){
+    var box=$("qzBox");if(!box)return;
+    var st=load(QKEY),h="";
+    if(!Q||Q.d!==today())Q=null;
+    if(!Q){
+      h='<div class="card"><h2 class="qz-q">'+esc(md(today()))+' 문제 5개가 준비됐어요</h2>'+
+        '<p class="note">보기 3개 중 하나를 고르면 바로 정답과 풀이가 나와요. 문제는 하루에 한 번 바뀌어요.</p>'+
+        (st.plays?'<p class="qz-stat">최고 점수 <b>'+(st.best||0)+' / '+N+'</b> · 플레이 <b>'+st.plays+'번</b></p>':'')+
+        '<button type="button" class="btn btn-flag" data-qz="start">시작하기</button></div>';
+    }else if(!Q.done){
+      var x=Q.qs[Q.i],q=x.q,picked=x.pick!=null;
+      h='<div class="gx-progress"><span>'+(Q.i+1)+' / '+N+'</span><div class="gx-bar"><i style="width:'+((Q.i+(picked?1:0))/N*100)+'%"></i></div></div>'+
+        '<div class="card"><h2 class="qz-q" id="qzQ" tabindex="-1">'+esc(q.q)+'</h2><div class="qz-opts" role="group" aria-labelledby="qzQ">'+
+        x.o.map(function(oi,k){
+          var cls="qz-opt",mk="";
+          if(picked){if(oi===0){cls+=" ok";mk='<span class="mk">✓ 정답</span>';}else if(oi===x.pick){cls+=" no";mk='<span class="mk">✗ 내 답</span>';}}
+          return '<button type="button" class="'+cls+'" data-qz="pick" data-i="'+oi+'"'+(picked?' disabled':'')+'><span class="lt" aria-hidden="true">'+LT[k]+'</span><span>'+esc(q.o[oi])+'</span>'+mk+'</button>';
+        }).join("")+'</div>';
+      if(picked){
+        var ok=x.pick===0,e=entry(q.r);
+        h+='<div class="qz-fb'+(ok?"":" no")+'" role="status"><b id="qzFb" tabindex="-1">'+(ok?"정답이에요!":"아쉬워요. 정답은 「"+esc(q.o[0])+"」")+'</b><p>'+esc(q.ex)+'</p>'+
+          '<p class="qz-ref">근거: R&amp;A·USGA 골프 규칙 · '+esc(q.ref)+'</p>'+
+          '<div class="qz-btns">'+(e?'<button type="button" class="chip" data-tab="guide" data-qz-rule="'+esc(q.r)+'">규칙 사전에서 보기</button>':'')+(e&&e.src?'<a class="ru-src" href="'+esc(e.src)+'" target="_blank" rel="noopener">원문 보기 ↗</a>':'')+'</div></div>'+
+          '<button type="button" class="btn btn-flag" data-qz="next">'+(Q.i<N-1?"다음 문제":"결과 보기")+'</button>';
+      }
+      h+='</div>';
+    }else{
+      var s=qzScore();
+      h='<div class="card qz-res"><small class="note">'+esc(md(Q.d))+' 룰 챌린지</small><p class="qz-score" id="qzRes" tabindex="-1">'+s+' / '+N+'</p>'+
+        '<p class="qz-dots" aria-label="'+Q.qs.map(function(x,k){return (k+1)+"번 "+(x.pick===0?"정답":"오답");}).join(", ")+'">'+Q.qs.map(function(x){return x.pick===0?"⭕":"❌";}).join(" ")+'</p>'+
+        '<p class="note">'+(s===N?"만점! 규칙 박사네요.":s>=3?"좋아요. 틀린 문제만 사전에서 한 번 더 보세요.":"헷갈리는 규칙이 많죠. 아래에서 다시 보고 내일 또 도전해요.")+'</p>'+
+        '<p class="qz-stat">최고 점수 <b>'+(st.best||0)+' / '+N+'</b> · 플레이 <b>'+(st.plays||0)+'번</b></p>'+
+        '<ol class="qz-review">'+Q.qs.map(function(x){return '<li><span>'+(x.pick===0?"⭕":"❌")+' '+esc(x.q.q)+'</span><small>정답: '+esc(x.q.o[0])+' · '+esc(x.q.ref)+'</small></li>';}).join("")+'</ol>'+
+        '<div class="qz-btns"><button type="button" class="btn btn-flag" data-qz="copy">결과 복사</button><button type="button" class="btn btn-plain" data-qz="again">다시 하기</button></div>'+
+        '<textarea id="qzCopy" class="copybox" rows="5" readonly hidden aria-label="복사할 결과"></textarea></div>';
+    }
+    h+='<p class="note ru-fine">공식 골프 규칙(2023년판)을 쉽게 풀어 쓴 문제예요. 그날 골프장 로컬 룰이 먼저예요.</p>';
+    box.innerHTML=h;
+    if(focus){var f=$(focus);if(f)f.focus();}
+  }
+  function qzText(){
+    var s=qzScore();
+    return ["[오늘의 골프 룰 챌린지] "+md(Q.d),s+" / "+N+"  "+Q.qs.map(function(x){return x.pick===0?"⭕":"❌";}).join(""),"","나도 풀어 보기 → https://app.wisegolf.kr/#quiz","— 슬기로운골프생활 · WISE GOLF"].join("\n");
+  }
+  function qzFinish(){
+    var st=load(QKEY),s=qzScore();
+    st.plays=(st.plays||0)+1;st.best=Math.max(st.best||0,s);st.last={d:Q.d,s:s};store(QKEY,st);
+    Q.done=true;
+  }
+
+  /* ===================== 오늘의 한 타 ===================== */
+  var SH=json("shData"),P=null;
+  function shNew(){
+    var d=today(),r=rng("shot:"+d),day=Math.floor(Date.parse(d+"T00:00:00Z")/864e5);
+    var s=SH[((day%SH.length)+SH.length)%SH.length];
+    P={d:d,s:s,o:shuffle([0,1,2],r),pick:null};
+  }
+  function svgMap(m,label){
+    var h='<svg viewBox="0 0 100 160" role="img" aria-label="'+esc(label)+'"><rect class="sh-rough" x="0" y="0" width="100" height="160" rx="6"/>';
+    if(m.fw)h+='<rect class="sh-fw" x="'+m.fw[0]+'" y="'+m.fw[1]+'" width="'+m.fw[2]+'" height="'+m.fw[3]+'" rx="14"/>';
+    (m.water||[]).forEach(function(w){h+='<rect class="sh-water" x="'+w[0]+'" y="'+w[1]+'" width="'+w[2]+'" height="'+w[3]+'" rx="5"/>';});
+    if(m.green)h+='<circle class="sh-green" cx="'+m.green[0]+'" cy="'+m.green[1]+'" r="'+m.green[2]+'"/>';
+    (m.bunker||[]).forEach(function(b){h+='<ellipse class="sh-bunker" cx="'+b[0]+'" cy="'+b[1]+'" rx="'+b[2]+'" ry="'+b[3]+'"/>';});
+    (m.ob||[]).forEach(function(o){h+='<line class="sh-ob" x1="'+o[0]+'" y1="'+o[1]+'" x2="'+o[2]+'" y2="'+o[3]+'"/><text class="sh-lb" x="'+(o[0]+2)+'" y="'+(o[1]+10)+'">OB</text>';});
+    (m.trees||[]).forEach(function(t){h+='<circle class="sh-tree" cx="'+t[0]+'" cy="'+t[1]+'" r="5"/>';});
+    if(m.pin)h+='<line class="sh-pole" x1="'+m.pin[0]+'" y1="'+m.pin[1]+'" x2="'+m.pin[0]+'" y2="'+(m.pin[1]-12)+'"/><path class="sh-flag" d="M'+m.pin[0]+' '+(m.pin[1]-12)+'l8 3-8 3z"/><circle class="sh-cup" cx="'+m.pin[0]+'" cy="'+m.pin[1]+'" r="1.4"/>';
+    if(m.ball)h+='<circle class="sh-ball" cx="'+m.ball[0]+'" cy="'+m.ball[1]+'" r="2.8"/><text class="sh-lb" x="'+(m.ball[0]+4.5)+'" y="'+(m.ball[1]+2)+'">내 공</text>';
+    return h+'</svg>';
+  }
+  function shRender(focus){
+    var box=$("shBox");if(!box)return;
+    if(!P||P.d!==today())shNew();
+    var s=P.s,picked=P.pick!=null,best=0;s.o.forEach(function(o,k){if(o.pts>s.o[best].pts)best=k;});
+    var info=s.info.map(function(x){return '<dt>'+esc(x[0])+'</dt><dd>'+esc(x[1])+'</dd>';}).join("");
+    var h='<div class="card"><div class="sh-head"><span class="sh-tag">'+esc(s.hole)+'</span><h2 class="qz-q" id="shQ" tabindex="-1">'+esc(s.t)+'</h2></div>'+
+      '<div class="sh-scene"><div class="sh-map">'+svgMap(s.map,s.hole+" 상황 그림. "+s.info.map(function(x){return x[0]+" "+x[1];}).join(", "))+'</div><dl class="sh-info">'+info+'</dl></div></div>';
+    if(!picked){
+      h+='<div class="card"><b class="ql" id="shAsk">어떻게 칠래요?</b><div class="qz-opts" role="group" aria-labelledby="shAsk">'+
+        P.o.map(function(oi,k){return '<button type="button" class="qz-opt" data-sh="pick" data-i="'+oi+'"><span class="lt" aria-hidden="true">'+LT[k]+'</span><span>'+esc(s.o[oi].t)+'</span></button>';}).join("")+'</div></div>';
+    }else{
+      var me=s.o[P.pick],rec=s.o[best],isBest=P.pick===best;
+      h+='<div class="card qz-res"><small class="note">이 상황 공략 점수</small><p class="qz-score" id="shRes" tabindex="-1">'+me.pts+' / 3</p>'+
+        '<p><span class="sh-tag t-'+(me.tag==="공격"?"a":me.tag==="안전"?"s":"m")+'">'+esc(me.tag)+'</span> '+esc(me.t)+'</p>'+
+        '<div class="qz-fb'+(isBest?"":" mid")+'"><b>'+(isBest?"추천 공략을 골랐어요!":"추천 공략은 「"+esc(rec.t)+"」")+'</b><p>'+esc(s.why)+'</p></div>'+
+        '<ul class="sh-list">'+P.o.map(function(oi,k){var o=s.o[oi];return '<li'+(oi===P.pick?' class="me"':'')+'><div class="sh-lh"><span class="lt" aria-hidden="true">'+LT[k]+'</span><b>'+esc(o.t)+'</b></div><div class="sh-meta"><span class="sh-tag t-'+(o.tag==="공격"?"a":o.tag==="안전"?"s":"m")+'">'+esc(o.tag)+'</span><span>'+o.pts+'점</span>'+(oi===P.pick?'<span>내 선택</span>':'')+(oi===best?'<span>추천</span>':'')+'</div><p><b>좋은 점</b> '+esc(o.good)+'</p><p><b>위험</b> '+esc(o.bad)+'</p></li>';}).join("")+'</ul>'+
+        '<p class="sh-fun">'+esc(s.fun)+'</p>'+
+        '<p class="note">상황·실력·그날 컨디션에 따라 다른 선택도 충분히 맞을 수 있어요. 점수는 보통 골퍼 기준 추천이에요.</p>'+
+        '<div class="qz-btns"><button type="button" class="btn btn-flag" data-sh="again">다시 하기</button>'+(s.rule&&entry(s.rule)?'<button type="button" class="chip" data-tab="guide" data-qz-rule="'+esc(s.rule)+'" data-back="shot">관련 규칙 보기</button>':'')+'</div></div>';
+    }
+    h+='<p class="note ru-fine">상황은 매일 바뀌어요. 내일 또 와서 공략해 보세요.</p>';
+    box.innerHTML=h;
+    if(focus){var f=$(focus);if(f)f.focus();}
+  }
+
+  /* 홈 카드 한 줄 */
+  window.MG_HOME=function(){var el=$("mgQz");if(!el)return;var st=load(QKEY);el.textContent=st.plays?"최고 "+(st.best||0)+" / "+N+" · "+st.plays+"번":"5문제 · 1분";};
+  window.QUIZ_OPEN=function(){qzRender();};
+  window.SHOT_OPEN=function(){shRender();};
+
+  document.addEventListener("click",function(e){
+    var b=e.target.closest("button");if(!b)return;var d=b.dataset;
+    if(d.qzRule){if(window.GUIDE_SHOW)window.GUIDE_SHOW(d.qzRule,d.back||"quiz");return;}
+    if(d.qz==="start"||d.qz==="again"){qzNew();qzRender("qzQ");return;}
+    if(d.qz==="pick"&&Q&&!Q.done){var x=Q.qs[Q.i];if(x.pick==null){x.pick=+d.i;qzRender("qzFb");}return;}
+    if(d.qz==="next"&&Q){if(Q.i<N-1){Q.i++;qzRender("qzQ");}else{qzFinish();qzRender("qzRes");}return;}
+    if(d.qz==="copy"&&Q&&Q.done){copyText(qzText(),$("qzCopy"),"결과를 복사했어요. 단톡방에 붙여넣으세요.");return;}
+    if(d.sh==="pick"&&P&&P.pick==null){P.pick=+d.i;shRender("shRes");return;}
+    if(d.sh==="again"){P.pick=null;P.o=shuffle([0,1,2],rng("shot:"+P.d+":"+Math.random()));shRender("shQ");return;}
+  });
 })();
 </script>
 <script>
@@ -3862,7 +4093,7 @@ window.AGE18={k:"wise_age18_v1",
 <script>
 /* ---------- 내 기록 백업: 이 폰 브라우저에 저장된 앱 기록을 파일 하나로 받기 / 불러오기 — 서버로 보내지 않는다 ---------- */
 (function(){
-  var KEYS=["golfround.v1","golfround.profile.v1","golfround.recent.v1","gpas_app_v1","gcas_app_v1","gsas_app_v1","gras_app_v1","wise_ride_v1","wise_wdt_v1","wq_device_id","wq_tempo_hist_v1","wq_swing_results_v1","wise_age18_v1","wise_cost_v1"];
+  var KEYS=["golfround.v1","golfround.profile.v1","golfround.recent.v1","gpas_app_v1","gcas_app_v1","gsas_app_v1","gras_app_v1","wise_ride_v1","wise_wdt_v1","wq_device_id","wq_tempo_hist_v1","wq_swing_results_v1","wise_age18_v1","wise_cost_v1","wise_quiz_v1"];
   var APP="wisegolf-golf-life";
   function $(id){return document.getElementById(id);}
   function toast(msg){var t=document.querySelector(".toast");if(!t){t=document.createElement("div");t.className="toast";t.setAttribute("role","status");document.body.appendChild(t);}t.textContent=msg;t.hidden=false;clearTimeout(toast.t);toast.t=setTimeout(function(){t.hidden=true;},3000);}
