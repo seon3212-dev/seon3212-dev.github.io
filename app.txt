@@ -598,18 +598,8 @@ details.yd-card:not([open]) .yd-sum{margin-bottom:0}
       </div>
     </div>
     <div class="hm-card">
-      <div class="k"><small>이번 주 가이드</small><span class="soon">공개 예정</span></div>
-      <b>레벨별 골프 가이드</b>
-      <span class="note">골린이부터 상급까지, 내 수준에 맞는 꿀팁과 레슨이 곧 올라와요.</span>
-    </div>
-    <div class="hm-card">
       <div class="k"><small>내 4분할 진단</small></div>
       <div class="hm-quad" id="hmQuad"></div>
-    </div>
-    <div class="hm-card">
-      <div class="k"><small>골프장 다반사</small><span class="soon">공개 예정</span></div>
-      <b>골프장에서 흔히 있을 법한 이야기</b>
-      <span class="note">웹툰으로 곧 찾아올게요.</span>
     </div>
     <div class="hm-card" id="bkCard">
       <div class="k"><small>내 기록 백업</small></div>
@@ -816,7 +806,7 @@ details.yd-card:not([open]) .yd-sum{margin-bottom:0}
   <!-- ===================== 골프 유형 검사 ===================== -->
   <section id="view-type" class="wrap" hidden aria-labelledby="gxTitle">
     <div class="gx-head">
-      <div class="gp-switch" role="group" aria-label="진단 고르기"><button type="button" data-tab="type" aria-current="true">운영 GRAS</button><button type="button" data-tab="gpas">신체 GPAS</button><button type="button" data-tab="gcas">클럽 GCAS</button><button type="button" data-tab="gsas">스윙 GSAS</button></div>
+      <div class="gp-switch" role="group" aria-label="진단 고르기"><button type="button" data-tab="type" aria-current="true">라운드 운영</button><button type="button" data-tab="gpas">신체</button><button type="button" data-tab="gcas">클럽</button><button type="button" data-tab="gsas">스윙</button></div>
       <h1 id="gxTitle">골프 유형 검사</h1>
       <p>20문제 · 3분이면 끝나요</p>
     </div>
@@ -849,7 +839,7 @@ details.yd-card:not([open]) .yd-sum{margin-bottom:0}
   <!-- ===================== 신체 검사 (GPAS) ===================== -->
   <section id="view-gpas" class="wrap" hidden aria-labelledby="gpTitle">
     <div class="gx-head">
-      <div class="gp-switch" role="group" aria-label="진단 고르기"><button type="button" data-tab="type">운영 GRAS</button><button type="button" data-tab="gpas" aria-current="true">신체 GPAS</button><button type="button" data-tab="gcas">클럽 GCAS</button><button type="button" data-tab="gsas">스윙 GSAS</button></div>
+      <div class="gp-switch" role="group" aria-label="진단 고르기"><button type="button" data-tab="type">라운드 운영</button><button type="button" data-tab="gpas" aria-current="true">신체</button><button type="button" data-tab="gcas">클럽</button><button type="button" data-tab="gsas">스윙</button></div>
       <h1 id="gpTitle">신체 검사</h1>
       <p>검사 20개 · 질문 7개 · 20~25분</p>
     </div>
@@ -859,7 +849,7 @@ details.yd-card:not([open]) .yd-sum{margin-bottom:0}
   <!-- ===================== 클럽 진단 (GCAS) ===================== -->
   <section id="view-gcas" class="wrap" hidden aria-labelledby="gcTitle">
     <div class="gx-head">
-      <div class="gp-switch" role="group" aria-label="진단 고르기"><button type="button" data-tab="type">운영 GRAS</button><button type="button" data-tab="gpas">신체 GPAS</button><button type="button" data-tab="gcas" aria-current="true">클럽 GCAS</button><button type="button" data-tab="gsas">스윙 GSAS</button></div>
+      <div class="gp-switch" role="group" aria-label="진단 고르기"><button type="button" data-tab="type">라운드 운영</button><button type="button" data-tab="gpas">신체</button><button type="button" data-tab="gcas" aria-current="true">클럽</button><button type="button" data-tab="gsas">스윙</button></div>
       <h1 id="gcTitle">클럽 진단</h1>
       <p>질문 9단계 · 5분 · 몰라도 고르기만</p>
     </div>
@@ -869,7 +859,7 @@ details.yd-card:not([open]) .yd-sum{margin-bottom:0}
   <!-- ===================== 스윙 진단 (GSAS) ===================== -->
   <section id="view-gsas" class="wrap" hidden aria-labelledby="gsTitle">
     <div class="gx-head">
-      <div class="gp-switch" role="group" aria-label="진단 고르기"><button type="button" data-tab="type">운영 GRAS</button><button type="button" data-tab="gpas">신체 GPAS</button><button type="button" data-tab="gcas">클럽 GCAS</button><button type="button" data-tab="gsas" aria-current="true">스윙 GSAS</button></div>
+      <div class="gp-switch" role="group" aria-label="진단 고르기"><button type="button" data-tab="type">라운드 운영</button><button type="button" data-tab="gpas">신체</button><button type="button" data-tab="gcas">클럽</button><button type="button" data-tab="gsas" aria-current="true">스윙</button></div>
       <h1 id="gsTitle">스윙 진단</h1>
       <p>질문 8단계 · 같은 채로 10구 · 기기 없어도 돼요</p>
     </div>
@@ -2043,14 +2033,14 @@ window.AGE18={k:"wise_age18_v1",
     }
     $("hmRound").innerHTML=h;
     var g={};try{g=(JSON.parse(localStorage.getItem("gras_app_v1")||"{}")||{}).last||{};}catch(e){g={};}
-    var gr=g.code_display?'<button type="button" data-tab="type"><span class="nm">운영 GRAS</span><b>'+hEsc(g.code_display)+'</b><span class="fr">'+hEsc(g.friendly_name||g.type_name||"")+'</span></button>'
-      :'<button type="button" data-tab="type"><span class="nm">운영 GRAS</span><b style="font:700 13px var(--font-body)">검사하기</b><span class="fr">골프 유형 검사 · 3분</span></button>';
+    var gr=g.code_display?'<button type="button" data-tab="type"><span class="nm">라운드 운영</span><b>'+hEsc(g.code_display)+'</b><span class="fr">'+hEsc(g.friendly_name||g.type_name||"")+'</span></button>'
+      :'<button type="button" data-tab="type"><span class="nm">라운드 운영</span><b style="font:700 13px var(--font-body)">검사하기</b><span class="fr">골프 유형 검사 · 3분</span></button>';
     var gpI=window.GPAS_HOME?window.GPAS_HOME():{text:"검사하기",sub:"신체 검사 · 20분"};
-    var gp='<button type="button" data-tab="gpas"><span class="nm">신체 GPAS</span><b style="font:700 13px var(--font-body)">'+hEsc(gpI.text)+'</b><span class="fr">'+hEsc(gpI.sub)+'</span></button>';
+    var gp='<button type="button" data-tab="gpas"><span class="nm">신체</span><b style="font:700 13px var(--font-body)">'+hEsc(gpI.text)+'</b><span class="fr">'+hEsc(gpI.sub)+'</span></button>';
     var gcI=window.GCAS_HOME?window.GCAS_HOME():{text:"진단하기",sub:"클럽 진단 · 5분"};
-    var gc='<button type="button" data-tab="gcas"><span class="nm">클럽 GCAS</span><b style="font:700 13px var(--font-body)">'+hEsc(gcI.text)+'</b><span class="fr">'+hEsc(gcI.sub)+'</span></button>';
+    var gc='<button type="button" data-tab="gcas"><span class="nm">클럽</span><b style="font:700 13px var(--font-body)">'+hEsc(gcI.text)+'</b><span class="fr">'+hEsc(gcI.sub)+'</span></button>';
     var gsI=window.GSAS_HOME?window.GSAS_HOME():{text:"진단하기",sub:"스윙 진단 · 10구"};
-    var gs='<button type="button" data-tab="gsas"><span class="nm">스윙 GSAS</span><b style="font:700 13px var(--font-body)">'+hEsc(gsI.text)+'</b><span class="fr">'+hEsc(gsI.sub)+'</span></button>';
+    var gs='<button type="button" data-tab="gsas"><span class="nm">스윙</span><b style="font:700 13px var(--font-body)">'+hEsc(gsI.text)+'</b><span class="fr">'+hEsc(gsI.sub)+'</span></button>';
     $("hmQuad").innerHTML=gr+gp+gc+gs;
     if(window.MG_HOME)window.MG_HOME();
   }
@@ -2657,7 +2647,7 @@ window.AGE18={k:"wise_age18_v1",
     if(res.asym.length)h+='<div class="card"><h2>좌우 차이</h2><ul class="gp-regs">'+res.asym.map(function(a){var note=swingNote(a,c);return '<li><div class="gp-reg-h"><b>'+esc(a.t.n)+'</b><span class="gp-pill '+(a.big?"gp-pri":"gp-watch")+'">'+(a.big?"뚜렷하게":"조금")+' 약함</span></div><p>'+esc(sideName(a.weak,c))+'이 더 약해요.'+(note?" "+esc(note):"")+'</p></li>';}).join("")+'</ul></div>';
     var nxt=[];
     if(res.pri.length)nxt.push("먼저 확인할 곳에 맞는 스트레칭·운동은 유료 신체 검사에서 골라 드릴 예정이에요.");
-    else nxt.push("몸에서 큰 제한이 안 보이면 스윙(GSAS)·클럽(GCAS)·라운드 운영(GRAS)을 같이 보는 게 좋아요.");
+    else nxt.push("몸에서 큰 제한이 안 보이면 스윙·클럽·라운드 운영을 같이 보는 게 좋아요.");
     if(!res.endOK)nxt.push("지속성 질문을 다 답하지 않아서 후반 체력은 판정하지 않았어요.");
     if(res.excluded.length)nxt.push("뺀 검사: "+res.excluded.join(", "));
     nxt.push("2~4주 뒤에 같은 조건(시간·신발·바닥)으로 다시 재 보면 변화가 보여요.");
@@ -2680,7 +2670,7 @@ window.AGE18={k:"wise_age18_v1",
     var c=cur(),res=judge(c),L=["[신체 검사 결과] "+summaryOf(res)];
     REG.forEach(function(r){L.push("· "+r.n+": "+ST[res.regions[r.id].st][0]);});
     res.asym.forEach(function(a){L.push("· 좌우: "+a.t.n+" "+sideName(a.weak,c)+" "+(a.big?"뚜렷하게":"조금")+" 약함");});
-    L.push("— WISE QUAD 신체 검사(GPAS) · 슬기로운골프생활 · WISE GOLF");
+    L.push("— WISE QUAD 신체 검사 · 슬기로운골프생활 · WISE GOLF");
     return L.join("\n");
   }
 
@@ -3072,8 +3062,8 @@ window.AGE18={k:"wise_age18_v1",
     if(r.type==="A")nx.push("채는 지금 그대로 두세요. 스윙·몸·라운드 운영 쪽부터 보는 게 좋아요.");
     if(r.type==="D")nx.push("어떤 미스가 나는지, 옆 채는 어떤지 알아본 뒤 다시 해 보세요.");
     if(r.type==="F"){
-      if(c.onset==="body")nx.push("신체 검사(GPAS)로 몸에서 먼저 확인할 곳을 찾아보세요.");
-      if(c.other==="most"||c.onset==="swing")nx.push("스윙 진단(GSAS)으로 같은 채 10구를 쳐서 스윙 쪽을 먼저 확인해 보세요.");
+      if(c.onset==="body")nx.push("신체 검사로 몸에서 먼저 확인할 곳을 찾아보세요.");
+      if(c.other==="most"||c.onset==="swing")nx.push("스윙 진단으로 같은 채 10구를 쳐서 스윙 쪽을 먼저 확인해 보세요.");
     }
     if(r.type!=="E")nx.push("측정 결과 나올 때까지는 채를 손대지 마세요. 바꿀 땐 한 번에 하나만, 바꾸기 전·후를 적어 두세요.");
     if(r.afterChg)nx.push("바꾼 뒤부터 이상하다면, 어디서 뭘 바꿨는지부터 챙겨 오세요.");
@@ -3100,7 +3090,7 @@ window.AGE18={k:"wise_age18_v1",
     if(r.type!=="E"&&(r.mn==="high"||r.mn==="rec"))L.push("· 먼저 측정할 항목: "+r.targets.join(", "));
     (r.facts||[]).forEach(function(f){L.push("· "+f[0]+" ("+f[1]+")");});
     (r.flow||[]).forEach(function(f){L.push("· "+f);});
-    L.push("— WISE QUAD 클럽 진단(GCAS) · 슬기로운골프생활 · WISE GOLF");
+    L.push("— WISE QUAD 클럽 진단 · 슬기로운골프생활 · WISE GOLF");
     return L.join("\n");
   }
 
@@ -3312,9 +3302,9 @@ window.AGE18={k:"wise_age18_v1",
     E:{t:"여러 쪽이 같이 걸려 있어요",b:"스윙만의 문제라고 보기엔 다른 쪽 신호도 비슷하게 나왔어요. 한쪽으로 정하지 않고, 아래 두 쪽을 차례로 확인해 보는 게 좋아요.",cad:"한 번에 하나씩 지워 가시죠. 확인하기 쉬운 쪽부터요."}
   };
   var PART={GSAS:{n:"스윙",act:"티칭 프로에게 스윙을 한 번 봐 달라고 하세요. 같은 채로 10개 친 이 결과를 같이 보여 주면 좋아요.",tab:null},
-    GPAS:{n:"몸 (신체 검사)",act:"신체 검사(GPAS)로 몸에서 먼저 확인할 곳을 찾아보세요.",tab:"gpas"},
-    GCAS:{n:"채 (클럽 진단)",act:"클럽 진단(GCAS)으로 그 채를 먼저 확인해 보세요.",tab:"gcas"},
-    GRAS:{n:"라운드 운영 (골프 유형 검사)",act:"골프 유형 검사(GRAS)로 필드에서 흔들리는 순간을 알아보세요.",tab:"type"}};
+    GPAS:{n:"몸 (신체 검사)",act:"신체 검사로 몸에서 먼저 확인할 곳을 찾아보세요.",tab:"gpas"},
+    GCAS:{n:"채 (클럽 진단)",act:"클럽 진단으로 그 채를 먼저 확인해 보세요.",tab:"gcas"},
+    GRAS:{n:"라운드 운영 (골프 유형 검사)",act:"골프 유형 검사로 필드에서 흔들리는 순간을 알아보세요.",tab:"type"}};
   var GN={stable:"잘 모여요",part:"조금 흩어져요",vary:"많이 흩어져요",hold:"아직 몰라요"};
   var EQN={high:"충분해요",mid:"보통이에요",low:"부족해요",none:"부족해요"};
   var BN={right:"오른쪽으로",left:"왼쪽으로",short:"목표보다 짧게"};
@@ -3512,7 +3502,7 @@ window.AGE18={k:"wise_age18_v1",
       if(nx){h+='<p class="gs-next"><b>'+esc(PART[nx].n)+'</b></p><ul class="gx-list">'+why.map(function(w){return '<li>'+esc(w)+'</li>';}).join("")+'</ul>';
         if(R.second)h+='<p class="note">같이 볼 쪽: <b>'+esc(PART[R.second].n)+'</b> — '+esc(R.W[R.second].join(", "))+'</p>';
         h+='<p class="gp-fine">"먼저 볼 쪽"은 가장 큰 원인이라는 뜻이 아니에요. 지금 답으로 확인하기 좋은 쪽이에요.</p>';}
-      else h+='<p>지금 결과로는 크게 손댈 곳이 안 보여요. 필드에서만 안 된다면 라운드 운영(GRAS)을 먼저 보세요.</p>';
+      else h+='<p>지금 결과로는 크게 손댈 곳이 안 보여요. 필드에서만 안 된다면 라운드 운영을 먼저 보세요.</p>';
       h+='</div>';
     }
     var acts=[];
@@ -3537,14 +3527,14 @@ window.AGE18={k:"wise_age18_v1",
     }
   }
   function copyText(){
-    var c=cur(),R=judge(c);if(R.type==="STOP")return "[스윙 진단] 오늘은 쉬어요\n— WISE QUAD 스윙 진단(GSAS) · 슬기로운골프생활 · WISE GOLF";
+    var c=cur(),R=judge(c);if(R.type==="STOP")return "[스윙 진단] 오늘은 쉬어요\n— WISE QUAD 스윙 진단 · 슬기로운골프생활 · WISE GOLF";
     var a=R.a,L=["[스윙 진단 결과] "+summaryOf(R,c)];
     L.push("· "+lab(SHOT,c.shot)+" · "+(CNAME[c.club]||"")+" · 공 "+a.n+"개");
     L.push("· 공이 모이는 정도"+(noL(a)?" (거리만)":"")+": "+GN[a.grade]);
     L.push("· 한쪽으로 가는지: "+biasTxt(a));
     a.facts.forEach(function(f){L.push("· "+f);});
     if(R.next)L.push("· 다음에 먼저 볼 쪽: "+PART[R.next].n);
-    L.push("— WISE QUAD 스윙 진단(GSAS) · 슬기로운골프생활 · WISE GOLF");
+    L.push("— WISE QUAD 스윙 진단 · 슬기로운골프생활 · WISE GOLF");
     return L.join("\n");
   }
 
