@@ -1,4 +1,20 @@
-<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head><body><title>슬기로운골프생활</title>
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head><body><script>
+/* 촬영 모드: 주소에 ?shoot=1 이 있을 때만. 화면에는 아무 표시도 안 함.
+   서버(script.google.com)로 가는 모든 요청에 shoot:1 을 붙이고, 앱 버전 칸 끝에 -shoot 을 붙임
+   (유형 검사·와이즈쿼드·규칙 질문 서버는 앱 버전 칸을 그대로 저장하므로 서버를 안 고쳐도 표시가 남음) */
+(function(){
+  var on=/[?&]shoot=1(?:&|$)/.test(location.search||"");window.WG_SHOOT=on;
+  if(!on||!window.fetch)return;
+  var f=window.fetch;
+  window.fetch=function(u,o){
+    try{if(/script\.google\.com/.test(String(u&&u.url||u))&&o&&typeof o.body==="string"&&o.body.charAt(0)==="{"){
+      var b=JSON.parse(o.body);b.shoot=1;b.app_version=String(b.app_version||"app")+"-shoot";
+      o=Object.assign({},o,{body:JSON.stringify(b)});}}catch(e){}
+    return f.apply(this,[u,o]);
+  };
+})();
+</script>
+<title>슬기로운골프생활</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Sans+KR:wght@400;500;600;700&display=swap">
@@ -506,6 +522,9 @@ body{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
 .rt-res{display:flex;flex-direction:column;gap:6px}.rt-res button{appearance:none;text-align:left;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:10px;padding:8px 10px;font:500 14px var(--font-body);cursor:pointer}.rt-res button small{display:block;color:var(--muted);font-size:12px}
 .rt-ok{font-size:13px;color:var(--fairway);font-weight:600}
 .pk-how{margin:2px 0}
+.wqs-demo{display:flex;flex-direction:column;gap:4px;background:var(--flag);color:#13221A;border-radius:var(--r);padding:14px 16px;margin-bottom:12px}
+.wqs-demo b{font-size:17px}
+.wqs-demo span{font-size:13px}
 .wqs-p{margin:0;font-size:15px;line-height:1.65}
 .wqs-k{font-size:12px;font-weight:700;color:var(--muted);letter-spacing:.02em}
 .wqs-beta{display:flex;flex-direction:column;gap:8px;border-left:4px solid var(--flag);background:var(--bg);border-radius:0 12px 12px 0;padding:12px}
@@ -889,6 +908,7 @@ details.yd-card:not([open]) .yd-sum{margin-bottom:0}
 
   <!-- ===================== 가이드: 규칙 사전 ===================== -->
   <section id="view-wqs" class="wrap" hidden aria-labelledby="wqsTitle">
+    <div id="wqsDemo" class="wqs-demo" hidden><b>예시 결과예요. 실제 검사 결과가 아니에요.</b><span>화면이 어떻게 나오는지 보여 드리려고 만든 견본이에요.</span></div>
     <div class="gx-hero"><small>무료 자가 진단</small><b class="gp-hero" id="wqsTitle">4분할 종합 설명</b><span>네 가지 무료 검사 결과를 한데 모아 풀어 드려요.</span></div>
     <div id="wqsBody"></div>
   </section>
@@ -4750,7 +4770,20 @@ window.SHOT_GEN=(function(){
     if(BETA.open)return '<div class="wqs-beta"><b>베타 '+BETA.gen+'기 마감 · 진단이 끝나면 '+(BETA.gen+1)+'기를 모집해요</b><a class="btn btn-plain" href="'+m+'">다음 기수 대기 신청 (메일)</a></div>';
     return '<div class="wqs-beta"><b>4분할 심층 검사 베타 '+BETA.gen+'기를 준비하고 있어요 · 선착순 '+BETA.cap+'명</b><a class="btn btn-plain" href="'+m+'">대기 신청 (메일)</a></div>';
   }
-  window.WQS_OPEN=function(){var b=$("wqsBody");if(!b)return;var D=data();
+  /* 촬영 모드 견본: ?shoot=1#wqs-demo 로 열 때만. 숫자는 견본, 라운드 운영은 이 폰에 유형 검사 결과가 있으면 그걸 씀 */
+  var DEMO=!!window.WG_SHOOT&&window.START_TAB==="wqs-demo";
+  function demoData(){
+    var gr=gras();if(gr&&!gr.code_display)gr=null;
+    return {gp:{n:20,ok:20,pri:[],pain:false},
+      gc:{title:"채 탓은 아닌 것 같아요",club:"7번 아이언",score:"90",set:{flags:true,known:6,tips:[],
+        notes:["드라이버는 SR인데 3번 우드는 X예요. 우드·유틸 쪽에서 강도가 두 단계 이상 뛰면 채마다 느낌이 달라져서 같은 스윙에도 결과가 갈릴 수 있어요."],
+        caveat:"단, 강도 표기는 제조사마다 기준이 달라요. 샤프트 브랜드가 다르면 두세 칸 차이가 나도 실제 강도는 맞을 수 있어요."}},
+      gs:{dR:20,dPct:14,lR:18,lPct:13},gr:gr,sb:1,shot:3,approx:false,distOnly:false,done:4};
+  }
+  window.WQS_OPEN=function(){var b=$("wqsBody");if(!b)return;
+    var dm=$("wqsDemo");if(dm)dm.hidden=!DEMO;
+    if(DEMO){b.innerHTML=build(demoData()).replace("골프 유형 검사를 아직 안 하셨어요.","골프 유형 검사를 하면 여기에 라운드 운영 유형과 잘하는 것, 조심할 때가 나와요.");return;}
+    var D=data();
     if(D.done<4){b.innerHTML='<div class="card"><p class="wqs-p">네 가지 무료 검사를 다 하면 종합 설명이 나와요. 지금 '+D.done+' / 4 했어요.</p><div class="quick">'+[["type","라운드 운영",D.gr],["gpas","신체",D.gp],["gcas","클럽",D.gc],["gsas","스윙",D.gs]].filter(function(x){return !x[2];}).map(function(x){return '<button type="button" class="btn btn-plain" data-tab="'+x[0]+'">'+x[1]+' 하러 가기</button>';}).join("")+'</div></div>';return;}
     b.innerHTML=build(D);};
   window.WQS_HOME=function(){var el=$("wqsHome");if(!el)return;var n=data().done;
@@ -4760,7 +4793,7 @@ window.SHOT_GEN=(function(){
   /* 이 스크립트가 홈·화면보다 늦게 실림: 실린 뒤 한 번 그림 */
   /* #wqs 로 바로 들어오면 그 화면, 홈이면 진단 칸(신체·클럽·스윙 결과)까지 다 실린 뒤 홈을 한 번 더 그림 */
   var h0=window.START_TAB||"",vh=$("view-home");
-  if(h0==="wqs"&&window.SHOW_TAB)window.SHOW_TAB("wqs");
+  if((h0==="wqs"||DEMO)&&window.SHOW_TAB)window.SHOW_TAB("wqs");
   else if(vh&&!vh.hidden&&window.SHOW_TAB)window.SHOW_TAB("home");
   else window.WQS_HOME();
 })();
