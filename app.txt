@@ -312,6 +312,11 @@ details.card[open]>summary::after{content:"－"}
 .gx-scale button{appearance:none;border:1.5px solid var(--line);background:var(--bg);color:var(--ink);border-radius:10px;padding:9px 0;font:600 17px var(--font-display);cursor:pointer;font-variant-numeric:tabular-nums}
 .gx-scale button[aria-pressed="true"]{background:var(--fairway);border-color:var(--fairway);color:var(--surface)}
 .gx-ends{display:flex;justify-content:space-between;font-size:11.5px;color:var(--muted)}
+.grp{display:flex;flex-direction:column;gap:8px;margin-top:10px}
+.grp .ql{font-size:13px;font-weight:700}
+.grp-save{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.grp-save input{flex:1 1 140px;min-width:0}
+.grp .chip.del{border-style:dashed}
 .gx-hero{background:var(--board);color:var(--board-ink);border-radius:var(--r);padding:18px 16px;display:flex;flex-direction:column;gap:8px}
 .gx-hero small{color:var(--board-muted);font-size:12px;letter-spacing:.04em}
 .gx-codeline{display:flex;align-items:baseline;gap:4px 12px;flex-wrap:wrap}
@@ -619,6 +624,7 @@ details.yd-card:not([open]) .yd-sum{margin-bottom:0}
       <b>폰을 바꿔도 기록을 옮길 수 있어요</b>
       <span class="note">라운드·내기·진단 기록을 파일 하나로 받아 두고, 새 폰에서 불러오면 그대로 돌아와요. 파일은 이 폰에서만 만들어지고 서버로 보내지 않아요. 동반자 이름도 들어 있으니 다른 사람에게 보내지 마세요.</span>
       <div class="yd-btns bk-btns"><button type="button" class="btn btn-flag" data-bk="save">백업 파일 받기</button><label class="btn btn-plain" for="bkFile">백업 불러오기</label><input type="file" id="bkFile" accept=".json,application/json" hidden></div>
+      <div id="bkWipe"><button type="button" class="btn btn-plain wq-forget" data-bk="askWipe">이 폰의 앱 기록 모두 지우기</button></div>
     </div>
   </section>
 
@@ -664,6 +670,7 @@ details.yd-card:not([open]) .yd-sum{margin-bottom:0}
       <h2>같이 치는 사람</h2>
       <div class="names" id="names"></div>
       <p class="note">첫 칸이 나예요. 3·4번째는 비우면 빠져요.</p>
+      <div id="grpBox" class="grp"></div>
     </div>
 
     <div class="card">
@@ -742,6 +749,7 @@ details.yd-card:not([open]) .yd-sum{margin-bottom:0}
         <div id="hzOpts" class="q" hidden><span class="ql">돈 방식</span><div class="quick" data-g="hzMode"></div><p class="note" id="hzNote"></p><span class="ql">후세인 정하기</span><div class="quick" data-g="hrank"></div><p class="note" id="hrNote"></p></div>
         <label class="agree"><input type="checkbox" id="age19"><span>내기하는 사람은 모두 19세 이상이고, 위 규칙에 모두 동의했어요</span></label>
       </div>
+      <div id="grpBet" class="grp"></div>
       </div>
     </details>
 
@@ -2248,13 +2256,15 @@ window.AGE18={k:"wise_age18_v1",
         if(!byA&&!(dr.n>0)){toast("몇 타인지 골라 주세요.");return;}
         var it=byA?{f:dr.f,t:dr.t,a:av}:{f:dr.f,t:dr.t,n:dr.n};
         S.bet.hd=Object.assign({},hdCfg());S.bet.hd.list=S.bet.hd.list.concat([it]);S.bet.hdDraft={how:dr.how};changed();toast(nameOf(dr.f)+" → "+nameOf(dr.t)+" "+(byA?money(av):dr.n+"타")+" 넣었어요.");return;}
-      case "askNew":$("resetArea").innerHTML='<div class="confirm"><span>지금 라운드 기록이 지워져요.</span><button class="btn btn-plain" type="button" data-act="new">지우고 새로 시작</button><button class="btn btn-plain" type="button" data-act="cancelNew">취소</button></div>';return;
+      case "askNew":$("resetArea").innerHTML='<div class="confirm"><span>지금 라운드 기록과 비용이 지워져요. 멤버·내기는 \'지난 라운드 그대로\'로 다시 불러올 수 있어요.</span><button class="btn btn-plain" type="button" data-act="new">지우고 새로 시작</button><button class="btn btn-plain" type="button" data-act="cancelNew">취소</button></div>';return;
       case "cancelNew":$("resetArea").innerHTML='<button class="btn btn-plain" type="button" data-act="askNew">새 라운드 시작</button>';return;
       case "new":
-        var keep=S.sample?null:{players:S.players.slice(),bet:Object.assign({},S.bet),stops:JSON.parse(JSON.stringify(S.stops)),drive:S.drive};
-        S=blank();if(keep){S.players=keep.players;S.bet=keep.bet;S.bet.vg={};S.bet.hz={};S.bet.near={};S.bet.tn={};S.bet.order=null;S.bet.eg={};S.bet.pk={};S.bet.dr={};S.bet.dc={};S.bet.ab={};S.bet.gal=[];S.bet.uc={};S.bet.hd=Object.assign({},hdCfg(),{list:[]});S.bet.hdDraft={};S.stops=keep.stops;S.drive=keep.drive;}
+        var keep=S.sample?null:{stops:JSON.parse(JSON.stringify(S.stops)),drive:S.drive};
+        if(!S.sample)grpKeepLast();
+        S=blank();if(keep){S.stops=keep.stops;S.drive=keep.drive;}
+        if(window.COST_RESET)window.COST_RESET();
         $("resetArea").innerHTML='<button class="btn btn-plain" type="button" data-act="askNew">새 라운드 시작</button>';
-        save();render();showTab("plan");toast("새 라운드를 시작해요. 공치러 어디 가세요?");return;
+        grpOpen=null;save();render();showTab("plan");toast("새 라운드를 시작해요. 공치러 어디 가세요?");return;
     }
   });
   document.addEventListener("input",function(e){
@@ -2286,6 +2296,72 @@ window.AGE18={k:"wise_age18_v1",
     if(d.where){S.stops[d.where].where=t.value;delete S.stops[d.where].pt;rtRes=null;changed();return;}
     if(d.pack!=null){S.pack[PACK()[+d.pack]]=t.checked;save();return;}
   });
+
+
+  /* ---------- 자주 치는 조: 멤버 + 내기 규칙을 이름 붙여 저장 (이 폰에만, 서버로 보내지 않음) ---------- */
+  var GKEY="wise_groups_v1",GMAX=10,grpOpen=null,grpDel=false,grpName="";
+  function gLoad(){try{var o=JSON.parse(localStorage.getItem(GKEY)||"null");if(o&&Array.isArray(o.list))return o;}catch(e){}return {list:[],last:null};}
+  function gStore(o){try{localStorage.setItem(GKEY,JSON.stringify(o));}catch(e){}}
+  function gEsc(x){return String(x==null?"":x).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];});}
+  /* 판마다 쌓이는 기록(홀별 결과·니어·핸디 목록)은 빼고 규칙만 */
+  function betRules(b){var x=JSON.parse(JSON.stringify(b||{}));x.vg={};x.hz={};x.near={};x.tn={};x.order=null;x.eg={};x.pk={};x.dr={};x.dc={};x.ab={};x.gal=[];x.uc={};x.hd=Object.assign({},x.hd||{},{list:[]});x.hdDraft={};return x;}
+  function hasNames(pl){return (pl||[]).some(function(n){return String(n||"").trim();});}
+  function hasScores(){return (S.scores||[]).some(function(r){return (r||[]).some(function(v){return v!=null;});});}
+  function grpKeepLast(){if(!hasNames(S.players)&&!(S.bet&&S.bet.on))return;var o=gLoad();o.last={players:S.players.slice(),bet:betRules(S.bet),t:Date.now()};gStore(o);}
+  function gameName(id){try{for(var i=0;i<GAMES.length;i++)if(GAMES[i].id===id)return GAMES[i].name;}catch(e){}return "";}
+  function gSum(g){var n=(g.players||[]).filter(function(x){return String(x||"").trim();}).length;return n+"명"+(g.bet&&g.bet.on?" · "+gameName(g.bet.game):" · 내기 안 함");}
+  function grpApply(g,label){
+    if(hasScores()){toast("타수를 적은 라운드에는 불러올 수 없어요. 새 라운드를 시작하고 불러와 주세요.");return;}
+    var b=blank();S.players=(g.players||[]).slice(0,4);while(S.players.length<4)S.players.push("");
+    S.bet=Object.assign(b.bet,betRules(g.bet));S.pick={};
+    save();render();toast("'"+label+"' 불러왔어요 ("+gSum(g)+")");
+  }
+  function grpHtml(where){
+    var o=gLoad(),h="";
+    if(where==="plan"&&(o.last||o.list.length)){
+      h+='<span class="ql">불러오기</span><div class="quick">';
+      if(o.last&&!grpDel)h+='<button type="button" class="chip" data-grp="last">지난 라운드 그대로</button>';
+      h+=o.list.map(function(g,i){return '<button type="button" class="chip'+(grpDel?' del':'')+'" data-grp="'+(grpDel?'del':'load')+'" data-gi="'+i+'">'+(grpDel?'× ':'')+gEsc(g.name)+'</button>';}).join("");
+      if(o.list.length)h+='<button type="button" class="chip" data-grp="delMode" aria-pressed="'+grpDel+'">'+(grpDel?'다 했어요':'조 지우기')+'</button>';
+      h+='</div>';
+    }
+    if(grpOpen===where){
+      h+='<div class="grp-save"><input type="text" id="grpIn-'+where+'" data-grpin="1" maxlength="12" placeholder="조 이름 (예: 타당조, 친구조, 회사조)" value="'+gEsc(grpName)+'"><button type="button" class="btn btn-flag" data-grp="save">저장</button><button type="button" class="btn btn-plain" data-grp="cancel">취소</button></div>'+
+        '<p class="note">지금 멤버와 내기 규칙(종류·금액·배판·보너스)을 이 폰에 저장해요. 같은 이름이면 새로 덮어써요.</p>';
+    }else{
+      h+='<div><button type="button" class="btn btn-plain" data-grp="open" data-gw="'+where+'">이 멤버·내기 규칙을 조로 저장</button></div>';
+    }
+    return h;
+  }
+  function renderGrp(){
+    ["plan","bet"].forEach(function(w){var el=$(w==="plan"?"grpBox":"grpBet");if(!el)return;
+      var a=document.activeElement;if(a&&a.getAttribute&&a.getAttribute("data-grpin")&&el.contains(a))return;
+      el.innerHTML=grpHtml(w);});
+  }
+  var _rp=renderPlan;renderPlan=function(){_rp();renderGrp();};
+  var _rs=renderScore;renderScore=function(){_rs();renderGrp();};
+  document.addEventListener("input",function(e){if(e.target&&e.target.getAttribute&&e.target.getAttribute("data-grpin"))grpName=e.target.value;});
+  document.addEventListener("keydown",function(e){if(e.key==="Enter"&&e.target&&e.target.getAttribute&&e.target.getAttribute("data-grpin")){e.preventDefault();grpSave();}});
+  function grpSave(){
+    var nm=String(grpName||"").trim().slice(0,12);if(!nm){toast("조 이름을 적어 주세요.");return;}
+    if(!hasNames(S.players)){toast("같이 치는 사람 이름을 먼저 넣어 주세요.");return;}
+    var o=gLoad(),i=-1;o.list.forEach(function(g,k){if(g.name===nm)i=k;});
+    var g={name:nm,players:S.players.slice(),bet:betRules(S.bet),t:Date.now()};
+    if(i>=0)o.list[i]=g;else{if(o.list.length>=GMAX){toast("조는 "+GMAX+"개까지 저장돼요. 안 쓰는 조를 지워 주세요.");return;}o.list.push(g);}
+    gStore(o);var a=document.activeElement;if(a&&a.blur)a.blur();grpOpen=null;grpName="";renderGrp();
+    toast(i>=0?"'"+nm+"' 새로 저장했어요 ("+gSum(g)+")":"'"+nm+"' 저장했어요 ("+gSum(g)+")");
+  }
+  document.addEventListener("click",function(e){
+    var b=e.target.closest("[data-grp]");if(!b)return;var a=b.getAttribute("data-grp"),o=gLoad();
+    if(a==="open"){grpOpen=b.getAttribute("data-gw");grpName="";grpDel=false;renderGrp();var f=$("grpIn-"+grpOpen);if(f)f.focus();return;}
+    if(a==="cancel"){var ae=document.activeElement;if(ae&&ae.blur)ae.blur();grpOpen=null;grpName="";renderGrp();return;}
+    if(a==="save"){grpSave();return;}
+    if(a==="last"){if(o.last)grpApply(o.last,"지난 라운드");return;}
+    if(a==="load"){var g=o.list[+b.getAttribute("data-gi")];if(g)grpApply(g,g.name);return;}
+    if(a==="delMode"){grpDel=!grpDel;renderGrp();return;}
+    if(a==="del"){var k=+b.getAttribute("data-gi"),d=o.list[k];if(!d)return;if(!window.confirm("'"+d.name+"' 지울까요?"))return;o.list.splice(k,1);gStore(o);if(!o.list.length)grpDel=false;renderGrp();toast("'"+d.name+"' 지웠어요");return;}
+  });
+  window.WG_GROUPS={load:gLoad,rules:betRules}; /* 테스트용 */
 
   render();
   var h0=(location.hash||"").slice(1);if(h0==="oneshot")h0="shot";window.START_TAB=h0;showTab(["home","plan","go","score","cost","type","quiz","shot"].indexOf(h0)>=0?h0:"home");
@@ -4384,7 +4460,7 @@ window.SHOT_GEN=(function(){
 <script>
 /* ---------- 내 기록 백업: 이 폰 브라우저에 저장된 앱 기록을 파일 하나로 받기 / 불러오기 — 서버로 보내지 않는다 ---------- */
 (function(){
-  var KEYS=["golfround.v1","golfround.profile.v1","golfround.recent.v1","gpas_app_v1","gcas_app_v1","gsas_app_v1","gras_app_v1","wise_ride_v1","wise_wdt_v1","wq_device_id","wq_tempo_hist_v1","wq_swing_results_v1","wise_age18_v1","wise_cost_v1","wise_quiz_v1","wise_shot_v1"];
+  var KEYS=["golfround.v1","golfround.profile.v1","golfround.recent.v1","gpas_app_v1","gcas_app_v1","gsas_app_v1","gras_app_v1","wise_ride_v1","wise_wdt_v1","wq_device_id","wq_tempo_hist_v1","wq_swing_results_v1","wise_age18_v1","wise_cost_v1","wise_quiz_v1","wise_shot_v1","wise_groups_v1"];
   var APP="wisegolf-golf-life";
   function $(id){return document.getElementById(id);}
   function toast(msg){var t=document.querySelector(".toast");if(!t){t=document.createElement("div");t.className="toast";t.setAttribute("role","status");document.body.appendChild(t);}t.textContent=msg;t.hidden=false;clearTimeout(toast.t);toast.t=setTimeout(function(){t.hidden=true;},3000);}
@@ -4418,7 +4494,30 @@ window.SHOT_GEN=(function(){
       location.hash="home";location.reload();
     };rd.onerror=function(){toast("파일을 읽지 못했어요.");};rd.readAsText(f);
   }
-  document.addEventListener("click",function(e){var b=e.target.closest("[data-bk]");if(b&&b.dataset.bk==="save")save();});
+  /* 모두 지우기: 서버의 진단·유형 기록을 먼저 지우고(기기 번호가 폰에 있어야 지울 수 있음) 폰 기록을 지운다 */
+  var WIPE_BTN='<button type="button" class="btn btn-plain wq-forget" data-bk="askWipe">이 폰의 앱 기록 모두 지우기</button>';
+  function wipeBox(h){var el=$("bkWipe");if(el)el.innerHTML=h;}
+  function wipeLocal(){
+    try{var ks=[];for(var i=0;i<localStorage.length;i++){var k=localStorage.key(i);if(KEYS.indexOf(k)>=0||/^(golfround|wise_|wq_|gpas|gcas|gsas|gras)/.test(k))ks.push(k);}ks.forEach(function(k){localStorage.removeItem(k);});}
+    catch(e){toast("지우지 못했어요. 브라우저 저장공간이 꺼져 있는지 확인해 주세요.");return;}
+    location.hash="";location.reload();
+  }
+  function wipe(){
+    var WQ=window.WQ;if(!WQ||!WQ.api||!WQ.post){wipeLocal();return;}
+    wipeBox('<p class="note">서버에 저장된 진단·유형 검사 기록을 지우는 중이에요…</p>');
+    var dv=WQ.deviceId();
+    Promise.all([WQ.post({action:"forget",device_id:dv}),window.GRAS_FORGET?window.GRAS_FORGET(dv):Promise.resolve({ok:true})]).then(function(rs){
+      if(rs[0]&&rs[0].ok&&rs[1]&&rs[1].ok){wipeLocal();return;}
+      wipeBox('<div class="confirm"><span>서버 기록을 지우지 못했어요. 인터넷 연결을 확인하고 다시 해 주세요. 폰 기록만 지우면 서버 기록은 나중에 지울 수 없어요(1년 뒤 누구 것인지 모르게 바뀌어요).</span><button class="btn btn-plain" type="button" data-bk="wipe">다시 해 보기</button><button class="btn btn-plain" type="button" data-bk="wipeLocal">폰 기록만 지우기</button><button class="btn btn-plain" type="button" data-bk="noWipe">취소</button></div>');
+    },function(){wipeBox('<div class="confirm"><span>서버 기록을 지우지 못했어요.</span><button class="btn btn-plain" type="button" data-bk="wipe">다시 해 보기</button><button class="btn btn-plain" type="button" data-bk="noWipe">취소</button></div>');});
+  }
+  document.addEventListener("click",function(e){var b=e.target.closest("[data-bk]");if(!b)return;var a=b.dataset.bk;
+    if(a==="save"){save();return;}
+    if(a==="askWipe"){wipeBox('<div class="confirm"><span>라운드·내기·비용·검사 결과·저장한 조까지 이 폰의 앱 기록이 모두 지워지고, 서버에 저장된 진단·유형 검사 기록도 같이 지워요. 되돌릴 수 없어요. 남길 기록이 있으면 먼저 \'백업 파일 받기\'를 눌러 주세요.</span><button class="btn btn-plain" type="button" data-bk="wipe">모두 지우기</button><button class="btn btn-plain" type="button" data-bk="noWipe">취소</button></div>');return;}
+    if(a==="noWipe"){wipeBox(WIPE_BTN);return;}
+    if(a==="wipe"){wipe();return;}
+    if(a==="wipeLocal"){wipeLocal();return;}
+  });
   document.addEventListener("change",function(e){if(e.target&&e.target.id==="bkFile"){var f=e.target.files&&e.target.files[0];e.target.value="";restore(f);}});
   window.WG_BACKUP={collect:collect,parse:parse}; /* 테스트용 */
 })();
@@ -4434,6 +4533,8 @@ window.SHOT_GEN=(function(){
   var C=load(),PICS=[];
   function $(id){return document.getElementById(id);}
   function blank(){return {people:[],items:[],unit:100,acct:"",pay:""};}
+  /* 새 라운드 시작 때 사람·항목만 비움 (계좌·송금 링크·단위는 남김) */
+  window.COST_RESET=function(){C={people:[],items:[],unit:C.unit,acct:C.acct,pay:C.pay};PICS.forEach(function(p){try{URL.revokeObjectURL(p.url);}catch(_){ }});PICS=[];save();try{render();}catch(e){}};
   function load(){try{var o=JSON.parse(localStorage.getItem(KEY)||"null");if(o&&o.people){var b=blank();Object.keys(b).forEach(function(k){if(o[k]===undefined)o[k]=b[k];});return o;}}catch(e){}return blank();}
   function save(){try{localStorage.setItem(KEY,JSON.stringify(C));}catch(e){}}
   function esc(x){return String(x==null?"":x).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];});}
