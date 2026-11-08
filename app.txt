@@ -1475,11 +1475,9 @@ window.AGE18={k:"wise_age18_v1",
     {id:"jopok",name:"조폭",sub:"판돈 스킨스",min:3,unit:"홀 상금 (원)",
       desc:["모두 같은 판돈을 내서 가운데 모아요.","홀마다 혼자 1등이면 홀 상금을 가져가요. 1등이 여럿이면 다음 홀로 이월(상금이 쌓여요).","돈 딴 사람이 더블 보기면 마지막에 딴 돈을, 트리플 보기 이상이면 딴 돈 전부를 판에 돌려놔요.","버디하면 가장 많이 딴 사람에게서 홀 상금만큼 뺏어 와요.","끝나고 남은 판돈은 똑같이 나눠요."]},
     {id:"happy",name:"해피",sub:"4321",min:4,max:4,
-      desc:["4명이 판돈을 똑같이 내요(예: 5만 원씩, 모두 20만 원).","홀마다 등수대로 가져가요. 5만 원씩이면 1등 4천·2등 3천·3등 2천·4등 1천(홀마다 1만 원), 10만 원씩이면 두 배예요.","동타면 앞 홀에서 더 못 친 사람이 앞 등수를 가져가요(앞 홀도 같으면 그 전 홀로). 1번 홀처럼 끝까지 같으면 뽑기로 정한 타순이 빠른 사람이 앞 등수예요.","남는 돈은 파3 니어 상금이에요(5만 원씩이면 2만 원 ÷ 파3 4개 = 5천 원).","니어가 없으면 다음 파3로 이월하거나 공금(그늘집·밥값)으로 돌려요.","15만 원씩 걷어 캐디피 15만 원을 먼저 빼고, 홀마다 1등 8천·2등 6천·3등 4천·4등 2천을 가져가는 모임도 있어요. 아래에서 \"8·6·4·2천 원\"과 먼저 빼는 돈을 넣으면 돼요."]},
-    {id:"scratch",name:"스크래치",sub:"전체 타수",min:2,unit:"한 타당 금액 (원)",
-      desc:["18홀 전체 타수를 두 사람씩 비교해요.","전체 타수 차이 × 금액을 진 사람이 이긴 사람에게 줘요. 배판 없어요.","홀마다 지금까지의 누적으로 보여줘요."]}
+      desc:["4명이 판돈을 똑같이 내요(예: 5만 원씩, 모두 20만 원).","홀마다 등수대로 가져가요. 5만 원씩이면 1등 4천·2등 3천·3등 2천·4등 1천(홀마다 1만 원), 10만 원씩이면 두 배예요.","동타면 앞 홀에서 더 못 친 사람이 앞 등수를 가져가요(앞 홀도 같으면 그 전 홀로). 1번 홀처럼 끝까지 같으면 뽑기로 정한 타순이 빠른 사람이 앞 등수예요.","남는 돈은 파3 니어 상금이에요(5만 원씩이면 2만 원 ÷ 파3 4개 = 5천 원).","니어가 없으면 다음 파3로 이월하거나 공금(그늘집·밥값)으로 돌려요.","15만 원씩 걷어 캐디피 15만 원을 먼저 빼고, 홀마다 1등 8천·2등 6천·3등 4천·4등 2천을 가져가는 모임도 있어요. 아래에서 \"8·6·4·2천 원\"과 먼저 빼는 돈을 넣으면 돼요."]}
   ];
-  var AMT={tadang:[["unit","한 타당 금액 (원)","예: 1000",1000]],scratch:[["unit","한 타당 금액 (원)","예: 1000",1000]],vegas:[["seed","한 사람이 걷는 돈 (원)","예: 100000",10000]],
+  var AMT={tadang:[["unit","한 타당 금액 (원)","예: 1000",1000]],vegas:[["seed","한 사람이 걷는 돈 (원)","예: 100000",10000]],
     hussein:[["unit","한 홀 금액 (원)","예: 1000",1000]],jopok:[["seed","한 사람이 내는 판돈 (원)","예: 50000",10000],["unit","홀 상금 (원)","예: 10000",1000]],happy:[["seed","한 사람이 걷는 돈 (원)","예: 50000",10000],["fee","판돈에서 먼저 빼는 돈 (캐디피 등, 원)","예: 150000",10000],["near","파3 니어 상금 (원 · 비우면 남는 돈을 파3 수로 나눔)","예: 10000",1000],["birdie","버디 상금 (원 · 비우면 없음)","예: 10000",1000]]};
   function amtFields(gid){if(gid==="hussein"&&S.bet.hzMode==="pot")return [["seed","한 사람이 걷는 돈 (원)","예: 100000",10000],["unit","홀 상금 (원)","예: 20000",1000]];return AMT[gid]||[];}
   function amt(k,gid){var a=(S.bet.amt||{})[gid||S.bet.game]||{};return Math.max(0,Math.floor(+a[k]||0));}
@@ -2298,9 +2296,10 @@ window.AGE18={k:"wise_age18_v1",
   });
 
 
-  /* ---------- 자주 치는 조: 멤버 + 내기 규칙을 이름 붙여 저장 (이 폰에만, 서버로 보내지 않음) ---------- */
-  var GKEY="wise_groups_v1",GMAX=10,grpOpen=null,grpDel=false,grpName="";
-  function gLoad(){try{var o=JSON.parse(localStorage.getItem(GKEY)||"null");if(o&&Array.isArray(o.list))return o;}catch(e){}return {list:[],last:null};}
+  /* ---------- 자주 치는 조(멤버 + 내기 규칙)와 내기 규칙만 따로 이름 붙여 저장 — 이 폰에만, 서버로 보내지 않음 ---------- */
+  if(S&&S.bet&&S.bet.game==="scratch"){S.bet.game="tadang";}
+  var GKEY="wise_groups_v1",GMAX=10,grpOpen=null,grpDel=null,grpName="";
+  function gLoad(){var o=null;try{o=JSON.parse(localStorage.getItem(GKEY)||"null");}catch(e){}if(!o||typeof o!=="object")o={};if(!Array.isArray(o.list))o.list=[];if(!Array.isArray(o.rules))o.rules=[];if(!o.last)o.last=null;return o;}
   function gStore(o){try{localStorage.setItem(GKEY,JSON.stringify(o));}catch(e){}}
   function gEsc(x){return String(x==null?"":x).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];});}
   /* 판마다 쌓이는 기록(홀별 결과·니어·핸디 목록)은 빼고 규칙만 */
@@ -2309,27 +2308,37 @@ window.AGE18={k:"wise_age18_v1",
   function hasScores(){return (S.scores||[]).some(function(r){return (r||[]).some(function(v){return v!=null;});});}
   function grpKeepLast(){if(!hasNames(S.players)&&!(S.bet&&S.bet.on))return;var o=gLoad();o.last={players:S.players.slice(),bet:betRules(S.bet),t:Date.now()};gStore(o);}
   function gameName(id){try{for(var i=0;i<GAMES.length;i++)if(GAMES[i].id===id)return GAMES[i].name;}catch(e){}return "";}
-  function gSum(g){var n=(g.players||[]).filter(function(x){return String(x||"").trim();}).length;return n+"명"+(g.bet&&g.bet.on?" · "+gameName(g.bet.game):" · 내기 안 함");}
+  function rSum(b){if(!b||!b.on)return "내기 안 함";var a=(b.amt||{})[b.game]||{},k=Object.keys(a)[0],v=k?+a[k]:0;return gameName(b.game)+(v>0?" "+v.toLocaleString("ko-KR")+"원":"");}
+  function gSum(g){var n=(g.players||[]).filter(function(x){return String(x||"").trim();}).length;return n+"명 · "+rSum(g.bet);}
   function grpApply(g,label){
     if(hasScores()){toast("타수를 적은 라운드에는 불러올 수 없어요. 새 라운드를 시작하고 불러와 주세요.");return;}
     var b=blank();S.players=(g.players||[]).slice(0,4);while(S.players.length<4)S.players.push("");
     S.bet=Object.assign(b.bet,betRules(g.bet));S.pick={};
     save();render();toast("'"+label+"' 불러왔어요 ("+gSum(g)+")");
   }
+  function ruleApply(r){
+    if(hasScores()){toast("타수를 적은 라운드에는 규칙을 불러올 수 없어요. 새 라운드에서 불러와 주세요.");return;}
+    S.bet=Object.assign(blank().bet,betRules(r.bet));
+    save();render();toast("'"+r.name+"' 불러왔어요 ("+rSum(r.bet)+") · 멤버는 그대로");
+  }
+  function chips(arr,kind,where){
+    var del=grpDel===where;
+    return arr.map(function(g,i){return '<button type="button" class="chip'+(del?' del':'')+'" data-grp="'+(del?'del':'load')+'" data-gk="'+kind+'" data-gi="'+i+'">'+(del?'× ':'')+gEsc(g.name)+'</button>';}).join("")+
+      (arr.length?'<button type="button" class="chip" data-grp="delMode" data-gw="'+where+'" aria-pressed="'+del+'">'+(del?'다 했어요':'지우기')+'</button>':'');
+  }
+  function saveForm(where,kind){
+    var ph=kind==="rule"?"규칙 이름 (예: 동호회 규칙, 회사 규칙)":"조 이름 (예: 타당조, 친구조, 회사조)";
+    var nt=kind==="rule"?"내기 규칙(종류·금액·배판·보너스)만 저장해요. 멤버는 안 들어가요. 같은 이름이면 새로 덮어써요.":"지금 멤버와 내기 규칙(종류·금액·배판·보너스)을 같이 저장해요. 같은 이름이면 새로 덮어써요.";
+    return '<div class="grp-save"><input type="text" id="grpIn-'+where+'" data-grpin="1" maxlength="12" placeholder="'+ph+'" value="'+gEsc(grpName)+'"><button type="button" class="btn btn-flag" data-grp="save">저장</button><button type="button" class="btn btn-plain" data-grp="cancel">취소</button></div><p class="note">'+nt+' 이 폰에만 저장돼요.</p>';
+  }
   function grpHtml(where){
-    var o=gLoad(),h="";
-    if(where==="plan"&&(o.last||o.list.length)){
-      h+='<span class="ql">불러오기</span><div class="quick">';
-      if(o.last&&!grpDel)h+='<button type="button" class="chip" data-grp="last">지난 라운드 그대로</button>';
-      h+=o.list.map(function(g,i){return '<button type="button" class="chip'+(grpDel?' del':'')+'" data-grp="'+(grpDel?'del':'load')+'" data-gi="'+i+'">'+(grpDel?'× ':'')+gEsc(g.name)+'</button>';}).join("");
-      if(o.list.length)h+='<button type="button" class="chip" data-grp="delMode" aria-pressed="'+grpDel+'">'+(grpDel?'다 했어요':'조 지우기')+'</button>';
-      h+='</div>';
-    }
-    if(grpOpen===where){
-      h+='<div class="grp-save"><input type="text" id="grpIn-'+where+'" data-grpin="1" maxlength="12" placeholder="조 이름 (예: 타당조, 친구조, 회사조)" value="'+gEsc(grpName)+'"><button type="button" class="btn btn-flag" data-grp="save">저장</button><button type="button" class="btn btn-plain" data-grp="cancel">취소</button></div>'+
-        '<p class="note">지금 멤버와 내기 규칙(종류·금액·배판·보너스)을 이 폰에 저장해요. 같은 이름이면 새로 덮어써요.</p>';
+    var o=gLoad(),h="",op=grpOpen&&grpOpen.split(":");
+    if(where==="plan"){
+      if(o.last||o.list.length){h+='<span class="ql">조 불러오기</span><div class="quick">'+(o.last&&grpDel!=="plan"?'<button type="button" class="chip" data-grp="last">지난 라운드 그대로</button>':'')+chips(o.list,"grp","plan")+'</div>';}
+      h+=op&&op[0]==="plan"?saveForm("plan","grp"):'<div><button type="button" class="btn btn-plain" data-grp="open" data-gw="plan:grp">이 멤버·내기 규칙을 조로 저장</button></div>';
     }else{
-      h+='<div><button type="button" class="btn btn-plain" data-grp="open" data-gw="'+where+'">이 멤버·내기 규칙을 조로 저장</button></div>';
+      if(o.rules.length){h+='<span class="ql">저장한 내기 규칙</span><div class="quick">'+chips(o.rules,"rule","bet")+'</div>';}
+      h+=op&&op[0]==="bet"?saveForm("bet",op[1]):'<div class="quick"><button type="button" class="btn btn-plain" data-grp="open" data-gw="bet:rule">이 내기 규칙만 저장</button><button type="button" class="btn btn-plain" data-grp="open" data-gw="bet:grp">멤버까지 조로 저장</button></div>';
     }
     return h;
   }
@@ -2343,23 +2352,26 @@ window.AGE18={k:"wise_age18_v1",
   document.addEventListener("input",function(e){if(e.target&&e.target.getAttribute&&e.target.getAttribute("data-grpin"))grpName=e.target.value;});
   document.addEventListener("keydown",function(e){if(e.key==="Enter"&&e.target&&e.target.getAttribute&&e.target.getAttribute("data-grpin")){e.preventDefault();grpSave();}});
   function grpSave(){
-    var nm=String(grpName||"").trim().slice(0,12);if(!nm){toast("조 이름을 적어 주세요.");return;}
-    if(!hasNames(S.players)){toast("같이 치는 사람 이름을 먼저 넣어 주세요.");return;}
-    var o=gLoad(),i=-1;o.list.forEach(function(g,k){if(g.name===nm)i=k;});
-    var g={name:nm,players:S.players.slice(),bet:betRules(S.bet),t:Date.now()};
-    if(i>=0)o.list[i]=g;else{if(o.list.length>=GMAX){toast("조는 "+GMAX+"개까지 저장돼요. 안 쓰는 조를 지워 주세요.");return;}o.list.push(g);}
+    var kind=grpOpen?grpOpen.split(":")[1]:"grp",isRule=kind==="rule";
+    var nm=String(grpName||"").trim().slice(0,12);if(!nm){toast(isRule?"규칙 이름을 적어 주세요.":"조 이름을 적어 주세요.");return;}
+    if(isRule&&!(S.bet&&S.bet.on)){toast("내기 종류를 먼저 골라 주세요.");return;}
+    if(!isRule&&!hasNames(S.players)){toast("같이 치는 사람 이름을 먼저 넣어 주세요.");return;}
+    var o=gLoad(),arr=isRule?o.rules:o.list,i=-1;arr.forEach(function(g,k){if(g.name===nm)i=k;});
+    var g=isRule?{name:nm,bet:betRules(S.bet),t:Date.now()}:{name:nm,players:S.players.slice(),bet:betRules(S.bet),t:Date.now()};
+    if(i>=0)arr[i]=g;else{if(arr.length>=GMAX){toast((isRule?"규칙은 ":"조는 ")+GMAX+"개까지 저장돼요. 안 쓰는 걸 지워 주세요.");return;}arr.push(g);}
     gStore(o);var a=document.activeElement;if(a&&a.blur)a.blur();grpOpen=null;grpName="";renderGrp();
-    toast(i>=0?"'"+nm+"' 새로 저장했어요 ("+gSum(g)+")":"'"+nm+"' 저장했어요 ("+gSum(g)+")");
+    var sm=isRule?rSum(g.bet):gSum(g);
+    toast("'"+nm+"' "+(i>=0?"새로 ":"")+"저장했어요 ("+sm+")");
   }
   document.addEventListener("click",function(e){
-    var b=e.target.closest("[data-grp]");if(!b)return;var a=b.getAttribute("data-grp"),o=gLoad();
-    if(a==="open"){grpOpen=b.getAttribute("data-gw");grpName="";grpDel=false;renderGrp();var f=$("grpIn-"+grpOpen);if(f)f.focus();return;}
+    var b=e.target.closest("[data-grp]");if(!b)return;var a=b.getAttribute("data-grp"),o=gLoad(),isRule=b.getAttribute("data-gk")==="rule",arr=isRule?o.rules:o.list;
+    if(a==="open"){grpOpen=b.getAttribute("data-gw");grpName="";grpDel=null;renderGrp();var f=$("grpIn-"+grpOpen.split(":")[0]);if(f)f.focus();return;}
     if(a==="cancel"){var ae=document.activeElement;if(ae&&ae.blur)ae.blur();grpOpen=null;grpName="";renderGrp();return;}
     if(a==="save"){grpSave();return;}
     if(a==="last"){if(o.last)grpApply(o.last,"지난 라운드");return;}
-    if(a==="load"){var g=o.list[+b.getAttribute("data-gi")];if(g)grpApply(g,g.name);return;}
-    if(a==="delMode"){grpDel=!grpDel;renderGrp();return;}
-    if(a==="del"){var k=+b.getAttribute("data-gi"),d=o.list[k];if(!d)return;if(!window.confirm("'"+d.name+"' 지울까요?"))return;o.list.splice(k,1);gStore(o);if(!o.list.length)grpDel=false;renderGrp();toast("'"+d.name+"' 지웠어요");return;}
+    if(a==="load"){var g=arr[+b.getAttribute("data-gi")];if(g){if(isRule)ruleApply(g);else grpApply(g,g.name);}return;}
+    if(a==="delMode"){var w=b.getAttribute("data-gw");grpDel=grpDel===w?null:w;renderGrp();return;}
+    if(a==="del"){var k=+b.getAttribute("data-gi"),d=arr[k];if(!d)return;if(!window.confirm("'"+d.name+"' 지울까요?"))return;arr.splice(k,1);gStore(o);if(!arr.length)grpDel=null;renderGrp();toast("'"+d.name+"' 지웠어요");return;}
   });
   window.WG_GROUPS={load:gLoad,rules:betRules}; /* 테스트용 */
 
