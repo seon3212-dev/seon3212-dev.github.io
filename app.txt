@@ -653,7 +653,7 @@ details.yd-card:not([open]) .yd-sum{margin-bottom:0}
     <div class="card" id="levelAsk" hidden><b>골프 실력이 어느 정도예요?</b><span class="note">처음 한 번만 물어봐요. 준비물과 안내를 맞춰 드려요. 나중에 "가는 길"에서 바꿀 수 있어요.</span><div class="quick" id="levelChips"></div></div>
     <div class="chem">
       <b>공 치기 전에, 동반자 케미 한번 볼까요?</b>
-      <span>골프 유형 검사를 하고 서로 어떤 스타일인지 맞춰 보세요. 같이 치는 사람을 알면 라운드가 더 재밌어져요.</span>
+      <span>골프 유형 검사로 나와 동반자가 어떤 스타일인지 맞춰 보세요. 3분이면 끝나요.</span>
       <button type="button" class="btn btn-flag" data-tab="type">골프 유형 검사 시작</button>
       <small>만 18세 이상만 할 수 있어요.</small>
     </div>
@@ -2627,14 +2627,14 @@ window.AGE18={k:"wise_age18_v1",
 
   /* ---- 영역과 검사 ---- */
   var REG=[
-    {id:"ankle",n:"발목",txt:"발목이 덜 접혀요. 어드레스에서 무릎을 굽히거나 다운스윙에서 버티는 데 영향을 주는지 확인해 볼 만해요."},
-    {id:"hip",n:"고관절·골반",txt:"고관절·골반이 덜 돌아가거나 따로 놀지 못해요. 백스윙에서 몸이 옆으로 밀리거나(스웨이) 다운스윙에서 일어서는(얼리 익스텐션) 동작과 연결되는지 확인해 볼 만해요."},
-    {id:"trunk",n:"몸통 회전",txt:"가슴이 덜 돌아가거나 골반과 따로 돌지 못해요. 백스윙이 팔로만 커지거나 자세가 무너지는 것과 연결되는지 확인해 볼 만해요."},
-    {id:"shoulder",n:"어깨",txt:"어깨가 덜 올라가거나 덜 돌아가요. 백스윙 탑에서 자세가 무너지거나 팔꿈치가 들리는 것과 연결되는지 확인해 볼 만해요."},
-    {id:"chain",n:"전신 연결",txt:"발목·고관절·어깨를 한꺼번에 쓰는 동작이 어려워요. 어드레스 자세를 끝까지 지키는 것과 연결되는지 확인해 볼 만해요."},
-    {id:"balance",n:"균형·하체",txt:"한 다리로 버티는 힘이나 균형이 부족해요. 체중 이동과 피니시가 흔들리는지 확인해 볼 만해요."},
-    {id:"arm",n:"목·팔·손목",txt:"목·팔뚝·손목 움직임이 제한돼요. 백스윙 때 고개가 따라 돌거나 코킹·릴리스가 어색한지 확인해 볼 만해요."},
-    {id:"endure",n:"지속능력",txt:"후반으로 갈수록 몸이 버티기 힘들어요. 후반 9홀에 스윙이 무너지는 것과 연결되는지 확인해 볼 만해요."}
+    {id:"ankle",n:"발목",txt:"발목이 덜 접혀요. 어드레스에서 무릎 굽히기나 다운스윙에서 버티기가 잘 안 되는지 봐 주세요."},
+    {id:"hip",n:"고관절·골반",txt:"고관절·골반이 덜 돌아가거나 따로 놀지 못해요. 백스윙에서 몸이 옆으로 밀리거나(스웨이) 다운스윙에서 일어서는(얼리 익스텐션) 버릇이 있다면 여기서 올 수 있어요."},
+    {id:"trunk",n:"몸통 회전",txt:"가슴이 덜 돌아가거나 골반과 따로 돌지 못해요. 백스윙이 팔로만 커지거나 자세가 무너진다면 같이 살펴보세요."},
+    {id:"shoulder",n:"어깨",txt:"어깨가 덜 올라가거나 덜 돌아가요. 백스윙 탑에서 자세가 무너지거나 팔꿈치가 들리는지 확인해 보세요."},
+    {id:"chain",n:"전신 연결",txt:"발목·고관절·어깨를 한꺼번에 쓰는 동작이 어려워요. 스윙하는 동안 어드레스 자세가 끝까지 유지되는지 봐 주세요."},
+    {id:"balance",n:"균형·하체",txt:"한 다리로 버티는 힘이나 균형이 부족해요. 체중을 옮길 때나 피니시에서 몸이 흔들리는지 살펴보세요."},
+    {id:"arm",n:"목·팔·손목",txt:"목·팔뚝·손목 움직임이 제한돼요. 백스윙 때 고개가 따라 돌거나 코킹·릴리스가 어색하지 않은지 확인해 보세요."},
+    {id:"endure",n:"지속능력",txt:"후반으로 갈수록 몸이 버티기 힘들어요. 후반 9홀에 스윙이 무너진다면 체력 때문일 수 있어요."}
   ];
   function regName(id){for(var i=0;i<REG.length;i++)if(REG[i].id===id)return REG[i].n;return id;}
   var G4=["A","B","C","D"],PTS={A:4,B:3,C:2,D:1};
@@ -2854,9 +2854,9 @@ window.AGE18={k:"wise_age18_v1",
   var ST={pri:["우선 확인","gp-pri"],watch:["확인 가치 있음","gp-watch"],good:["양호","gp-good"],hold:["판정 보류","gp-hold"],none:["아직 안 함","gp-none"]};
   function swingNote(a,c){
     var lead=a.isLead;
-    if(a.t.id==="hipIR")return lead?"앞쪽 고관절이 덜 돌아요. 다운스윙에서 몸이 일어서거나(얼리 익스텐션) 앞으로 밀리는(슬라이드) 것과 연결되는지 확인해 볼 만해요.":"뒤쪽 고관절이 덜 돌아요. 백스윙에서 몸이 옆으로 밀리는(스웨이) 것과 연결되는지 확인해 볼 만해요.";
-    if(a.t.id==="balance"||a.t.id==="oneChair"||a.t.id==="bridge")return lead?"앞쪽 다리로 버티는 힘이 약해요. 피니시에서 버티기 힘든지 확인해 볼 만해요.":"뒤쪽 다리로 버티는 힘이 약해요. 백스윙에서 오른쪽으로 밀리는지 확인해 볼 만해요.".replace("오른쪽",c.hand==="L"?"왼쪽":"오른쪽");
-    if(a.t.id==="ninety"&&!lead)return "뒤쪽 어깨가 덜 돌아요. 백스윙 탑에서 팔꿈치가 들리는(플라잉 엘보) 것과 연결되는지 확인해 볼 만해요.";
+    if(a.t.id==="hipIR")return lead?"앞쪽 고관절이 덜 돌아요. 다운스윙에서 몸이 일어서거나(얼리 익스텐션) 앞으로 밀린다면(슬라이드) 여기서 올 수 있어요.":"뒤쪽 고관절이 덜 돌아요. 백스윙에서 몸이 옆으로 밀리는지(스웨이) 봐 주세요.";
+    if(a.t.id==="balance"||a.t.id==="oneChair"||a.t.id==="bridge")return lead?"앞쪽 다리로 버티는 힘이 약해요. 피니시에서 끝까지 서 있기 힘든지 확인해 보세요.":"뒤쪽 다리로 버티는 힘이 약해요. 백스윙에서 몸이 뒤쪽으로 밀리는지 살펴보세요.".replace("오른쪽",c.hand==="L"?"왼쪽":"오른쪽");
+    if(a.t.id==="ninety"&&!lead)return "뒤쪽 어깨가 덜 돌아요. 백스윙 탑에서 팔꿈치가 들린다면(플라잉 엘보) 같이 살펴보세요.";
     return "";
   }
   function summaryOf(res){
@@ -3283,7 +3283,7 @@ window.AGE18={k:"wise_age18_v1",
     }else{
       if(r.safety==="caution")h+='<div class="card gp-warn"><b>점검도 한 번 받아 보세요</b><p>'+(c.sig.length?"고르신 것: "+esc(c.sig.map(function(s){for(var i=0;i<SIG.length;i++)if(SIG[i][0]===s)return SIG[i][1];return "";}).join(", "))+".":"이상이 있는지 잘 모르겠다고 하셨어요.")+' 당장 위험한 건 아니지만, 세게 치기 전에 한 번 점검받는 게 좋아요.</p></div>';
       h+='<div class="card"><h2>답해 주신 것</h2>'+(r.facts.length?'<ul class="gc-facts">'+r.facts.map(function(f){return '<li>'+esc(f[0])+' <small>'+esc(f[1])+'</small></li>';}).join("")+'</ul>':'<p class="note">답해 주신 내용이 거의 없어요.</p>')+'</div>';
-      h+='<div class="card"><h2>아직 모르는 것</h2><p class="note">측정해야 알 수 있는 값이에요. 짐작으로 채우지 않았어요.</p><div class="gp-row">'+r.unknown.map(function(u){return '<span class="gc-tag">'+esc(u)+'</span>';}).join("")+'</div></div>';
+      h+='<div class="card"><h2>아직 모르는 것</h2><p class="note">측정해야 알 수 있는 값이에요.</p><div class="gp-row">'+r.unknown.map(function(u){return '<span class="gc-tag">'+esc(u)+'</span>';}).join("")+'</div></div>';
       var cmp=[];
       r.flow.forEach(function(f){cmp.push(f);});
       r.comps.forEach(function(x){if(x.st==="ok")cmp.push(cn(x.id)+J(x.id,"은")+" 괜찮다고 하셨죠. 그럼 "+cn(c.p1)+" 쪽 문제일 가능성이 커요.");if(x.st==="bad")cmp.push(cn(x.id)+"도 같이 안 맞는다고 하셨죠. 채 하나 문제라기보다 세트 흐름이나 스윙도 같이 봐야 해요.");
@@ -3407,7 +3407,7 @@ window.AGE18={k:"wise_age18_v1",
     f("irons");f("wedges"); /* 웨지가 아이언보다 가볍거나 부드러운 건 일부러 쓰는 경우가 많아 따로 짚지 않음 */
     /* 유틸↔아이언: 카본 유틸과 스틸 아이언은 강도 글자·무게 차이가 커도 흔하고 문제없어서 짚지 않음 */
     var b=c.bag||[],sc=c.score;
-    if((sc==="110"||sc==="120")&&(b.indexOf("i3")>=0||b.indexOf("i4")>=0))tips.push("100타대 실력에 3·4번 아이언이 들어 있어요. 이 실력대에서는 같은 거리를 유틸리티로 치는 게 훨씬 쉬워요.");
+    if((sc==="110"||sc==="120")&&(b.indexOf("i3")>=0||b.indexOf("i4")>=0))tips.push("100타대 실력에 3·4번 아이언이 들어 있어요. 이 실력대에서는 같은 거리를 유틸리티로 치는 게 더 편해요.");
     var lv=notes.filter(function(x){return x.indexOf("일부러 그렇게 하신")<0;}).length;
     return {notes:notes,tips:tips,known:known,rows:rows.length,flags:lv,caveat:jump?"단, 강도 표기는 제조사마다 기준이 달라요. 샤프트 브랜드가 다르면 두세 칸 차이가 나도 실제 강도는 맞을 수 있어요.":"",okText:known>=2?"샤프트 강도가 채마다 단계별로 잘 이어져 있어요.":"강도를 고르지 않아서 백 전체 구성은 보지 못했어요."};
   }
