@@ -1334,11 +1334,22 @@ window.AGE18={k:"wise_age18_v1",
     ev.sort(function(x,y){return x.t-y.t;});
     return {depart:depart,tee:tee,arrive:arrive,D:S.route.total,ev:ev,prev:depart<0,pk:pk,wake:wake,prep:prep,real:true};
   }
+  /* 목록에서 고른 골프장이면 그 시·군(예: 제주시, 광산구)이 주소에 들어 있는 결과만 맞는 것으로 봄 */
+  function courseCity(){var c=S.courseId!=null&&COURSES[S.courseId];if(!c||c.name!==S.course||!c.city)return "";var w=String(c.city).trim().split(/\s+/);return w[w.length-1];}
+  function locFits(loc){var ct=courseCity();return !ct||String((loc&&loc.addr)||"").indexOf(ct)>=0;}
   function ensureCourse(){
-    if(S.courseLoc&&S.courseLoc.for===S.course)return Promise.resolve(true);
+    if(S.courseLoc&&S.courseLoc.for===S.course&&locFits(S.courseLoc))return Promise.resolve(true);
     if(!S.course)return Promise.resolve(false);
-    return rapi({action:"place",q:S.course}).then(function(r){if(!r.ok||!r.list||!r.list.length)return false;S.courseLoc=Object.assign({for:S.course},r.list[0]);save();return true;});
+    var ct=courseCity(),c=S.courseId!=null&&COURSES[S.courseId];
+    function pick(r){if(!r||!r.ok||!r.list||!r.list.length)return null;for(var i=0;i<r.list.length;i++)if(locFits(r.list[i]))return r.list[i];return null;}
+    return rapi({action:"place",q:S.course}).then(function(r){
+      var h=pick(r);if(h)return h;
+      if(!ct)return null;
+      return rapi({action:"place",q:String(c.city)+" "+S.course}).then(function(r2){return pick(r2);});
+    }).then(function(h){if(!h)return false;S.courseLoc=Object.assign({for:S.course},h);save();return true;});
   }
+  /* 예전에 다른 지역 골프장으로 잘못 잡혀 저장된 위치는 버림 */
+  if(S.courseLoc&&S.courseLoc.for===S.course&&!locFits(S.courseLoc)){S.courseLoc=null;S.route=null;}
   function rtFind(target,q){
     q=String(q||"").trim();if(!q){toast("장소 이름을 적어 주세요");return;}
     rtBusy=target;rtRes=null;renderGo();
