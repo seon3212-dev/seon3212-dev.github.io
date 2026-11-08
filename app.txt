@@ -312,14 +312,6 @@ details.card[open]>summary::after{content:"－"}
 .gx-scale button{appearance:none;border:1.5px solid var(--line);background:var(--bg);color:var(--ink);border-radius:10px;padding:9px 0;font:600 17px var(--font-display);cursor:pointer;font-variant-numeric:tabular-nums}
 .gx-scale button[aria-pressed="true"]{background:var(--fairway);border-color:var(--fairway);color:var(--surface)}
 .gx-ends{display:flex;justify-content:space-between;font-size:11.5px;color:var(--muted)}
-.ht-list{list-style:none;margin:14px 0 0;padding:0;display:flex;flex-direction:column;gap:10px}
-.ht-item{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:12px 14px;display:flex;flex-direction:column;gap:6px}
-.ht-item .ht-top{display:flex;align-items:baseline;gap:8px}
-.ht-item .ht-n{font-weight:800;min-width:1.6em}
-.ht-item b{font-size:16px}
-.ht-item .ht-soon{margin-left:auto;font-size:12px;color:var(--muted);white-space:nowrap}
-.ht-item .ht-btns{display:flex;flex-wrap:wrap;gap:8px}
-.ht-ch{margin-top:14px}
 .gx-hero{background:var(--board);color:var(--board-ink);border-radius:var(--r);padding:18px 16px;display:flex;flex-direction:column;gap:8px}
 .gx-hero small{color:var(--board-muted);font-size:12px;letter-spacing:.04em}
 .gx-codeline{display:flex;align-items:baseline;gap:4px 12px;flex-wrap:wrap}
@@ -622,12 +614,6 @@ details.yd-card:not([open]) .yd-sum{margin-bottom:0}
       <div class="hm-quad" id="hmQuad"></div>
       <div id="wqsHome"></div>
     </div>
-    <div class="hm-card">
-      <div class="k"><small>앱 사용법</small></div>
-      <b>처음이면 영상으로 먼저 보세요</b>
-      <span class="note">라운드 준비부터 내기 정산까지, 기능별로 짧게 보여 드려요.</span>
-      <div class="yd-btns"><button type="button" class="btn btn-plain" data-tab="howto">사용법 영상 보기</button></div>
-    </div>
     <div class="hm-card" id="bkCard">
       <div class="k"><small>내 기록 백업</small></div>
       <b>폰을 바꿔도 기록을 옮길 수 있어요</b>
@@ -897,12 +883,6 @@ details.yd-card:not([open]) .yd-sum{margin-bottom:0}
   <section id="view-wqs" class="wrap" hidden aria-labelledby="wqsTitle">
     <div class="gx-hero"><small>무료 자가 진단</small><b class="gp-hero" id="wqsTitle">4분할 종합 설명</b><span>네 가지 무료 검사 결과를 한데 모아 풀어 드려요.</span></div>
     <div id="wqsBody"></div>
-  </section>
-
-  <!-- ===================== 앱 사용법 영상 (#howto) ===================== -->
-  <section id="view-howto" class="wrap" hidden aria-labelledby="htTitle">
-    <div class="gx-hero"><small>앱 사용법</small><b class="gp-hero" id="htTitle">앱 사용법 영상</b><span>기능별로 짧게 보여 드려요. 보고 나서 바로 해 볼 수 있게 버튼도 붙여 놨어요.</span></div>
-    <div id="htBody"></div>
   </section>
 
   <section id="view-guide" class="wrap" hidden aria-labelledby="ruTitle">
@@ -2127,7 +2107,7 @@ window.AGE18={k:"wise_age18_v1",
   /* ---------- 탭 ---------- */
   function showTab(t){
     S.tab=t;save();
-    ["home","plan","go","score","cost","type","gpas","gcas","gsas","guide","quiz","shot","wqs","howto"].forEach(function(x){$("view-"+x).hidden=x!==t;var tb=$("tab-"+x);if(tb)tb.setAttribute("aria-selected",String(x===t));});
+    ["home","plan","go","score","cost","type","gpas","gcas","gsas","guide","quiz","shot","wqs"].forEach(function(x){$("view-"+x).hidden=x!==t;var tb=$("tab-"+x);if(tb)tb.setAttribute("aria-selected",String(x===t));});
     var inRound=t==="plan"||t==="go"||t==="score"||t==="cost";$("segRound").hidden=!inRound;$("sampleBar").hidden=!(inRound&&S.sample);
     [["nav-home",t==="home"||t==="quiz"||t==="shot"],["nav-round",inRound],["nav-guide",t==="guide"],["nav-diag",t==="type"||t==="gpas"||t==="gcas"||t==="gsas"||t==="wqs"]].forEach(function(n){var el=$(n[0]);if(n[1])el.setAttribute("aria-current","page");else el.removeAttribute("aria-current");});
     if(t==="home")renderHome();
@@ -2308,7 +2288,7 @@ window.AGE18={k:"wise_age18_v1",
   });
 
   render();
-  var h0=(location.hash||"").slice(1);if(h0==="oneshot")h0="shot";window.START_TAB=h0;showTab(["home","plan","go","score","cost","type","quiz","shot","howto"].indexOf(h0)>=0?h0:"home");
+  var h0=(location.hash||"").slice(1);if(h0==="oneshot")h0="shot";window.START_TAB=h0;showTab(["home","plan","go","score","cost","type","quiz","shot"].indexOf(h0)>=0?h0:"home");
   window.SHOW_TAB=showTab;  /* 진단 탭 바로가기(#gpas·#gcas·#gsas)는 맨 아래에서 — 진단 화면이 다 준비된 뒤 */
 })();
 </script>
@@ -4441,39 +4421,6 @@ window.SHOT_GEN=(function(){
   document.addEventListener("click",function(e){var b=e.target.closest("[data-bk]");if(b&&b.dataset.bk==="save")save();});
   document.addEventListener("change",function(e){if(e.target&&e.target.id==="bkFile"){var f=e.target.files&&e.target.files[0];e.target.value="";restore(f);}});
   window.WG_BACKUP={collect:collect,parse:parse}; /* 테스트용 */
-})();
-</script>
-<script>
-/* ---------- 앱 사용법 영상 (#howto) — 영상이 올라가면 v에 유튜브 영상 ID(watch?v= 뒤 11글자)만 넣으면 됨 ---------- */
-(function(){
-  var CH="https://www.youtube.com/@golfseondobujang";
-  var HOWTO=[
-    {n:"⓪",t:"홈 화면과 내 기록 백업",d:"앱 둘러보기, 폰 바꿀 때 기록 옮기기",tab:"home",go:"홈 보기",v:""},
-    {n:"①",t:"골프 유형 검사",d:"나와 동반자의 라운드 성향과 케미",tab:"type",go:"유형 검사 하러 가기",v:""},
-    {n:"②",t:"라운드 준비",d:"골프장·날짜·티타임, 같이 치는 사람",tab:"plan",go:"라운드 준비하러 가기",v:""},
-    {n:"③",t:"가는 길",d:"각자 가요 — 출발 시간 알려 주기",tab:"go",go:"가는 길 보러 가기",v:""},
-    {n:"④",t:"픽업 · 들를 곳",d:"태워 가기, 만나서 같이 가기, 들를 곳",tab:"go",go:"픽업 정하러 가기",v:""},
-    {n:"⑤",t:"내기 고르고 정산",d:"타당으로 보는 내기 정하기와 정산",tab:"score",go:"스코어·내기 하러 가기",v:""},
-    {n:"⑥",t:"비용 나누기",d:"그린피·캐디피·식사, 4명이 나누기",tab:"cost",go:"비용 나누러 가기",v:""},
-    {n:"⑦",t:"신체 · 클럽 · 스윙 검사",d:"무료 자가 진단 세 가지 소개",tab:"gpas",go:"검사 하러 가기",v:""},
-    {n:"⑧",t:"규칙 사전",d:"법전처럼 어려운 규칙을 알기 쉬운 말로",tab:"guide",go:"규칙 사전 열기",v:""},
-    {n:"⑨",t:"미니게임",d:"1분이면 끝나는 골프 게임",tab:"quiz",go:"미니게임 하러 가기",v:""}
-  ];
-  function esc(x){return String(x==null?"":x).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});}
-  function render(){
-    var el=document.getElementById("htBody");if(!el)return;
-    var up=HOWTO.filter(function(x){return x.v;}).length;
-    el.innerHTML=(up?'':'<p class="note">영상은 하나씩 올라가요. 올라오기 전에는 아래 버튼으로 바로 해 보셔도 돼요.</p>')+
-      '<ol class="ht-list">'+HOWTO.map(function(x){
-        return '<li class="ht-item"><div class="ht-top"><span class="ht-n">'+x.n+'</span><b>'+esc(x.t)+'</b>'+(x.v?'':'<span class="ht-soon">곧 올라와요</span>')+'</div>'+
-          '<span class="note">'+esc(x.d)+'</span><div class="ht-btns">'+
-          (x.v?'<a class="btn btn-flag" href="https://www.youtube.com/watch?v='+encodeURIComponent(x.v)+'" target="_blank" rel="noopener">▶ 영상 보기</a>':'')+
-          '<button type="button" class="btn btn-plain" data-tab="'+x.tab+'">'+esc(x.go)+'</button></div></li>';
-      }).join("")+'</ol>'+
-      '<a class="btn btn-plain ht-ch" href="'+CH+'" target="_blank" rel="noopener">유튜브 채널 \'골프선도부장\'에서 전체 보기</a>';
-  }
-  window.HOWTO=HOWTO;window.HOWTO_RENDER=render; // 테스트용
-  render();
 })();
 </script>
 <script>
