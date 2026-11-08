@@ -4713,13 +4713,13 @@ window.SHOT_GEN=(function(){
       var w=D.approx?"공이 떨어진 칸으로 보면 대략 "+swl(sh)+" 수준의 폭이에요":("10구 중 가운데 8구가 앞뒤 "+Math.round(gs.dR)+"m"+(gs.lR!=null?" · 좌우 "+Math.round(gs.lR)+"m":"")+" 안에 모였어요. "+swl(sh)+" 수준의 폭이에요"+(D.distOnly?"(좌우 자료가 없어 거리만 봤어요)":""));
       t=esc(w)+". ";
       if(sb!=null&&shc>sb){var by=gr&&gpGood?"라운드 운영과 몸 상태가":gr?"라운드 운영이":gpGood?"몸 상태가":"샷 말고 다른 부분이";
-        t+="그런데도 "+esc(BAND[sb])+" 타수를 치고 계신 건 "+by+" 그만큼 받쳐 주고 있다는 뜻이에요. 실수를 크게 만들지 않는 운영은 아무나 못 하는 강점이에요.";}
+        t+="그래도 "+esc(BAND[sb])+" 타수가 나오는 건 "+by+" 받쳐 주고 있어서예요.";}
       else if(sb!=null&&shc<sb)t+="스윙은 "+esc(BAND[sb])+"보다 잘 모이는 편이에요. 연습장에서 쌓은 게 필드에서 다 나오지 않고 있을 수 있어요.";
       else if(sb!=null)t+=sh<0?"70대 실력에 맞게 아주 잘 모여요.":"적어 주신 실력과 비슷한 수준이에요.";
     }else t=gs?"공이 5개보다 적어서 스윙 폭은 아직 보지 못했어요.":"스윙 진단을 아직 안 하셨어요.";
     h+=para("스윙",t);
     /* 신체 */
-    h+=para("신체",gp?("검사 "+gp.n+"개 중 "+gp.ok+"개를 무난하게 통과했어요. "+(gp.pri.length?"먼저 살펴볼 곳으로 "+esc(gp.pri.join(", "))+"이(가) 나왔어요. 원인을 정한 게 아니라 먼저 볼 곳이라는 뜻이에요.":"몸에서는 큰 제한이 안 보여요. 탄탄한 몸이 스윙을 받쳐 주고 있어요.")+(gp.pain?" 아파서 멈춘 검사가 있었으니 그 동작은 전문가 확인이 먼저예요.":"")):"신체 검사를 아직 안 하셨어요.");
+    h+=para("신체",gp?("검사 "+gp.n+"개 중 "+gp.ok+"개를 무난하게 통과했어요. "+(gp.pri.length?"먼저 살펴볼 곳은 "+esc(gp.pri.join(", "))+"예요. 원인으로 정해진 건 아니고, 먼저 확인해 볼 곳이에요.":"몸에서는 큰 제한이 안 보여요.")+(gp.pain?" 아파서 멈춘 검사가 있었어요. 그 동작은 전문가에게 먼저 확인받으세요.":"")):"신체 검사를 아직 안 하셨어요.");
     /* 클럽 */
     if(gc){var cs=esc(gc.title)+(gc.club?" ("+esc(gc.club)+")":"")+". ";
       if(gc.set.flags)cs+="백 전체를 보면, "+esc(gc.set.notes.filter(function(x){return x.indexOf("일부러 그렇게 하신")<0;})[0])+(gc.set.caveat&&gc.set.notes.filter(function(x){return x.indexOf("일부러 그렇게 하신")<0;})[0].indexOf("두 단계 이상")>=0?" "+esc(gc.set.caveat):"");
@@ -4732,13 +4732,14 @@ window.SHOT_GEN=(function(){
     if(gr){var pr=gr.profile||{},st=(pr.strengths||[])[0],rk=(pr.risk_scenes||[])[0];
       var dot=function(x){x=String(x).trim();return /[.!?요다]$/.test(x)?x:x+".";};
       var rt=esc(gr.code_display)+" "+esc(gr.friendly_name||gr.type_name||"")+" 스타일이에요. "+(st?"잘하는 것: "+esc(dot(st))+" ":"")+(rk?"조심할 때: "+esc(dot(rk))+" ":"");
-      if(sh!=null&&sb!=null)rt+=shc>sb?"샷보다 타수가 잘 나오는 걸 보면 지금 운영은 잘 되고 있어요.":shc<sb?"샷에 비해 타수가 더 나와요. 상담을 받으면 운영·회복에서 나아질 점이 있어요.":"운영에서 몇 타를 더 줄일 수 있는지는 상담에서 정확히 볼 수 있어요.";
+      if(sh!=null&&sb!=null)rt+=shc>sb?"샷보다 타수가 잘 나오는 걸 보면 지금 운영은 잘 되고 있어요.":shc<sb?"샷에 비해 타수가 더 나와요. 운영이나 실수 뒤 회복에서 줄일 타수가 있는지 상담에서 볼 수 있어요.":"운영으로 몇 타를 더 줄일 수 있는지는 상담에서 볼 수 있어요.";
       h+=para("라운드 운영",rt);}
     else h+=para("라운드 운영","골프 유형 검사를 아직 안 하셨어요.");
     /* 눈에 띄는 곳 → 4분할 심층 하나로 */
     var focus=sh!=null&&sb!=null&&shc>sb?"스윙":sh!=null&&sb!=null&&shc<sb?"라운드 운영":gc&&gc.set.flags?"클럽":gp&&gp.pri.length?"몸":null;
-    var close=(focus?"무료 결과로는 "+focus+" 쪽이 눈에 띄어요. 하지만 "+focus+" 쪽에서 보이는 문제의 원인이 다른 쪽에 있는 경우도 많아요. ":"무료 결과로는 네 가지가 고르게 나왔어요. ")+"4분할 심층 검사를 받으시면 정말 이게 문제인지 정확하게 알 수 있어요.";
-    h+='<div class="card"><p class="wqs-p"><b>'+esc(close)+'</b></p><p class="note">무료 검사는 자가 진단이라 정확도가 떨어져요. 클럽과 스윙은 실측으로, 라운드 운영은 상담으로 봐야 정확한 병목이 나와요.</p>'+beta()+'</div>';
+    var others=["몸","클럽","스윙","라운드 운영"].filter(function(x){return x!==focus;});
+    var close=(focus?"무료 결과에서는 "+focus+"이 가장 눈에 띄어요. 그런데 "+focus+"에서 보이는 문제가 실제로는 "+others.slice(0,2).join("이나 ")+" 때문인 경우도 많아요. ":"무료 결과에서는 특별히 튀는 곳이 없었어요. ")+"4분할 심층 검사에서 네 가지를 같이 재 보면 원인이 어디인지 알 수 있어요.";
+    h+='<div class="card"><p class="wqs-p"><b>'+esc(close)+'</b></p><p class="note">무료 검사는 직접 재고 답한 결과라 정확도에 한계가 있어요. 클럽과 스윙은 실제로 재 보고, 라운드 운영은 상담을 해야 막히는 곳을 정확히 찾을 수 있어요.</p>'+beta()+'</div>';
     return h;
   }
   function beta(){
