@@ -503,7 +503,7 @@ body{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
 /* 내 거리표 */
 .yd-prev{list-style:none;margin:4px 0 0;padding:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:4px 12px;font-size:14px}.yd-prev li{display:flex;justify-content:space-between;gap:6px}.yd-prev b{font-size:14px}
 .yd-meta{font-size:12px;color:var(--board-muted)}
-.yd-btns{display:flex;gap:8px}.bk-btns{margin-top:10px}.sw-v{font-size:14px;margin:12px 0 4px;color:var(--muted)}.sw-list li{display:grid;grid-template-columns:1fr auto;gap:2px 8px;align-items:center;text-align:left}.sw-list li>.sw-k{grid-column:1/-1;font-size:12.5px;color:var(--muted)}.sw-list li b{font-size:17px;font-variant-numeric:tabular-nums}.sw-list li small{grid-column:1/-1;font-size:12px;color:var(--muted)}.bk-btns label.btn{display:inline-flex;align-items:center;cursor:pointer}.yd-btns .btn{flex:1;justify-content:center;min-height:44px}.yd-ask .yd-cancel,.ride-card .yd-cancel{background:transparent;color:var(--board-ink);border:1px solid var(--board-muted)}
+.yd-btns{display:flex;gap:8px}.fb-row{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px}.fb-row .btn{white-space:nowrap}.fb-mail{font-size:13px;color:var(--muted)}.gdesc .fb-row .btn{padding:6px 12px;font-size:13px}.bk-btns{margin-top:10px}.sw-v{font-size:14px;margin:12px 0 4px;color:var(--muted)}.sw-list li{display:grid;grid-template-columns:1fr auto;gap:2px 8px;align-items:center;text-align:left}.sw-list li>.sw-k{grid-column:1/-1;font-size:12.5px;color:var(--muted)}.sw-list li b{font-size:17px;font-variant-numeric:tabular-nums}.sw-list li small{grid-column:1/-1;font-size:12px;color:var(--muted)}.bk-btns label.btn{display:inline-flex;align-items:center;cursor:pointer}.yd-btns .btn{flex:1;justify-content:center;min-height:44px}.yd-ask .yd-cancel,.ride-card .yd-cancel{background:transparent;color:var(--board-ink);border:1px solid var(--board-muted)}
 .yd-card{gap:8px}.yd-date{font-size:12px;color:var(--muted)}
 .yd-over{font-size:13px;font-weight:700;color:var(--flag-ink);background:var(--flag);border-radius:10px;padding:6px 10px}
 .yd-tbl{display:flex;flex-direction:column;font-size:14px;font-variant-numeric:tabular-nums}
@@ -642,6 +642,11 @@ details.yd-card:not([open]) .yd-sum{margin-bottom:0}
       <div class="k"><small>사용법 영상</small></div>
       <b>앱 쓰는 법, 영상 한 편에 다 있어요</b>
       <div class="yd-btns"><a class="btn btn-plain" href="https://youtu.be/aqztJeNeZI0" target="_blank" rel="noopener">유튜브에서 보기 ↗</a></div>
+    </div>
+    <div class="hm-card" id="fbCard">
+      <div class="k"><small>의견 보내기</small></div>
+      <b>불편한 점이나 우리 동네 내기 규칙을 알려 주세요</b>
+      <div class="yd-btns fb-row"><a class="btn btn-plain" href="https://pf.kakao.com/_xixbxahG/chat" target="_blank" rel="noopener">카톡으로 보내기 ↗</a><a class="fb-mail" href="mailto:help@wisegolf.kr?subject=%EC%8A%AC%EA%B8%B0%EB%A1%9C%EC%9A%B4%EA%B3%A8%ED%94%84%EC%83%9D%ED%99%9C%20%EC%95%B1%20%EC%9D%98%EA%B2%AC">메일 help@wisegolf.kr</a></div>
     </div>
     <div class="hm-card" id="bkCard">
       <div class="k"><small>내 기록 백업</small></div>
@@ -1954,7 +1959,7 @@ window.AGE18={k:"wise_age18_v1",
     $("betBox").hidden=!S.bet.on;
     if(G.ready===false){$("gdesc").innerHTML='<b>'+G.name+'</b><p class="note">이 게임 규칙을 받는 중이에요. 규칙이 정해지면 바로 넣을게요.</p>';}
     else{var n=act().length,warn=(G.max&&n!==G.max)?'<p class="note" style="color:var(--over)">지금 '+n+'명이에요. '+G.name+'는 '+G.max+'명이 쳐야 해요.</p>':((G.min&&n<G.min)?'<p class="note" style="color:var(--over)">'+G.name+'는 '+G.min+'명 이상이어야 해요.</p>':'');
-      $("gdesc").innerHTML='<b>'+G.name+' <span class="note">'+G.sub+'</span></b><ol>'+G.desc.map(function(t){return '<li>'+esc(t)+'</li>';}).join("")+'</ol>'+warn+'<p class="note">모임마다 규칙이 다르면 알려 주세요. 돈은 계산만 해요.</p>';}
+      $("gdesc").innerHTML='<b>'+G.name+' <span class="note">'+G.sub+'</span></b><ol>'+G.desc.map(function(t){return '<li>'+esc(t)+'</li>';}).join("")+'</ol>'+warn+'<p class="note">모임마다 규칙이 다르면 알려 주세요. 돈은 계산만 해요.</p><div class="fb-row"><a class="btn btn-plain" href="https://pf.kakao.com/_xixbxahG/chat" target="_blank" rel="noopener">카톡으로 의견 보내기 ↗</a><a class="fb-mail" href="mailto:help@wisegolf.kr?subject=%EC%8A%AC%EA%B8%B0%EB%A1%9C%EC%9A%B4%EA%B3%A8%ED%94%84%EC%83%9D%ED%99%9C%20%EC%95%B1%20%EC%9D%98%EA%B2%AC">메일 help@wisegolf.kr</a></div>';}
     var ab=$("amtBox"),fl=amtFields(G.id)||[];
     if(ab.getAttribute("data-g")!==G.id+(S.bet.hzMode||"")){ab.setAttribute("data-g",G.id+(S.bet.hzMode||""));ab.innerHTML=fl.map(function(f){return '<div class="q"><label class="ql" for="amt-'+f[0]+'">'+f[1]+'</label>'+(f[0]==="seed"?'<div class="quick" id="seedQ"></div>':'')+'<input type="number" id="amt-'+f[0]+'" data-amt="'+f[0]+'" inputmode="numeric" step="'+f[3]+'" min="0" placeholder="'+(f[0]==="seed"?"직접 적기":f[2])+'"></div>';}).join("")+((G.id==="happy"||G.id==="vegas")?'<p class="note" id="happyInfo"></p>':'');}
     if($("seedQ"))$("seedQ").innerHTML=[10000,50000,100000].map(function(v){return '<button type="button" class="chip" data-amtq="seed:'+v+'" aria-pressed="'+(amt("seed")===v)+'">'+(v/10000)+'만 원</button>';}).join("");
