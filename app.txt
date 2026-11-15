@@ -1191,7 +1191,7 @@ window.AGE18={k:"wise_age18_v1",
     return {tab:"plan",course:"",courseId:null,nines:null,date:today(),tee:"",players:["","","",""],
       move:"self",pick:{},buffer:40,drive:50,pack:{},from:null,courseLoc:null,route:null,
       stops:{coffee:{on:false,where:"course"},gimbap:{on:false,where:"home"},store:{on:false,where:"home"},gas:{on:false,where:"home"},meal:{on:false,where:"course"}},
-      bet:{on:false,game:"tadang",amt:{},bp:{tie3:true,tie4:true,triple:true,yangpa:false,par3dbl:true,birdie:false},hd:{when:"none",pre:"avg",avg:{},list:[]},hdDraft:{},bpWhen:"next",bonus:{birdie:{mode:"stroke",v:1},putt:{mode:"stroke",v:3},shot:{mode:"stroke",v:5},hio:{mode:"stroke",v:10}},eg:{},pk:{},dr:{},joker:"bogey",drawMode:"app",vtie:"carry",stack:"cap4",hrank:2,skip:{first:"on",last:"on"},nearMode:"carry",hpMode:"4321",tnear:"stroke",tn2:1,tn:{},tnCash:10000,tnPot:50000,tnPrize:10000,order:null,vg:{},hz:{},near:{},dc:{},ab:{},gal:[],uc:{}},age19:false,
+      bet:{on:false,game:"tadang",amt:{},bp:{tie3:true,tie4:true,triple:true,yangpa:false,par3dbl:true,birdie:true},hd:{when:"none",pre:"avg",avg:{},list:[]},hdDraft:{},bpWhen:"this",bonus:{birdie:{mode:"stroke",v:1},putt:{mode:"stroke",v:3},shot:{mode:"stroke",v:5},hio:{mode:"stroke",v:10}},eg:{},pk:{},dr:{},joker:"bogey",drawMode:"app",vtie:"carry",stack:"cap4",hrank:2,skip:{first:"on",last:"on"},nearMode:"carry",hpMode:"4321",tnear:"stroke",tn2:1,tn:{},tnCash:10000,tnPot:50000,tnPrize:10000,order:null,vg:{},hz:{},near:{},dc:{},ab:{},gal:[],uc:{}},age19:false,
       par:DEFAULT_PAR.slice(),scores:[0,1,2,3].map(function(){return Array(18).fill(null);}),hole:0,sample:false};
   }
   function sample(){
@@ -1509,7 +1509,7 @@ window.AGE18={k:"wise_age18_v1",
   /* 내기 게임: 규칙은 모임마다 달라서 흔한 방식을 기본값으로 둔다. 금액은 계산만 한다. */
   var GAMES=[
     {id:"tadang",name:"타당",sub:"스트로크",min:2,unit:"한 타당 금액 (원)",
-      desc:["홀마다 타수 차이로 계산해요.","타수 차이 × 금액을 진 사람이 이긴 사람에게 줘요.","배판 있음을 고르면 3명 이상 동타, 트리플 이상, 파3 더블 이상이 나온 다음 홀이 2배예요. 조건은 하나씩 켜고 끌 수 있어요.","파3에서는 스코어 넣는 곳에 니어 칸이 떠요. 니어한 사람을 누르면 1타씩 받아요. 지우개가 나오면 누르지 않아요.","버디·퍼트 이글·샷 이글·홀인원 보너스를 타당 몇 개 더(예: 1·3·5·10타) 또는 금액으로 걸 수 있어요."]},
+      desc:["홀마다 타수 차이로 계산해요.","타수 차이 × 금액을 진 사람이 이긴 사람에게 줘요.","배판 있음을 고르면 3명 동타, 트리플 이상, 파3 더블 이상, 버디 이상이 나온 그 홀이 2배예요. 4명 동타는 다음 홀이 2배예요. 조건은 하나씩 켜고 끌 수 있고, 당홀 배판을 다음 홀 배판으로 바꿀 수 있어요.","파3에서는 스코어 넣는 곳에 니어 칸이 떠요. 니어한 사람을 누르면 1타씩 받아요. 지우개가 나오면 누르지 않아요.","버디·퍼트 이글·샷 이글·홀인원 보너스를 타당 몇 개 더(예: 1·3·5·10타) 또는 금액으로 걸 수 있어요."]},
     {id:"vegas",name:"뽑기",sub:"한국식",min:4,max:4,
       desc:["4명이 같은 돈을 걷어요(예: 10만 원씩, 모두 40만 원).","홀마다 뽑기 통에서 막대를 뽑아요(같은 색 2개씩 두 쌍 + 조커 1개). 같은 색 두 사람이 한 팀, 짝 없는 사람은 조커 뽑은 사람과 한 팀이에요.","두 사람 타수를 더해 적은 팀이 이겨요. 이긴 팀 두 사람이 걷은 돈의 10분의 1씩 가져가요(10만 원이면 1만 원씩, 18홀이면 36만 원).","조커 뽑은 사람 타수는 정한 규칙으로 쳐요: 무조건 보기 / 무조건 4타(파5 버디·파4 파·파3 보기) / 무조건 파.","같으면 상금이 다음 홀로 이월돼요. 남는 돈(10만 원이면 4만 원)은 파3 니어 상금이에요."]},
     {id:"hussein",name:"후세인",sub:"1 대 3",min:4,max:4,unit:"한 홀 금액 (원)",
@@ -1761,7 +1761,7 @@ window.AGE18={k:"wise_age18_v1",
   function hdNetBox(rows){
     return '<p class="ql" style="margin-top:6px">사람별 합계 (선핸디만)</p><ul class="settle sh-list hd-net">'+hdNet(rows).map(function(x){return '<li><span class="nm">'+esc(nameOf(x.i))+'</span><span class="amt '+(x.v>0?"plus":(x.v<0?"minus":""))+'">'+won(x.v)+'</span></li>';}).join("")+'</ul>'+
       '<details class="hd-detail"><summary>누가 누구에게 얼마인지 보기</summary><ul class="settle sh-list hd-prev">'+rows.map(function(x){return '<li><span class="nm">'+esc(nameOf(x.f))+' → '+esc(nameOf(x.t))+'</span><span class="amt">'+(x.n?x.n+'타 · ':'')+money(x.won)+'</span></li>';}).join("")+'</ul></details>';}
-  function tnFix(b){if(b&&!b.tn2){if(!b.tnear)b.tnear="stroke";b.tn2=1;}return b;}
+  function tnFix(b){if(b&&b.game&&!b.bpWhen)b.bpWhen="next";if(b&&!b.tn2){if(!b.tnear)b.tnear="stroke";b.tn2=1;}return b;}
   function tnMode(g){var t=g&&g.tnear;return t===true?"stroke":(["stroke","cash","pot"].indexOf(t)>=0?t:"off");}
   function won(v){return (v>0?"+":(v<0?"−":""))+Math.abs(v).toLocaleString("ko-KR")+"원";}
   function money(v){return Math.abs(v).toLocaleString("ko-KR")+"원";}
@@ -1977,7 +1977,7 @@ window.AGE18={k:"wise_age18_v1",
       $("happyInfo").innerHTML=hu>0?((hf>0&&hsd>0?'4명 '+money(hsd*4)+'에서 '+money(hf)+'을 먼저 빼고 <b>'+money(Math.max(0,hsd*4-hf))+'</b>으로 시작해요 · ':'')+(S.bet.hpMode==="2468"?'':'걷는 돈에 맞춰 자동으로 정해져요 · ')+'1등 <b>'+money(hu*4)+'</b> · 2등 <b>'+money(hu*3)+'</b> · 3등 <b>'+money(hu*2)+'</b> · 4등 <b>'+money(hu)+'</b> · 파3 '+p3n+'개 니어 <b>'+money(npv)+'</b>씩'+(npv<=0?' (니어 상금이 안 남아요)':'')+happyRest()):'걷는 돈을 넣으면 등수 금액과 니어 상금이 자동으로 나와요.';
       $("nearInfo").textContent="";}
     var sk=S.bet.skip||{};$("skipChips").innerHTML=[["first","첫 홀"],["last","마지막 홀"]].map(function(x){var cur=sk[x[0]]||"on";if(cur==="birdie"&&G.id!=="tadang")cur="off";return '<div class="skrow"><b>'+x[1]+'</b>'+[["on","내기"],["off","안 함"]].concat(G.id==="tadang"?[["birdie","버디피만"]]:[]).map(function(o){return '<button type="button" class="chip" data-skip="'+x[0]+':'+o[0]+'" aria-pressed="'+(cur===o[0])+'">'+o[1]+'</button>';}).join("")+'</div>';}).join("");$("skipNote").textContent=G.id==="tadang"?"기본은 모든 홀 내기해요. 안 함은 스코어만 적고, 버디피만은 그 홀에서 버디·이글·홀인원 보너스만 주고받아요.":"기본은 모든 홀 내기해요. 안 함을 고른 홀은 스코어만 적어요.";
-    $("tadOpts").hidden=G.id!=="tadang";$("bpPreset").hidden=G.id!=="tadang";if(G.id==="tadang"){var pb=S.bet.bp||{},pk=["tie3","tie4","triple","yangpa","par3dbl","birdie"],pOn=pk.filter(function(k){return pb[k];}).join(","),pre=pOn===""?"off":"on";$("bpPre").innerHTML=[["on","배판 있음"],["off","배판 없음"]].map(function(x){return '<button type="button" class="chip" data-bpre="'+x[0]+'" aria-pressed="'+(pre===x[0])+'">'+x[1]+'</button>';}).join("");var pw=S.bet.bpWhen==="this"?"그 홀이":"다음 홀이";var pl=[];if(pb.tie3&&pb.tie4)pl.push("3명 이상 동타");else if(pb.tie3)pl.push("3명 동타");if(pb.triple)pl.push("트리플 이상");if(pb.yangpa)pl.push("양파 이상");if(pb.par3dbl)pl.push("파3 더블 이상");if(pb.birdie)pl.push("버디 이상");var p4=pb.tie4&&!pb.tie3?(pl.length?" 4명 동타도 다음 홀이 2배예요.":"4명 동타가 나오면 다음 홀이 2배예요."):"";$("bpPreNote").textContent=pre==="off"?"배판 없이 타수 차이만 계산해요.":((pl.length?pl.join(", ")+"이 나오면 "+pw+" 2배예요.":"")+p4+" 조건은 아래 \"규칙 더 정하기\"에서 켜고 꺼요.");}renderHd();
+    $("tadOpts").hidden=G.id!=="tadang";$("bpPreset").hidden=G.id!=="tadang";if(G.id==="tadang"){var pb=S.bet.bp||{},pk=["tie3","tie4","triple","yangpa","par3dbl","birdie"],pOn=pk.filter(function(k){return pb[k];}).join(","),pre=pOn===""?"off":"on";$("bpPre").innerHTML=[["on","배판 있음"],["off","배판 없음"]].map(function(x){return '<button type="button" class="chip" data-bpre="'+x[0]+'" aria-pressed="'+(pre===x[0])+'">'+x[1]+'</button>';}).join("");var pw=S.bet.bpWhen==="this"?"그 홀이":"다음 홀이";var pT=S.bet.bpWhen==="this",pl=[];if(pb.tie3&&pb.tie4&&!pT)pl.push("3명 이상 동타");else if(pb.tie3)pl.push("3명 동타");if(pb.triple)pl.push("트리플 이상");if(pb.yangpa)pl.push("양파 이상");if(pb.par3dbl)pl.push("파3 더블 이상");if(pb.birdie)pl.push("버디 이상");var p4=pb.tie4&&(pT||!pb.tie3)?(pl.length?(pT?" 4명 동타는 다음 홀이 2배예요.":" 4명 동타도 다음 홀이 2배예요."):"4명 동타가 나오면 다음 홀이 2배예요."):"";$("bpPreNote").textContent=pre==="off"?"배판 없이 타수 차이만 계산해요.":((pl.length?pl.join(", ")+"이 나오면 "+pw+" 2배예요.":"")+p4+" 조건은 아래 \"규칙 더 정하기\"에서 켜고 꺼요.");}renderHd();
     var msum=$("moreSum");if(msum){var hc=hdCfg(),mt=[];
       if(["tadang","scratch"].indexOf(G.id)>=0)mt.push(hc.when==="none"?"핸디 없음":lab2(HD_WHEN,hc.when).replace(/ \(.*\)/,""));
       if(G.id==="tadang"){var bpn=["tie3","tie4","triple","yangpa","par3dbl","birdie"].filter(function(k){return (S.bet.bp||{})[k];}).length;mt.push(bpn?"배판 조건 "+bpn+"개":"배판 없음");if(tnMode(S.bet)!=="off")mt.push("파3 니어");}
@@ -2236,7 +2236,7 @@ window.AGE18={k:"wise_age18_v1",
       else if(k==="dn")S.bet.hdDraft.n=+v;
       changed();return;}
     if(d.hddel!=null){S.bet.hd=Object.assign({},hdCfg());S.bet.hd.list=S.bet.hd.list.slice();S.bet.hd.list.splice(+d.hddel,1);changed();toast("핸디를 지웠어요.");return;}
-    if(d.bpre){var pv=d.bpre==="on",pb0=S.bet.bp||{};if(pv&&["tie3","tie4","triple","yangpa","par3dbl","birdie"].some(function(k){return pb0[k];}))return;S.bet.bp={tie3:pv,tie4:pv,triple:pv,yangpa:false,par3dbl:pv,birdie:false};changed();return;}
+    if(d.bpre){var pv=d.bpre==="on",pb0=S.bet.bp||{};if(pv&&["tie3","tie4","triple","yangpa","par3dbl","birdie"].some(function(k){return pb0[k];}))return;S.bet.bp={tie3:pv,tie4:pv,triple:pv,yangpa:false,par3dbl:pv,birdie:pv};if(pv)S.bet.bpWhen="this";changed();return;}
     if(d.bp){S.bet.bp=Object.assign({},S.bet.bp||{});S.bet.bp[d.bp]=!S.bet.bp[d.bp];changed();return;}
     if(d.vg){var vp2=d.vg.split(":");S.bet.vg[vp2[0]]=+vp2[1];changed();return;}
     if(d.ord!=null){var a5=act(),dr=(S.bet.orderDraft||[]).slice();if(dr.indexOf(+d.ord)<0)dr.push(+d.ord);if(dr.length>=a5.length-1){a5.forEach(function(i){if(dr.indexOf(i)<0)dr.push(i);});S.bet.order=dr;S.bet.orderDraft=null;toast("타순: "+dr.map(nameOf).join(" → "));}else S.bet.orderDraft=dr;changed();return;}
