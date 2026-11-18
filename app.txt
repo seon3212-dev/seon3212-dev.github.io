@@ -652,6 +652,8 @@ details.yd-card:not([open]) .yd-sum{margin-bottom:0}
       <div class="k"><small>바로가기</small></div>
       <b>폰 바탕화면에 바로가기를 만들어 두세요</b>
       <span class="note">아이콘만 누르면 주소를 치지 않고 바로 들어와요.</span>
+      <div class="yd-btns" id="a2hsBtnRow" hidden><button type="button" class="btn btn-flag" id="a2hsBtn">바탕화면에 추가</button></div>
+      <span class="note" id="a2hsMsg" hidden>바탕화면에 추가했어요. 다음부터는 아이콘을 눌러 들어오세요.</span>
       <details class="a2hs"><summary>만드는 법 보기</summary>
         <ul id="a2hsList">
           <li data-os="kakao" hidden>카카오톡 안에서 열린 화면이에요. 먼저 화면의 메뉴에서 "다른 브라우저로 열기"(아이폰은 "Safari로 열기")를 눌러 주세요. 그다음 이 칸을 다시 열면 방법이 나와요.</li>
@@ -662,6 +664,7 @@ details.yd-card:not([open]) .yd-sum{margin-bottom:0}
       </details>
     </div>
     <script>(function(){var u=navigator.userAgent||"",os=/KAKAOTALK/i.test(u)?"kakao":(/iPhone|iPad|iPod/i.test(u)?"ios":(/SamsungBrowser/i.test(u)?"samsung":(/Android/i.test(u)&&/Chrome/i.test(u)?"chrome":"")));if(!os)return;var L=document.querySelectorAll("#a2hsList li");for(var i=0;i<L.length;i++)L[i].hidden=L[i].getAttribute("data-os")!==os;})();</script>
+    <script>(function(){var u=navigator.userAgent||"",card=document.getElementById("a2hsCard"),row=document.getElementById("a2hsBtnRow"),btn=document.getElementById("a2hsBtn"),msg=document.getElementById("a2hsMsg"),ev=null;try{if(window.matchMedia&&window.matchMedia("(display-mode: standalone)").matches){if(card)card.hidden=true;return;}}catch(e){}if(!/Android/i.test(u)||/KAKAOTALK/i.test(u))return;try{var m=document.querySelector('link[rel="manifest"]');if(m)m.setAttribute("href","manifest-app.webmanifest");}catch(e){}try{if("serviceWorker" in navigator&&(location.protocol==="https:"||location.hostname==="localhost"))navigator.serviceWorker.register("sw.js").catch(function(){});}catch(e){}window.addEventListener("beforeinstallprompt",function(e){e.preventDefault();ev=e;if(row)row.hidden=false;});if(btn)btn.addEventListener("click",function(){if(!ev)return;var x=ev;ev=null;if(row)row.hidden=true;try{x.prompt();if(x.userChoice)x.userChoice.then(function(c){if(c&&c.outcome==="accepted"&&msg)msg.hidden=false;});}catch(e){}});window.addEventListener("appinstalled",function(){if(row)row.hidden=true;if(msg)msg.hidden=false;});})();</script>
     <div class="hm-card" id="bkCard">
       <div class="k"><small>내 기록 백업</small></div>
       <b>폰을 바꿔도 기록을 옮길 수 있어요</b>
